@@ -7,7 +7,7 @@ import {ScrambleText} from "@/components/scramble-text";
 export default function Home() {
     return (
         <main
-            className="flex min-h-screen w-full grow flex-col items-center justify-start gap-6 py-20 font-mono [&>*]:w-full [&>*]:max-w-2xl">
+            className="flex min-h-screen w-full grow flex-col items-center justify-start gap-6 p-8 font-mono md:py-20 [&>*]:w-full [&>*]:max-w-2xl">
             <header className={"flex items-center space-x-3"}>
                 <Image priority src={"/images/me.png"} alt={"pfp"} width={25} height={25}
                        className={cn("rounded-full")}/>
