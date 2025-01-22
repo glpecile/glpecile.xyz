@@ -2,8 +2,8 @@
 
 help:
 	@echo "📚 Available commands:"
-	@echo "  - deps: Install pnpm and project dependencies"
-	@echo "  - install: Install dependencies using pnpm"
+	@echo "  - deps: Install bun and project dependencies"
+	@echo "  - install: Install dependencies using bun"
 	@echo "  - create_env: Create environment variables file to then fill out"
 	@echo "  - build: Build the project"
 	@echo "  - start: Start a production build of the project on specified port (default: 3000)"
@@ -11,18 +11,18 @@ help:
 	@echo "  - dev: Start the development server on specified port (default: 3000)"
 	@echo "  - lint: Run linting, this is run automatically before each commit"
 	@echo "  - clean: Clean the project by removing node_modules and .next directories"
-	@echo "  - clean_cache: Clean the project and pnpm cache"
+	@echo "  - clean_cache: Clean the project and bun cache"
 	@echo "  - up_next: Update next.js and related dependencies"
 
-install_pnpm:
-	@echo "🚧 Installing pnpm..."
-	npm install -g pnpm
+install_bun:
+	@echo "🚧 Installing bun..."
+	npm install -g bun
 
 install:
 	@echo "🛠️ Installing..."
-	pnpm install --merge-git-branch-lockfiles
+	bun install --save-text-lockfile
 
-deps: install_pnpm install
+deps: install_bun install
 
 create_env:
 	@echo "🚚 Creating environment variables files .env",
@@ -32,21 +32,21 @@ PORT ?= 3000
 
 build:
 	@echo "🏗️ Building..."
-	pnpm build
+	bun build
 
 start:
 	@echo "🧜‍ Starting on port $(PORT)..."
-	pnpm run start -p $(PORT)
+	bun run start -p $(PORT)
 
 deploy: build start
 
 dev:
 	@echo "🧑‍💻 Starting dev server on port $(PORT)..."
-	pnpm run dev -p $(PORT)
+	bun run dev -p $(PORT)
 
 lint:
 	@echo "🧹 Linting..."
-	pnpm lint
+	bun lint
 
 clean:
 	@echo "🗑️ Cleaning..."
@@ -54,13 +54,13 @@ clean:
 
 clean_cache: clean
 	@echo "🗑️ Cleaning everything..."
-	pnpm cache clear --all
+	bun cache clear --all
 
 up_next:
 	@echo "▲ Updating next..."
-	pnpm up next react react-dom eslint-config-next --latest
+	bun up next react react-dom eslint-config-next --latest
 
 up_biome:
 	@echo "🆙 Updating biome..."
-	pnpm up @biomejs/biome --latest
-	pnpm dlx @biomejs/biome migrate --write
+	bun up @biomejs/biome --latest
+	bun dlx @biomejs/biome migrate --write
