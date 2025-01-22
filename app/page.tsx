@@ -1,36 +1,34 @@
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
+import Link from "next/link";
+import {siteConfig} from "@/config/site";
+import Image from "next/image";
+import {ScrambleText} from "@/components/scramble-text";
 
 export default function Home() {
-	return (
-		<main className="flex min-h-screen max-w-full grow flex-col items-center justify-center gap-6 font-mono">
-			<h1 className={cn("font-bold text-xl")}>
-				Welcome to next-shadcn-template
-			</h1>
-			<section className={cn("max-w-2xl space-y-2")}>
-				<p>
-					This is a Next.js template with a few features to help you
-					get started quickly. It includes TypeScript, Biome, Tailwind
-					CSS, and Motion (fka Framer Motion).
-				</p>
-				<div className="z-10 w-full items-center justify-between text-sm lg:flex">
-					<p className="fixed top-0 left-0 flex w-full justify-center border-gray-300 border-b bg-gradient-to-b from-zinc-200 pt-8 pb-6 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:dark:bg-zinc-800/30">
-						Get started by editing&nbsp;
-						<code className="font-bold font-mono">
-							app/page.tsx
-						</code>
-					</p>
-					<div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white lg:static lg:size-auto lg:bg-none dark:from-black dark:via-black">
-						<a
-							className="flex place-items-center gap-2 p-8 hover:underline"
-							href="https://glpecile.xyz"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							By Gian Luca Pecile
-						</a>
-					</div>
-				</div>
-			</section>
-		</main>
-	);
+    return (
+        <main
+            className="flex min-h-screen w-full grow flex-col items-center justify-start gap-6 py-20 font-mono [&>*]:w-full [&>*]:max-w-2xl">
+            <header className={"flex items-center space-x-3"}>
+                <Image priority src={"/images/me.png"} alt={"pfp"} width={25} height={25}
+                       className={cn("rounded-full")}/>
+                <ScrambleText className={cn("text-left font-bold text-xl")} text={"glpecile"}/>
+            </header>
+            <section className={cn("space-y-3 text-left")}>
+                <p>
+                    Frontend Engineer.
+                </p>
+                <ul className={"list-disc space-y-1 pl-6"}>
+                    {Object.entries(siteConfig.links).map(([key, value]) => (
+                        <li key={key}>
+                            <Link className={"capitalize underline hover:font-bold"} href={value}
+                                  target={"_blank"} rel={"noopener noreferrer"}
+                            >
+                                {key}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </section>
+        </main>
+    );
 }
