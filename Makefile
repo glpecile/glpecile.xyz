@@ -58,9 +58,9 @@ clean_cache: clean
 
 up_next:
 	@echo "▲ Updating next..."
-	bun up next react react-dom eslint-config-next --latest
+	bun update next react react-dom eslint-config-next --latest
 
 up_biome:
 	@echo "🆙 Updating biome..."
-	bun up @biomejs/biome --latest
+	bun update @biomejs/biome --latest
 	bun dlx @biomejs/biome migrate --write
