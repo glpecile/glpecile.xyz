@@ -15,9 +15,9 @@
 	"dependencies": {
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
-		"lucide-react": "^0.522.0",
+		"lucide-react": "^0.525.0",
 		"mini-svg-data-uri": "^1.4.4",
-		"motion": "12.18.1",
+		"motion": "12.19.2",
 		"next": "15.3.3",
 		"next-themes": "^0.4.6",
 		"react": "^19.1.0",
@@ -30,16 +30,16 @@
 		"@biomejs/biome": "1.9.4",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
-		"@tailwindcss/postcss": "^4.1.10",
-		"@types/node": "^22.15.32",
+		"@tailwindcss/postcss": "^4.1.11",
+		"@types/node": "^22.15.34",
 		"@types/react": "^19.0.7",
 		"@types/react-dom": "^19.0.2",
-		"eslint": "^9.29.0",
+		"eslint": "^9.30.0",
 		"eslint-config-next": "15.3.3",
 		"eslint-plugin-tailwindcss": "^3.18.0",
 		"husky": "^9.1.7",
 		"postcss": "^8.5.6",
-		"tailwindcss": "^4.1.10",
+		"tailwindcss": "^4.1.11",
 		"typescript": "^5.8.3"
 	}
 }
