@@ -15,7 +15,7 @@
 	"dependencies": {
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
-		"lucide-react": "^0.542.0",
+		"lucide-react": "^0.544.0",
 		"mini-svg-data-uri": "^1.4.4",
 		"motion": "12.23.12",
 		"next": "15.3.3",
@@ -27,11 +27,11 @@
 		"use-scramble": "^2.2.15"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.2.3",
+		"@biomejs/biome": "2.2.4",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"@tailwindcss/postcss": "^4.1.13",
-		"@types/node": "^22.18.1",
+		"@types/node": "^22.18.3",
 		"@types/react": "^19.0.7",
 		"@types/react-dom": "^19.0.2",
 		"eslint": "^9.35.0",
