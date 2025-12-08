@@ -63,4 +63,4 @@ up_next:
 up_biome:
 	@echo "🆙 Updating biome..."
 	bun update @biomejs/biome --latest
-	bun dlx @biomejs/biome migrate --write
+	bunx @biomejs/biome migrate --write
