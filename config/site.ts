@@ -16,7 +16,6 @@ export const siteConfig = {
         },
     ],
     links: {
-        bento: "https://bento.me/glpecile",
         x: "https://x.com/glpwzrd",
         bluesky: "https://bsky.app/profile/glpecile.xyz",
         github: "https://github.com/glpecile",
