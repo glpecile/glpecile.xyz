@@ -62,7 +62,7 @@
 			"!**/node_modules",
 			"!**/dist",
 			"!**/CHANGELOG.md",
-			"!**/pnpm-lock.yaml",
+			"!**/bun.lock",
 			"!**/.next",
 			"!**/out",
 			"!**/.astro"
