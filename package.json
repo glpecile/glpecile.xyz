@@ -1,30 +1,35 @@
 {
-	"name": "glpecile.xyz",
-	"description": "personal site",
-	"author": "Gian Luca Pecile",
-	"repository": "https://glpecile.xyz",
-	"version": "0.1.0",
-	"private": true,
-	"scripts": {
-		"dev": "astro dev",
-		"build": "astro build",
-		"start": "astro preview",
-		"lint": "biome lint .",
-		"check": "astro check",
-		"prepare": "husky"
-	},
-	"dependencies": {
-		"astro": "^5.15.5"
-	},
-	"devDependencies": {
-		"@astrojs/check": "^0.9.9",
-		"@biomejs/biome": "2.4.14",
-		"@commitlint/cli": "^19.8.1",
-		"@commitlint/config-conventional": "^19.8.1",
-		"@tailwindcss/vite": "^4.2.4",
-		"@types/node": "^22.19.17",
-		"husky": "^9.1.7",
-		"tailwindcss": "^4.2.4",
-		"typescript": "^5.9.3"
-	}
+  "name": "glpecile.xyz",
+  "description": "personal site",
+  "author": "Gian Luca Pecile",
+  "repository": "https://glpecile.xyz",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "start": "astro preview",
+    "lint": "biome lint .",
+    "check": "astro check",
+    "prepare": "husky",
+    "deploy": "bun run build && wrangler deploy",
+    "preview": "bun run build && wrangler dev",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "12",
+    "astro": "^5.15.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@biomejs/biome": "2.4.14",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@tailwindcss/vite": "^4.2.4",
+    "@types/node": "^22.19.17",
+    "husky": "^9.1.7",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.90.0"
+  }
 }
