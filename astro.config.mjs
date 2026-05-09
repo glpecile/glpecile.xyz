@@ -1,9 +1,14 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
+import cloudflare from "@astrojs/cloudflare";
+
 export default defineConfig({
-	site: "https://glpecile.xyz",
-	vite: {
+    site: "https://glpecile.xyz",
+
+    vite: {
 		plugins: [tailwindcss()],
 	},
+
+    adapter: cloudflare()
 });
