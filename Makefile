@@ -10,9 +10,9 @@ help:
 	@echo "  - deploy: Runs a build and start command to deploy the project"
 	@echo "  - dev: Start the development server on specified port (default: 3000)"
 	@echo "  - lint: Run linting, this is run automatically before each commit"
-	@echo "  - clean: Clean the project by removing node_modules and .next directories"
+	@echo "  - clean: Clean the project by removing node_modules and build directories"
 	@echo "  - clean_cache: Clean the project and bun cache"
-	@echo "  - up_next: Update next.js and related dependencies"
+	@echo "  - up: Update frontend framework necessary dependencies"
 
 install_bun:
 	@echo "🚧 Installing bun..."
@@ -50,15 +50,15 @@ lint:
 
 clean:
 	@echo "🗑️ Cleaning..."
-	rm -rf node_modules .next
+	rm -rf node_modules .astro dist
 
 clean_cache: clean
 	@echo "🗑️ Cleaning everything..."
 	bun cache clear --all
 
-up_next:
-	@echo "▲ Updating next..."
-	bun update next react react-dom eslint-config-next --latest
+up:
+	@echo "🧑‍🚀 Updating astro..."
+	bunx @astrojs/upgrade
 
 up_biome:
 	@echo "🆙 Updating biome..."

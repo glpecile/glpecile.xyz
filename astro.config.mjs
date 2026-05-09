@@ -3,12 +3,15 @@ import tailwindcss from "@tailwindcss/vite";
 
 import cloudflare from "@astrojs/cloudflare";
 
-export default defineConfig({
-    site: "https://glpecile.xyz",
+import react from "@astrojs/react";
 
-    vite: {
+export default defineConfig({
+	site: "https://glpecile.xyz",
+
+	vite: {
 		plugins: [tailwindcss()],
 	},
 
-    adapter: cloudflare()
+	adapter: cloudflare(),
+	integrations: [react()],
 });
