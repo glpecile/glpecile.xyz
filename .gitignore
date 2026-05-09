@@ -7,8 +7,10 @@
 # testing
 /coverage
 
-# next.js
+# next.js / astro
 /.next/
+/.astro/
+/dist/
 /out/
 
 # production
@@ -31,7 +33,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # Jetbrains
 .idea/
