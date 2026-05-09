@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-	--font-sans: "Inter", sans-serif;
 	--font-mono: "JetBrains Mono", monospace;
+	--font-sans: "JetBrains Mono", monospace;
 
 	--color-border: hsl(var(--border));
 	--color-input: hsl(var(--input));
@@ -132,9 +132,119 @@
 
 	body {
 		font-family: var(--font-sans);
+		font-size: 15px;
+		letter-spacing: -0.01em;
 	}
 
 	a {
 		text-underline-offset: 0.15em;
 	}
+
+	::selection {
+		background: hsl(var(--foreground) / 0.18);
+		color: hsl(var(--background));
+	}
 }
+
+	@layer components {
+		.eyebrow {
+			@apply text-[0.75rem] uppercase tracking-[0.35em] text-foreground/45;
+		}
+
+		.terminal-link {
+			text-decoration: none;
+		}
+
+		.terminal-link:hover,
+		.terminal-link:focus-visible {
+			text-decoration: underline;
+			outline: none;
+		}
+
+		.blog-prose {
+			color: hsl(var(--foreground) / 0.74);
+			font-size: 1rem;
+			line-height: 2;
+		}
+
+		.blog-prose > * + * {
+			margin-top: 1.5rem;
+		}
+
+		.blog-prose h1,
+		.blog-prose h2,
+		.blog-prose h3 {
+			color: hsl(var(--foreground));
+			font-family: var(--font-mono);
+			font-weight: 700;
+			line-height: 1.2;
+		}
+
+		.blog-prose h1 {
+			font-size: clamp(1.9rem, 4vw, 2.8rem);
+			margin-top: 2rem;
+		}
+
+		.blog-prose h2 {
+			font-size: clamp(1.4rem, 2vw, 1.8rem);
+			margin-top: 2.5rem;
+		}
+
+		.blog-prose h3 {
+			font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+			margin-top: 2rem;
+		}
+
+		.blog-prose a {
+			color: hsl(var(--foreground));
+			text-decoration: underline;
+			text-decoration-thickness: 1px;
+		}
+
+		.blog-prose strong {
+			color: hsl(var(--foreground));
+			font-weight: 700;
+		}
+
+		.blog-prose code {
+			font-family: var(--font-mono);
+			font-size: 0.92em;
+			padding: 0;
+		}
+
+		.blog-prose pre {
+			overflow-x: auto;
+			padding: 0;
+		}
+
+		.blog-prose pre code {
+			background: transparent;
+			padding: 0;
+		}
+
+		.blog-prose blockquote {
+			color: hsl(var(--foreground));
+			margin-left: 0;
+			padding-left: 1rem;
+			border-left: 1px solid hsl(var(--foreground) / 0.18);
+		}
+
+		.blog-prose blockquote p {
+			margin: 0;
+		}
+
+		.blog-prose ul,
+		.blog-prose ol {
+			padding-left: 1.25rem;
+		}
+
+		.blog-prose li::marker {
+			color: hsl(var(--foreground) / 0.45);
+		}
+
+		.blog-prose hr {
+			border: 0;
+			border-top: 1px solid hsl(var(--foreground) / 0.1);
+			margin: 2rem 0;
+		}
+	}

@@ -1,0 +1,98 @@
+---
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
+
+const posts = await getBlogPosts();
+---
+
+<SiteLayout
+	title="Blog"
+	description="MDX notes, tiny essays, and micro-posts."
+	path="/blog"
+>
+	<section class="space-y-4">
+		<p class="eyebrow">* blog</p>
+		<h1 class="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
+			Small notes. Full-sized blog.
+		</h1>
+		<p class="max-w-3xl text-sm leading-8 text-foreground/65 sm:text-base">
+			Thoughts, experiments, and tiny posts that still deserve a permanent
+			URL.
+		</p>
+
+		{posts.length === 0 ? (
+			<p class="text-sm text-foreground/55">no posts yet.</p>
+		) : (
+			<ol class="space-y-5">
+				{posts.map((post, index) => (
+					<li class="space-y-1">
+						<p class="text-xs uppercase tracking-[0.28em] text-foreground/42">
+							{formatDate(post.data.updatedDate ?? post.data.pubDate)}
+						</p>
+						<p class="text-base leading-8 sm:text-lg">
+							<a class="terminal-link" href={getBlogPostUrl(post.id)}>
+								{post.data.title}
+							</a>
+							{index < 9 && (
+								<span class="text-foreground/35"> [{index + 1}]</span>
+							)}
+						</p>
+						<p class="max-w-3xl text-sm leading-8 text-foreground/60 sm:text-base">
+							{post.data.description}
+						</p>
+					</li>
+				))}
+			</ol>
+		)}
+
+		{posts.length > 0 && (
+			<p class="text-sm text-foreground/48">
+				use <span class="text-foreground/68">[1-9]</span> for the latest posts.
+			</p>
+		)}
+	</section>
+
+	<script
+		is:inline
+		define:vars={{ recentPostUrls: posts.slice(0, 9).map((post) => getBlogPostUrl(post.id)) }}
+	>
+		const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+
+		const onBlogShortcut = (event) => {
+			if (
+				event.defaultPrevented ||
+				event.repeat ||
+				event.metaKey ||
+				event.ctrlKey ||
+				event.altKey
+			) {
+				return;
+			}
+
+			const target = event.target;
+
+			if (
+				target instanceof HTMLElement &&
+				(editableTags.has(target.tagName) || target.isContentEditable)
+			) {
+				return;
+			}
+
+			if (!/^\d$/.test(event.key)) {
+				return;
+			}
+
+			const index = Number(event.key) - 1;
+			const href = recentPostUrls[index];
+
+			if (!href) {
+				return;
+			}
+
+			event.preventDefault();
+			window.location.assign(href);
+		};
+
+		document.addEventListener("keydown", onBlogShortcut);
+	</script>
+</SiteLayout>

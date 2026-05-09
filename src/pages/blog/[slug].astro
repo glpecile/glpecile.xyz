@@ -1,0 +1,58 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render, type CollectionEntry } from "astro:content";
+
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import { formatDate, getBlogPosts } from "@/lib/blog";
+
+export const getStaticPaths = (async () => {
+	const posts = await getBlogPosts();
+
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post },
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = {
+	post: CollectionEntry<"blog">;
+};
+
+const { post } = Astro.props as Props;
+const { Content } = await render(post);
+const displayDate = post.data.updatedDate ?? post.data.pubDate;
+const postPath = `/blog/${post.id}`;
+---
+
+<SiteLayout
+	title={post.data.title}
+	description={post.data.description}
+	path={postPath}
+	type="article"
+	publishedTime={post.data.pubDate.toISOString()}
+>
+	<article class="space-y-6">
+		<a
+			href="/blog"
+			class="terminal-link inline-flex items-center gap-2 text-sm text-foreground/65"
+		>
+			<span aria-hidden="true">&larr;</span>
+			<span>Back to blog</span>
+		</a>
+
+		<header class="space-y-4">
+			<p class="eyebrow">* post</p>
+			<p class="text-sm text-foreground/50">{formatDate(displayDate)}</p>
+			<h1 class="max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
+				{post.data.title}
+			</h1>
+			<p class="max-w-3xl text-sm leading-8 text-foreground/62 sm:text-base">
+				{post.data.description}
+			</p>
+		</header>
+
+		<div class="blog-prose">
+			<Content />
+		</div>
+	</article>
+</SiteLayout>

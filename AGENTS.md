@@ -12,3 +12,13 @@ Project-specific guidance for working in this repo.
 - Keep the `@/*` alias pointing to `./src/*`. New imports and generated files should use the `src`-based alias layout.
 - Run `bun run check` after `.astro` changes. Use `bun run lint` for TS, JS, and CSS changes that Biome covers.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
+- Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
+
+## Frontend Style
+
+- Preserve the site's plain-text terminal aesthetic. Use nexxel.dev and terminal.shop/faq as the tone reference.
+- Prefer monospace typography, simple section labels, inline nav, text lists, and understated separators over cards, pills, panels, and dashboard-like chrome.
+- Do not introduce decorative gradients, glowing background effects, floating ambient shapes, or glassmorphism.
+- Avoid heavy borders, shadows, blur, and oversized containers unless the user explicitly asks for them.
+- Prefer links and lists over boxed CTAs. The UI should feel closer to a personal terminal page than a SaaS landing page.
+- Keep motion subtle and rare. Keyboard-driven navigation should stay instant with no decorative animation.

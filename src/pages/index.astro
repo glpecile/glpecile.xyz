@@ -1,112 +1,100 @@
 ---
-import { Image } from "astro:assets";
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
+
 import { siteConfig } from "../../config/site";
-import "../styles/global.css";
 
 const socialLinks = Object.entries(siteConfig.links);
-const pageTitle = siteConfig.name;
+const work = siteConfig.work;
+const latestPost = (await getBlogPosts())[0];
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{pageTitle}</title>
-		<meta name="description" content={siteConfig.description} />
-		<meta name="category" content={siteConfig.category} />
-		<meta name="theme-color" content={siteConfig.themeColor} />
-		<meta property="og:site_name" content={siteConfig.shortName} />
-		<meta property="og:type" content="website" />
-		<meta property="og:title" content={pageTitle} />
-		<meta property="og:description" content={siteConfig.description} />
-		<meta property="og:url" content={siteConfig.siteUrl} />
-		<meta property="og:image" content={`${siteConfig.siteUrl}/images/me.png`} />
-		<meta name="twitter:card" content="summary" />
-		<meta name="twitter:title" content={pageTitle} />
-		<meta name="twitter:description" content={siteConfig.description} />
-		<link rel="canonical" href={siteConfig.siteUrl} />
-		<link rel="icon" href="/favicon.ico" sizes="any" />
-		<link rel="apple-touch-icon" href="/apple-icon.png" />
-		<link rel="manifest" href="/manifest.webmanifest" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"
-			rel="stylesheet"
-		/>
-	</head>
-	<body class="min-h-screen bg-background font-sans antialiased">
-		<main
-			class="flex min-h-screen w-full grow flex-col items-center justify-start gap-6 p-8 font-mono *:w-full *:max-w-2xl md:py-20"
-		>
-			<header class="flex items-center space-x-3">
-				<Image
-					src="/images/me.png"
-					alt="Portrait of Gian Luca Pecile"
-					width={25}
-					height={25}
-					loading="eager"
-					class="rounded-full"
-				/>
-				<span class="text-left text-xl font-bold" data-scramble data-text="glpecile"
-					>glpecile</span
-				>
-			</header>
-			<section class="space-y-3 text-left">
-				<p>Frontend Engineer.</p>
-				<ul class="list-disc space-y-1 pl-6">
-					{socialLinks.map(([key, value]) => (
-						<li>
-							<a class="capitalize underline hover:font-bold" href={value} target="_blank" rel="noopener noreferrer">
-								{key}
+<SiteLayout>
+	<section class="space-y-4">
+		<p class="eyebrow">* home</p>
+		<h1 class="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
+			Frontend Engineer.
+		</h1>
+		<p class="max-w-3xl text-sm leading-8 text-foreground/68 sm:text-base">
+			Shipping websites and apps from time to time.
+		</p>
+		<p class="text-sm text-foreground/50">
+			shortcut keys: <span class="text-foreground/72">[h] home</span>
+			<span class="text-foreground/35"> / </span>
+			<span class="text-foreground/72">[b] blog</span>
+		</p>
+	</section>
+
+	{latestPost && (
+		<section class="space-y-3">
+			<p class="eyebrow">* latest</p>
+			<p class="text-base leading-8 sm:text-lg">
+				<a class="terminal-link" href={getBlogPostUrl(latestPost.id)}>
+					{latestPost.data.title}
+				</a>
+				<span class="text-foreground/40">
+					 {"//"} {formatDate(latestPost.data.updatedDate ?? latestPost.data.pubDate)}
+				</span>
+			</p>
+			<p class="max-w-3xl text-sm leading-8 text-foreground/62 sm:text-base">
+				{latestPost.data.description}
+			</p>
+		</section>
+	)}
+
+	<section class="space-y-4">
+		<p class="eyebrow">* work</p>
+		<ol class="space-y-5">
+			{work.map((job) => (
+				<li class="space-y-1">
+					<p class="text-base leading-8 sm:text-lg">
+						<span class="text-foreground">{job.role}</span>
+						<span class="text-foreground/38"> @ </span>
+						{job.url ? (
+							<a
+								class="terminal-link text-foreground/72"
+								href={job.url}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{job.company}
 							</a>
-						</li>
-					))}
-				</ul>
-			</section>
-		</main>
+						) : (
+							<span class="text-foreground/72">{job.company}</span>
+						)}
+					</p>
+					<p class="text-sm leading-7 text-foreground/50 sm:text-base">
+						{job.period}
+					</p>
+					<p class="text-sm leading-7 text-foreground/50 sm:text-base">
+						{job.place}
+					</p>
+					{job.summary && (
+						<p class="max-w-3xl text-sm leading-8 text-foreground/62 sm:text-base">
+							{job.summary}
+						</p>
+					)}
+				</li>
+			))}
+		</ol>
+	</section>
 
-		<script is:inline>
-			const element = document.querySelector("[data-scramble]");
-			const text = element?.getAttribute("data-text") ?? "";
-
-			if (element instanceof HTMLElement && text) {
-				const prefersReducedMotion = window.matchMedia(
-					"(prefers-reduced-motion: reduce)",
-				).matches;
-
-				if (prefersReducedMotion) {
-					element.textContent = text;
-				} else {
-					const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-					const tick = 16;
-					const scrambleFrames = 5;
-					let frame = 0;
-
-					const interval = window.setInterval(() => {
-						const settled = Math.max(0, frame - scrambleFrames);
-						element.textContent = text
-							.split("")
-							.map((character, index) => {
-								if (index < settled) {
-									return character;
-								}
-
-								return characters[Math.floor(Math.random() * characters.length)];
-							})
-							.join("");
-
-						frame += 1;
-
-						if (settled >= text.length) {
-							window.clearInterval(interval);
-							element.textContent = text;
-						}
-					}, tick);
-				}
-			}
-		</script>
-	</body>
-</html>
+	<section class="space-y-3">
+		<p class="eyebrow">* socials</p>
+		<ul class="space-y-2 text-sm sm:text-base">
+			{socialLinks.map(([label, href]) => (
+				<li>
+					<a
+						href={href}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="terminal-link inline-flex items-center gap-3"
+					>
+						<span class="text-foreground/35">-</span>
+						<span class="capitalize">{label}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</section>
+</SiteLayout>
