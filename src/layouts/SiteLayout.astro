@@ -39,6 +39,10 @@ const isCurrentPath = (href: string) =>
 	href === "/"
 		? currentPath === "/"
 		: currentPath === href || currentPath.startsWith(`${href}/`);
+const navItems = siteConfig.mainNav.map((item) => ({
+	...item,
+	isActive: isCurrentPath(item.href),
+}));
 ---
 
 <!doctype html>
@@ -96,7 +100,7 @@ const isCurrentPath = (href: string) =>
 	<body class="min-h-screen bg-background text-foreground antialiased">
 		<div class="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-6 py-8 sm:px-8 md:py-12">
 			<main class="flex flex-1 flex-col gap-12">
-			<header class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+			<header class="flex justify-between gap-5">
 				<a
 					href="/"
 					class="inline-flex w-fit items-center gap-3 no-underline"
@@ -120,30 +124,62 @@ const isCurrentPath = (href: string) =>
 					</span>
 				</a>
 
-				<nav aria-label="Primary" class="w-full sm:w-auto">
-					<ul class="flex w-full items-center justify-between gap-x-5 gap-y-2 text-sm sm:w-auto sm:justify-start">
-						{siteConfig.mainNav.map((item) => {
-							const isActive = isCurrentPath(item.href);
+				<details class="relative sm:hidden" data-mobile-nav>
+					<summary
+						aria-label="Toggle navigation"
+						class="inline-flex h-10 w-10 cursor-pointer list-none items-center justify-center text-foreground/62 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 [&::-webkit-details-marker]:hidden"
+					>
+						<span aria-hidden="true" class="flex flex-col gap-1.5">
+							<span class="block h-px w-5 bg-current"></span>
+							<span class="block h-px w-5 bg-current"></span>
+							<span class="block h-px w-5 bg-current"></span>
+						</span>
+					</summary>
 
-							return (
+					<nav aria-label="Mobile primary" class="absolute right-0 top-full z-10 mt-4 min-w-40 bg-background">
+						<ul class="flex flex-col gap-3 border-r border-foreground/12 pr-3 text-right text-sm">
+							{navItems.map((item) => (
 								<li>
 									<a
 										href={item.href}
-										aria-current={isActive ? "page" : undefined}
+										aria-current={item.isActive ? "page" : undefined}
 										aria-keyshortcuts={item.shortcut}
 										class:list={[
-											"terminal-link inline-flex items-center gap-2",
-											isActive ? "text-foreground" : "text-foreground/60",
+											"terminal-link inline-flex items-center justify-end gap-2",
+											item.isActive ? "text-foreground" : "text-foreground/60",
 										]}
 									>
 										<span class="text-foreground/35">[{item.shortcut}]</span>
-										<span class:list={["lowercase", isActive && "underline"]}>
+										<span class:list={["lowercase", item.isActive && "underline"]}>
 											{item.title}
 										</span>
 									</a>
 								</li>
-							);
-						})}
+							))}
+						</ul>
+					</nav>
+				</details>
+
+				<nav aria-label="Primary" class="hidden sm:block sm:w-auto">
+					<ul class="flex items-center gap-x-5 gap-y-2 text-sm sm:justify-start">
+						{navItems.map((item) => (
+							<li>
+								<a
+									href={item.href}
+									aria-current={item.isActive ? "page" : undefined}
+									aria-keyshortcuts={item.shortcut}
+									class:list={[
+										"terminal-link inline-flex items-center gap-2",
+										item.isActive ? "text-foreground" : "text-foreground/60",
+									]}
+								>
+									<span class="text-foreground/35">[{item.shortcut}]</span>
+									<span class:list={["lowercase", item.isActive && "underline"]}>
+										{item.title}
+									</span>
+								</a>
+							</li>
+						))}
 					</ul>
 				</nav>
 			</header>
@@ -229,6 +265,38 @@ const isCurrentPath = (href: string) =>
 			};
 
 			document.addEventListener("keydown", onShortcut);
+		</script>
+
+		<script is:inline>
+			const mobileNav = document.querySelector("[data-mobile-nav]");
+
+			if (mobileNav instanceof HTMLDetailsElement) {
+				const closeMobileNav = () => {
+					mobileNav.open = false;
+				};
+
+				document.addEventListener("click", (event) => {
+					if (!mobileNav.open) {
+						return;
+					}
+
+					const target = event.target;
+
+					if (target instanceof Node && !mobileNav.contains(target)) {
+						closeMobileNav();
+					}
+				});
+
+				document.addEventListener("keydown", (event) => {
+					if (event.key === "Escape") {
+						closeMobileNav();
+					}
+				});
+
+				mobileNav.querySelectorAll("a").forEach((link) => {
+					link.addEventListener("click", closeMobileNav);
+				});
+			}
 		</script>
 
 		<script is:inline>
