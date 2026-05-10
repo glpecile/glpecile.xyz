@@ -25,12 +25,17 @@ export const siteConfig = {
             href: "/",
             shortcut: "h",
         },
-        {
-            title: "Blog",
-            href: "/blog",
-            shortcut: "b",
-        },
-    ],
+		{
+			title: "Blog",
+			href: "/blog",
+			shortcut: "b",
+		},
+		{
+			title: "Work",
+			href: "/work",
+			shortcut: "w",
+		},
+	],
     links: {
         x: "https://x.com/glpwzrd",
         bluesky: "https://bsky.app/profile/glpecile.xyz",

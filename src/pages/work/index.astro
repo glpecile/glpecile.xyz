@@ -1,0 +1,61 @@
+---
+import PageIntro from "@/components/page-intro.astro";
+import SiteLayout from "@/layouts/site-layout.astro";
+
+import { siteConfig } from "../../../config/site";
+
+const work = siteConfig.work;
+---
+
+<SiteLayout
+	title="Work"
+	description="Work, teaching, and design across a few different corners of the internet."
+	path="/work"
+	previewPath="/work/preview"
+>
+	<section class="space-y-4">
+		<PageIntro
+			label="work"
+			title="Past work experience."
+			description="A few places where I shipped frontend work, taught design patterns, or left things a little cleaner than I found them."
+		/>
+
+		{work.length === 0 ? (
+			<p class="text-tone-soft text-sm">no work yet.</p>
+		) : (
+			<ol class="space-y-5">
+				{work.map((job) => (
+					<li class="space-y-1">
+						<p class="text-base leading-8 sm:text-lg">
+							<span class="text-foreground">{job.role}</span>
+							<span class="text-tone-faint"> @ </span>
+							{job.url ? (
+								<a
+									class="terminal-link"
+									href={job.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{job.company}
+								</a>
+							) : (
+								<span class="text-tone-strong">{job.company}</span>
+							)}
+						</p>
+						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							{job.period}
+						</p>
+						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							{job.place}
+						</p>
+						{job.summary && (
+							<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+								{job.summary}
+							</p>
+						)}
+					</li>
+				))}
+			</ol>
+		)}
+	</section>
+</SiteLayout>

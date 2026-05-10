@@ -1,52 +1,56 @@
 ---
-import SectionLabel from "@/components/SectionLabel.astro";
-import SiteLayout from "@/layouts/SiteLayout.astro";
+import MoreLink from "@/components/more-link.astro";
+import PageIntro from "@/components/page-intro.astro";
+import SectionLabel from "@/components/section-label.astro";
+import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 
 import { siteConfig } from "../../config/site";
 
 const socialLinks = Object.entries(siteConfig.links);
+const posts = await getBlogPosts();
 const work = siteConfig.work;
-const latestPost = (await getBlogPosts())[0];
+const featuredWork = work.slice(0, 3);
+const hasMoreWork = work.length > featuredWork.length;
 ---
 
 <SiteLayout>
-	<section class="space-y-4">
-		<SectionLabel label="home" />
-		<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
-			Frontend Engineer.
-		</h1>
-		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-			Shipping websites and apps from time to time.
-		</p>
-		<p class="text-tone-soft text-sm">
-			shortcut keys: <span class="text-tone-mid">[h] home</span>
-			<span class="text-tone-faint"> / </span>
-			<span class="text-tone-mid">[b] blog</span>
-		</p>
-	</section>
+	<PageIntro
+		label="home"
+		title="Frontend Engineer."
+		description="Shipping websites and apps from time to time."
+		extra={'shortcut keys: <span class="text-tone-mid">[h] home</span><span class="text-tone-faint"> / </span><span class="text-tone-mid">[b] blog</span><span class="text-tone-faint"> / </span><span class="text-tone-mid">[w] work</span>'}
+	/>
 
-	{latestPost && (
-		<section class="space-y-3">
-			<SectionLabel label="latest" />
-			<p class="text-base leading-8 sm:text-lg">
-				<a class="terminal-link" href={getBlogPostUrl(latestPost.id)}>
-					{latestPost.data.title}
-				</a>
-				<span class="text-tone-faint">
-					 {"//"} {formatDate(latestPost.data.updatedDate ?? latestPost.data.pubDate)}
-				</span>
-			</p>
-			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-				{latestPost.data.description}
-			</p>
-		</section>
-	)}
+	<section class="space-y-4">
+		<SectionLabel label="blog" />
+
+		{posts.length === 0 ? (
+			<p class="text-tone-soft text-sm">no posts yet.</p>
+		) : (
+			<ol class="space-y-4">
+				{posts.map((post) => (
+					<li class="grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-5">
+						<p class="text-tone-faint text-sm leading-7 sm:text-base">
+							{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
+						</p>
+						<p class="text-base leading-8 sm:text-lg">
+							<a class="terminal-link" href={getBlogPostUrl(post.id)}>
+								{post.data.title}
+							</a>
+						</p>
+					</li>
+				))}
+			</ol>
+		)}
+
+		{posts.length > 0 && <MoreLink href="/blog" />}
+	</section>
 
 	<section class="space-y-4">
 		<SectionLabel label="work" />
 		<ol class="space-y-5">
-			{work.map((job) => (
+			{featuredWork.map((job) => (
 				<li class="space-y-1">
 					<p class="text-base leading-8 sm:text-lg">
 						<span class="text-foreground">{job.role}</span>
@@ -78,6 +82,7 @@ const latestPost = (await getBlogPosts())[0];
 				</li>
 			))}
 		</ol>
+		{hasMoreWork && <MoreLink href="/work" />}
 	</section>
 
 	<section class="space-y-3">

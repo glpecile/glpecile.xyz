@@ -1,6 +1,6 @@
 ---
-import SectionLabel from "@/components/SectionLabel.astro";
-import SiteLayout from "@/layouts/SiteLayout.astro";
+import PageIntro from "@/components/page-intro.astro";
+import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 
 const posts = await getBlogPosts();
@@ -13,14 +13,11 @@ const posts = await getBlogPosts();
 	previewPath="/blog/preview"
 >
 	<section class="space-y-4">
-		<SectionLabel label="blog" />
-		<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
-			Small notes. Full-sized blog.
-		</h1>
-		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-			Thoughts, experiments, and tiny posts that still deserve a permanent
-			URL.
-		</p>
+		<PageIntro
+			label="blog"
+			title="Small notes. Full-sized blog."
+			description="Thoughts, experiments, and tiny posts that still deserve a permanent URL."
+		/>
 
 		{posts.length === 0 ? (
 			<p class="text-tone-soft text-sm">no posts yet.</p>

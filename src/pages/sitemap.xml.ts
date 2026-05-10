@@ -13,6 +13,7 @@ export async function GET() {
 	const urls = [
 		{ loc: `${siteConfig.siteUrl}/`, lastmod: today },
 		{ loc: `${siteConfig.siteUrl}/blog`, lastmod: latestPostDate },
+		{ loc: `${siteConfig.siteUrl}/work`, lastmod: today },
 		...posts.map((post) => ({
 			loc: `${siteConfig.siteUrl}/blog/${post.id}`,
 			lastmod: formatSitemapDate(post.data.updatedDate ?? post.data.pubDate),

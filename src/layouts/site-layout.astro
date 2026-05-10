@@ -214,14 +214,14 @@ const navItems = siteConfig.mainNav.map((item) => ({
 									href={item.href}
 									aria-current={item.isActive ? "page" : undefined}
 									aria-keyshortcuts={item.shortcut}
-								class:list={[
-									"terminal-link inline-flex items-center gap-2",
-									item.isActive ? "text-foreground" : "text-tone-mid",
-								]}
-							>
-								<span class="text-tone-faint">[{item.shortcut}]</span>
-								<span class:list={["lowercase", item.isActive && "underline"]}>
-									{item.title}
+									class:list={[
+										"terminal-link inline-flex items-center gap-2",
+										item.isActive ? "text-foreground" : "text-tone-mid",
+									]}
+								>
+									<span class="text-tone-faint">[{item.shortcut}]</span>
+									<span class:list={["lowercase", item.isActive && "underline"]}>
+										{item.title}
 									</span>
 								</a>
 							</li>
@@ -376,7 +376,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 				window.__glpecileTheme.root.dataset.themePreference === "light" ||
 				window.__glpecileTheme.root.dataset.themePreference === "dark"
 					? window.__glpecileTheme.root.dataset.themePreference
-				: "auto";
+					: "auto";
 
 			syncThemeButtons(storedTheme);
 

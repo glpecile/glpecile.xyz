@@ -9,5 +9,10 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
 	},
-	"include": ["src/**/*", "config/**/*", "./worker-configuration.d.ts"]
+	"include": [
+		".astro/types.d.ts",
+		"src/**/*",
+		"config/**/*",
+		"./worker-configuration.d.ts"
+	]
 }

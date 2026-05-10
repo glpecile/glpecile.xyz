@@ -15,6 +15,7 @@ Project-specific guidance for working in this repo.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
 - Never use `any`. Prefer concrete types, `unknown`, or small typed helpers instead.
 - Prefer `async`/`await` over `.then()` chains.
+- Use kebab-case for component, layout, and route-related filenames. Avoid PascalCase filenames like `SiteLayout.astro` or `SectionLabel.astro`.
 
 ## Frontend Style
 
