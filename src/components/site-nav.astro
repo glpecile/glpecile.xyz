@@ -1,0 +1,153 @@
+---
+import { siteConfig } from "#config/site";
+
+export interface Props {
+	currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+const isCurrentPath = (href: string) =>
+	href === "/"
+		? currentPath === "/"
+		: currentPath === href || currentPath.startsWith(`${href}/`);
+
+const navItems = siteConfig.mainNav.map((item) => ({
+	...item,
+	isActive: isCurrentPath(item.href),
+}));
+---
+
+<div class="shrink-0" data-site-nav>
+	<div class="group relative sm:hidden" data-mobile-nav data-state="closed">
+		<button
+			type="button"
+			aria-label="Toggle navigation"
+			aria-controls="mobile-primary-nav"
+			aria-expanded="false"
+			data-mobile-nav-toggle
+			class="text-tone-mid inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors duration-200 ease-out hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 motion-reduce:transition-none"
+		>
+			<span aria-hidden="true" class="relative block h-5 w-5">
+				<span
+					class="absolute left-0 top-0.5 block h-px w-5 bg-current transition-transform duration-200 ease-out group-data-[state=open]:translate-y-[8px] group-data-[state=open]:rotate-45 motion-reduce:transition-none"
+				></span>
+				<span
+					class="absolute left-0 top-1/2 block h-px w-5 -translate-y-1/2 bg-current transition-opacity duration-150 ease-out group-data-[state=open]:opacity-0 motion-reduce:transition-none"
+				></span>
+				<span
+					class="absolute bottom-0.5 left-0 block h-px w-5 bg-current transition-transform duration-200 ease-out group-data-[state=open]:-translate-y-[8px] group-data-[state=open]:-rotate-45 motion-reduce:transition-none"
+				></span>
+			</span>
+		</button>
+
+		<nav
+			id="mobile-primary-nav"
+			aria-label="Mobile primary"
+			aria-hidden="true"
+			data-mobile-nav-panel
+			class="pointer-events-none absolute right-0 top-full z-10 mt-3 min-w-44 origin-top-right translate-y-1 border border-foreground/10 bg-background px-4 py-3 opacity-0 transition-[opacity,transform] duration-200 ease-out group-data-[state=open]:pointer-events-auto group-data-[state=open]:translate-y-0 group-data-[state=open]:opacity-100 motion-reduce:transition-none"
+		>
+			<ul class="flex flex-col gap-3 text-left text-sm">
+				{navItems.map((item) => (
+					<li>
+						<a
+							href={item.href}
+							aria-current={item.isActive ? "page" : undefined}
+							aria-keyshortcuts={item.shortcut}
+							class:list={[
+								"terminal-link inline-flex w-full items-center justify-between gap-4",
+								item.isActive ? "text-foreground" : "text-tone-mid",
+							]}
+						>
+							<span class="text-tone-faint">[{item.shortcut}]</span>
+							<span class:list={["lowercase", item.isActive && "underline"]}>
+								{item.title}
+							</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	</div>
+
+	<nav aria-label="Primary" class="hidden sm:block sm:w-auto">
+		<ul class="flex items-center gap-x-5 gap-y-2 text-sm sm:justify-start">
+			{navItems.map((item) => (
+				<li>
+					<a
+						href={item.href}
+						aria-current={item.isActive ? "page" : undefined}
+						aria-keyshortcuts={item.shortcut}
+						class:list={[
+							"terminal-link inline-flex items-center gap-2",
+							item.isActive ? "text-foreground" : "text-tone-mid",
+						]}
+					>
+						<span class="text-tone-faint">[{item.shortcut}]</span>
+						<span class:list={["lowercase", item.isActive && "underline"]}>
+							{item.title}
+						</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</nav>
+</div>
+
+<script is:inline>
+	const currentScript = document.currentScript;
+	const root =
+		currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
+
+	if (root instanceof HTMLElement) {
+		const mobileNav = root.querySelector("[data-mobile-nav]");
+		const toggle = root.querySelector("[data-mobile-nav-toggle]");
+		const panel = root.querySelector("[data-mobile-nav-panel]");
+
+		if (
+			mobileNav instanceof HTMLElement &&
+			toggle instanceof HTMLButtonElement &&
+			panel instanceof HTMLElement
+		) {
+			const setOpen = (open) => {
+				mobileNav.dataset.state = open ? "open" : "closed";
+				toggle.setAttribute("aria-expanded", open ? "true" : "false");
+				panel.setAttribute("aria-hidden", open ? "false" : "true");
+				panel.inert = !open;
+			};
+
+			const close = () => {
+				setOpen(false);
+			};
+
+			toggle.addEventListener("click", () => {
+				setOpen(mobileNav.dataset.state !== "open");
+			});
+
+			document.addEventListener("click", (event) => {
+				if (mobileNav.dataset.state !== "open") {
+					return;
+				}
+
+				const target = event.target;
+
+				if (target instanceof Node && !mobileNav.contains(target)) {
+					close();
+				}
+			});
+
+			document.addEventListener("keydown", (event) => {
+				if (event.key === "Escape") {
+					close();
+				}
+			});
+
+			panel.querySelectorAll("a").forEach((link) => {
+				link.addEventListener("click", close);
+			});
+
+			setOpen(false);
+		}
+	}
+</script>
