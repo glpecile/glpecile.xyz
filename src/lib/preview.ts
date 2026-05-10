@@ -1,7 +1,6 @@
 import jetBrainsMonoBoldUrl from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff?url";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import resvgWasmModule from "@resvg/resvg-wasm/index_bg.wasm";
-import { createElement } from "react";
 import satori, { init as initSatori } from "satori/standalone";
 import yogaWasmModule from "satori/yoga.wasm";
 
@@ -14,10 +13,19 @@ const avatarPath = "/images/me.png";
 const fontName = "JetBrains Mono";
 
 type PreviewThemeName = "light" | "dark";
+type SatoriNode = Parameters<typeof satori>[0];
+type PreviewNode = {
+	type: string;
+	props: {
+		style?: Record<string, string | number>;
+		children?: PreviewChild | PreviewChild[];
+		[key: string]: unknown;
+	};
+};
+type PreviewChild = PreviewNode | string;
 
 type PreviewTheme = {
 	background: string;
-	border: string;
 	foreground: string;
 	heading: string;
 	muted: string;
@@ -28,7 +36,6 @@ type PreviewTheme = {
 const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
 	light: {
 		background: "#dce0e8",
-		border: "rgba(92, 95, 119, 0.16)",
 		foreground: "#45475a",
 		heading: "#1d5fe3",
 		muted: "rgba(92, 95, 119, 0.82)",
@@ -37,7 +44,6 @@ const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
 	},
 	dark: {
 		background: "#1e1e2e",
-		border: "rgba(127, 132, 156, 0.3)",
 		foreground: "#cdd6f4",
 		heading: "#cba6f7",
 		muted: "rgba(186, 194, 222, 0.78)",
@@ -98,7 +104,6 @@ async function getFont(requestUrl: string) {
 	return await fontPromise;
 }
 
-
 async function ensureWasm() {
 	if (!wasmInit) {
 		wasmInit = initWasm(resvgWasmModule);
@@ -115,20 +120,35 @@ async function ensureSatori() {
 	await satoriInit;
 }
 
-function createPreview(
+function getPreviewLabel(requestUrl: string) {
+	const { pathname } = new URL(requestUrl);
+	const segments = pathname.split("/").filter(Boolean);
+	const previewIndex = segments.lastIndexOf("preview");
+	const segment = previewIndex > 0 ? segments[previewIndex - 1] : segments.at(-1);
+
+	if (!segment || segment === "preview") {
+		return "home";
+	}
+
+	return segment.replace(/[-_]+/g, " ");
+}
+
+function createPreviewNode(
 	title: string,
 	subtitle: string,
 	avatar: string,
+	section: string,
 	theme: PreviewTheme,
-) {
+): SatoriNode {
 	const titleSize = title.length > 22 ? 68 : 82;
+	const sectionSize = section.length > 20 ? 18 : 24;
 
-	return createElement(
-		"div",
-		{
+	const node: PreviewNode = {
+		type: "div",
+		props: {
 			style: {
 				alignItems: "center",
-				background: theme.background,
+				backgroundColor: theme.background,
 				color: theme.foreground,
 				display: "flex",
 				height: "100%",
@@ -136,96 +156,110 @@ function createPreview(
 				padding: "72px",
 				width: "100%",
 			},
-		},
-		createElement(
-			"div",
-			{
-				style: {
-					alignItems: "center",
-					display: "flex",
-					gap: "40px",
-					paddingBottom: "20px",
-					paddingTop: "20px",
-					borderBottom: `1px solid ${theme.border}`,
-					borderTop: `1px solid ${theme.border}`,
-					width: "100%",
+			children: {
+				type: "div",
+				props: {
+					style: {
+						alignItems: "center",
+						display: "flex",
+						gap: "40px",
+						width: "100%",
+					},
+					children: [
+						{
+							type: "img",
+							props: {
+								alt: "",
+								height: 120,
+								src: avatar,
+								style: {
+									borderRadius: "9999px",
+									display: "flex",
+									flexShrink: 0,
+									height: "120px",
+									width: "120px",
+								},
+								width: 120,
+							},
+						},
+						{
+							type: "div",
+							props: {
+								style: {
+									display: "flex",
+									flexDirection: "column",
+									gap: "16px",
+								},
+								children: [
+									{
+										type: "div",
+										props: {
+											style: {
+												color: theme.section,
+												display: "flex",
+												fontSize: sectionSize,
+												letterSpacing: "0.28em",
+												lineHeight: 1.3,
+												maxWidth: "860px",
+												textTransform: "uppercase",
+											},
+											children: `* ${section}`,
+										},
+									},
+									{
+										type: "div",
+										props: {
+											style: {
+												color: theme.heading,
+												display: "flex",
+												fontSize: titleSize,
+												fontWeight: 700,
+												letterSpacing: "-0.05em",
+												lineHeight: 1,
+												maxWidth: "860px",
+											},
+											children: title,
+										},
+									},
+									{
+										type: "div",
+										props: {
+											style: {
+												color: theme.subtitle,
+												display: "flex",
+												fontSize: 34,
+												letterSpacing: "0.12em",
+												lineHeight: 1.3,
+												maxWidth: "860px",
+												textTransform: "uppercase",
+											},
+											children: subtitle,
+										},
+									},
+									{
+										type: "div",
+										props: {
+											style: {
+												color: theme.muted,
+												display: "flex",
+												fontSize: 22,
+												letterSpacing: "0.08em",
+												lineHeight: 1.4,
+												textTransform: "uppercase",
+											},
+											children: "glpecile.xyz",
+										},
+									},
+								],
+							},
+						},
+					],
 				},
 			},
-			createElement("img", {
-				alt: "",
-				height: 120,
-				src: avatar,
-				style: {
-					borderRadius: "9999px",
-					flexShrink: 0,
-				},
-				width: 120,
-			}),
-			createElement(
-				"div",
-				{
-					style: {
-						display: "flex",
-						flexDirection: "column",
-						gap: "16px",
-					},
-				},
-				createElement(
-					"div",
-					{
-						style: {
-							color: theme.section,
-							fontSize: 24,
-							letterSpacing: "0.28em",
-							textTransform: "uppercase",
-						},
-					},
-					"* preview",
-				),
-				createElement(
-					"div",
-					{
-						style: {
-							color: theme.heading,
-							fontSize: titleSize,
-							fontWeight: 700,
-							letterSpacing: "-0.05em",
-							lineHeight: 1,
-							maxWidth: "860px",
-						},
-					},
-					title,
-				),
-				createElement(
-					"div",
-					{
-						style: {
-							color: theme.subtitle,
-							fontSize: 34,
-							letterSpacing: "0.12em",
-							lineHeight: 1.3,
-							maxWidth: "860px",
-							textTransform: "uppercase",
-						},
-					},
-					subtitle,
-				),
-				createElement(
-					"div",
-					{
-						style: {
-							color: theme.muted,
-							fontSize: 22,
-							letterSpacing: "0.08em",
-							lineHeight: 1.4,
-							textTransform: "uppercase",
-						},
-					},
-					"glpecile.xyz",
-				),
-			),
-		),
-	);
+		},
+	};
+
+	return node as unknown as SatoriNode;
 }
 
 export async function renderPreview(
@@ -238,6 +272,7 @@ export async function renderPreview(
 	await ensureSatori();
 
 	const theme = previewThemes[themeName];
+	const section = getPreviewLabel(requestUrl);
 
 	const [avatar, font] = await Promise.all([
 		getAvatar(requestUrl),
@@ -245,7 +280,7 @@ export async function renderPreview(
 	]);
 
 	const svg = await satori(
-		createPreview(title, subtitle, avatar, theme),
+		createPreviewNode(title, subtitle, avatar, section, theme),
 		{
 			...size,
 			fonts: [
@@ -261,16 +296,16 @@ export async function renderPreview(
 
 	return new Uint8Array(
 		new Resvg(svg, {
-		background: theme.background,
-		fitTo: {
-			mode: "width",
-			value: size.width,
-		},
-		font: {
-			defaultFontFamily: fontName,
-			fontBuffers: [new Uint8Array(font)],
-			monospaceFamily: fontName,
-		},
+			background: theme.background,
+			fitTo: {
+				mode: "width",
+				value: size.width,
+			},
+			font: {
+				defaultFontFamily: fontName,
+				fontBuffers: [new Uint8Array(font)],
+				monospaceFamily: fontName,
+			},
 		}).render().asPng(),
 	);
 }
