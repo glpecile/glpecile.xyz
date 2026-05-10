@@ -1,8 +1,6 @@
-import type { BlogPost } from "@/lib/blog";
-
-import { getBlogPostUrl } from "@/lib/blog";
-
 import { siteConfig } from "#config/site";
+import type { BlogPost } from "@/lib/blog";
+import { getBlogPostUrl } from "@/lib/blog";
 
 type WorkItem = (typeof siteConfig.work)[number];
 

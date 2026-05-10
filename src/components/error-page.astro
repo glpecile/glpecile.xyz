@@ -1,4 +1,6 @@
 ---
+import { siteConfig } from "#config/site";
+
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 
@@ -12,6 +14,10 @@ export interface Props {
 }
 
 const { code, title, description, hint, error, path = "/" } = Astro.props;
+const navItems = siteConfig.mainNav.map((item) => ({
+	...item,
+	label: item.title.toLowerCase(),
+}));
 
 const details =
 	error instanceof Error
@@ -40,14 +46,16 @@ const details =
 		</div>
 
 		<div class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm sm:text-base">
-			<a href="/" class="terminal-link inline-flex items-center gap-2">
-				<span class="text-tone-faint">[h]</span>
-				<span>home</span>
-			</a>
-			<a href="/blog" class="terminal-link inline-flex items-center gap-2">
-				<span class="text-tone-faint">[b]</span>
-				<span>blog</span>
-			</a>
+			{navItems.map((item) => (
+				<a
+					href={item.href}
+					class="terminal-link inline-flex items-center gap-2"
+					aria-keyshortcuts={item.shortcut}
+				>
+					<span class="text-tone-faint">[{item.shortcut}]</span>
+					<span>{item.label}</span>
+				</a>
+			))}
 		</div>
 
 		{details && (
