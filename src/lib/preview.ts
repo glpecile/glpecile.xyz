@@ -33,7 +33,7 @@ const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
 		heading: "#1d5fe3",
 		muted: "rgba(92, 95, 119, 0.82)",
 		section: "#1d5fe3",
-		subtitle: "#8839ef",
+		subtitle: "#4f97b1",
 	},
 	dark: {
 		background: "#1e1e2e",
