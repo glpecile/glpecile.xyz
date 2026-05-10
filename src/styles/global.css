@@ -30,6 +30,13 @@
 
 	--color-card: hsl(var(--card));
 	--color-card-foreground: hsl(var(--card-foreground));
+	--color-heading: hsl(var(--heading));
+	--color-heading-soft: hsl(var(--heading-soft));
+	--color-section: hsl(var(--section));
+	--color-tone-strong: hsl(var(--tone-strong));
+	--color-tone-mid: hsl(var(--tone-mid));
+	--color-tone-soft: hsl(var(--tone-soft));
+	--color-tone-faint: hsl(var(--tone-faint));
 
 	--radius-lg: var(--radius);
 	--radius-md: calc(var(--radius) - 2px);
@@ -52,35 +59,44 @@
 
 @layer base {
 	:root {
-		color-scheme: light dark;
+		color-scheme: light;
 
-		--background: 0 0% 100%;
-		--foreground: 0 0% 3.9%;
+		--background: 220 22% 92%;
+		--foreground: 234 21% 27%;
 
-		--card: 0 0% 100%;
-		--card-foreground: 0 0% 3.9%;
+		--card: 220 21% 89%;
+		--card-foreground: 234 21% 27%;
 
-		--popover: 0 0% 100%;
-		--popover-foreground: 0 0% 3.9%;
+		--popover: 220 21% 89%;
+		--popover-foreground: 234 21% 27%;
 
-		--primary: 0 0% 9%;
-		--primary-foreground: 0 0% 98%;
+		--primary: 234 21% 27%;
+		--primary-foreground: 220 22% 92%;
 
-		--secondary: 0 0% 96.1%;
-		--secondary-foreground: 0 0% 9%;
+		--secondary: 223 16% 83%;
+		--secondary-foreground: 234 21% 27%;
 
-		--muted: 0 0% 96.1%;
-		--muted-foreground: 0 0% 45.1%;
+		--muted: 220 21% 89%;
+		--muted-foreground: 233 15% 34%;
 
-		--accent: 0 0% 96.1%;
-		--accent-foreground: 0 0% 9%;
+		--accent: 223 16% 83%;
+		--accent-foreground: 234 21% 27%;
 
-		--destructive: 0 84.2% 60.2%;
-		--destructive-foreground: 0 0% 98%;
+		--destructive: 347 87% 44%;
+		--destructive-foreground: 220 22% 92%;
 
-		--border: 0 0% 89.8%;
-		--input: 0 0% 89.8%;
-		--ring: 0 0% 3.9%;
+		--border: 225 13% 71%;
+		--input: 225 13% 71%;
+		--ring: 220 91% 54%;
+		--heading: 220 91% 46%;
+		--heading-soft: 231 97% 72%;
+		--section: 220 91% 46%;
+		--selection: 223 16% 83%;
+		--selection-foreground: 234 21% 27%;
+		--tone-strong: 234 21% 27%;
+		--tone-mid: 233 15% 34%;
+		--tone-soft: 233 11% 42%;
+		--tone-faint: 231 10% 51%;
 
 		--radius: 0.5rem;
 	}
@@ -92,33 +108,42 @@
 	:root[data-theme="dark"] {
 		color-scheme: dark;
 
-		--background: 0 0% 3.9%;
-		--foreground: 0 0% 98%;
+		--background: 240 21% 15%;
+		--foreground: 226 64% 88%;
 
-		--card: 0 0% 3.9%;
-		--card-foreground: 0 0% 98%;
+		--card: 240 21% 12%;
+		--card-foreground: 226 64% 88%;
 
-		--popover: 0 0% 3.9%;
-		--popover-foreground: 0 0% 98%;
+		--popover: 240 21% 12%;
+		--popover-foreground: 226 64% 88%;
 
-		--primary: 0 0% 98%;
-		--primary-foreground: 0 0% 9%;
+		--primary: 226 64% 88%;
+		--primary-foreground: 240 21% 15%;
 
-		--secondary: 0 0% 14.9%;
-		--secondary-foreground: 0 0% 98%;
+		--secondary: 237 16% 23%;
+		--secondary-foreground: 226 64% 88%;
 
-		--muted: 0 0% 14.9%;
-		--muted-foreground: 0 0% 63.9%;
+		--muted: 237 16% 23%;
+		--muted-foreground: 228 24% 72%;
 
-		--accent: 0 0% 14.9%;
-		--accent-foreground: 0 0% 98%;
+		--accent: 237 16% 23%;
+		--accent-foreground: 226 64% 88%;
 
-		--destructive: 0 62.8% 30.6%;
-		--destructive-foreground: 0 0% 98%;
+		--destructive: 343 81% 75%;
+		--destructive-foreground: 240 23% 9%;
 
-		--border: 0 0% 14.9%;
-		--input: 0 0% 14.9%;
-		--ring: 0 0% 83.1%;
+		--border: 234 13% 31%;
+		--input: 234 13% 31%;
+		--ring: 217 92% 76%;
+		--heading: 267 84% 81%;
+		--heading-soft: 232 97% 85%;
+		--section: 41 86% 83%;
+		--selection: 237 16% 23%;
+		--selection-foreground: 226 64% 88%;
+		--tone-strong: 226 64% 88%;
+		--tone-mid: 227 35% 80%;
+		--tone-soft: 228 24% 72%;
+		--tone-faint: 230 13% 55%;
 	}
 
 	* {
@@ -145,14 +170,44 @@
 	}
 
 	::selection {
-		background: hsl(var(--foreground) / 0.18);
-		color: hsl(var(--background));
+		background: hsl(var(--selection));
+		color: hsl(var(--selection-foreground));
 	}
 }
 
 	@layer components {
 		.eyebrow {
-			@apply text-[0.75rem] uppercase tracking-[0.35em] text-foreground/45;
+			color: hsl(var(--heading-soft) / 0.6);
+			font-size: 0.75rem;
+			letter-spacing: 0.35em;
+			text-transform: uppercase;
+		}
+
+		.page-heading {
+			color: var(--color-heading);
+		}
+
+		.text-tone-strong {
+			color: var(--color-tone-strong);
+		}
+
+		.text-tone-mid {
+			color: var(--color-tone-mid);
+		}
+
+		.text-tone-soft {
+			color: var(--color-tone-soft);
+		}
+
+		.text-tone-faint {
+			color: var(--color-tone-faint);
+		}
+
+		.section-label {
+			color: hsl(var(--section) / 0.82);
+			font-size: 0.75rem;
+			letter-spacing: 0.35em;
+			text-transform: uppercase;
 		}
 
 		.terminal-link {
@@ -166,7 +221,7 @@
 		}
 
 		.blog-prose {
-			color: hsl(var(--foreground) / 0.74);
+			color: hsl(var(--tone-mid));
 			font-size: 1rem;
 			line-height: 2;
 		}
@@ -178,7 +233,7 @@
 		.blog-prose h1,
 		.blog-prose h2,
 		.blog-prose h3 {
-			color: hsl(var(--foreground));
+			color: var(--color-heading);
 			font-family: var(--font-mono);
 			font-weight: 700;
 			line-height: 1.2;
@@ -227,10 +282,10 @@
 		}
 
 		.blog-prose blockquote {
-			color: hsl(var(--foreground));
+			color: hsl(var(--tone-strong));
 			margin-left: 0;
 			padding-left: 1rem;
-			border-left: 1px solid hsl(var(--foreground) / 0.18);
+			border-left: 1px solid hsl(var(--tone-faint) / 0.38);
 		}
 
 		.blog-prose blockquote p {
@@ -243,12 +298,12 @@
 		}
 
 		.blog-prose li::marker {
-			color: hsl(var(--foreground) / 0.45);
+			color: hsl(var(--tone-faint));
 		}
 
 		.blog-prose hr {
 			border: 0;
-			border-top: 1px solid hsl(var(--foreground) / 0.1);
+			border-top: 1px solid hsl(var(--tone-faint) / 0.22);
 			margin: 2rem 0;
 		}
 	}

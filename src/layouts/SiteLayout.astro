@@ -169,7 +169,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 				<details class="relative sm:hidden" data-mobile-nav>
 					<summary
 						aria-label="Toggle navigation"
-						class="inline-flex h-10 w-10 cursor-pointer list-none items-center justify-center text-foreground/62 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 [&::-webkit-details-marker]:hidden"
+						class="text-tone-mid inline-flex h-10 w-10 cursor-pointer list-none items-center justify-center transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 [&::-webkit-details-marker]:hidden"
 					>
 						<span aria-hidden="true" class="flex flex-col gap-1.5">
 							<span class="block h-px w-5 bg-current"></span>
@@ -191,10 +191,10 @@ const navItems = siteConfig.mainNav.map((item) => ({
 										aria-keyshortcuts={item.shortcut}
 										class:list={[
 											"terminal-link inline-flex w-full items-center justify-between gap-4",
-											item.isActive ? "text-foreground" : "text-foreground/60",
+											item.isActive ? "text-foreground" : "text-tone-mid",
 										]}
 									>
-										<span class="text-foreground/35">[{item.shortcut}]</span>
+										<span class="text-tone-faint">[{item.shortcut}]</span>
 										<span class:list={["lowercase", item.isActive && "underline"]}>
 											{item.title}
 										</span>
@@ -213,14 +213,14 @@ const navItems = siteConfig.mainNav.map((item) => ({
 									href={item.href}
 									aria-current={item.isActive ? "page" : undefined}
 									aria-keyshortcuts={item.shortcut}
-									class:list={[
-										"terminal-link inline-flex items-center gap-2",
-										item.isActive ? "text-foreground" : "text-foreground/60",
-									]}
-								>
-									<span class="text-foreground/35">[{item.shortcut}]</span>
-									<span class:list={["lowercase", item.isActive && "underline"]}>
-										{item.title}
+								class:list={[
+									"terminal-link inline-flex items-center gap-2",
+									item.isActive ? "text-foreground" : "text-tone-mid",
+								]}
+							>
+								<span class="text-tone-faint">[{item.shortcut}]</span>
+								<span class:list={["lowercase", item.isActive && "underline"]}>
+									{item.title}
 									</span>
 								</a>
 							</li>
@@ -232,18 +232,18 @@ const navItems = siteConfig.mainNav.map((item) => ({
 			<slot />
 			</main>
 
-			<footer class="pt-12 text-sm text-foreground/48">
+			<footer class="text-tone-soft pt-12 text-sm">
 				<p class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
 					<span class="inline-flex items-center gap-2">
 						<svg
 							viewBox="0 0 16 16"
 							aria-hidden="true"
-							class="h-4 w-4 fill-current text-foreground/68"
+							class="text-tone-mid h-4 w-4 fill-current"
 						>
 							<path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
 						</svg>
 						<a
-							class="terminal-link text-foreground/68"
+							class="terminal-link text-tone-mid"
 							href="https://github.com/glpecile/glpecile.xyz"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -255,14 +255,14 @@ const navItems = siteConfig.mainNav.map((item) => ({
 						class="inline-flex flex-wrap items-center gap-x-2 gap-y-2 text-sm sm:flex-nowrap sm:gap-2"
 						data-theme-picker
 					>
-						<span class="text-[0.72rem] uppercase tracking-[0.28em] text-foreground/30">
+						<span class="text-tone-faint text-[0.72rem] uppercase tracking-[0.28em]">
 							theme
 						</span>
 						<button
 							type="button"
 							data-theme-option="auto"
 							aria-keyshortcuts="a"
-							class="terminal-link cursor-pointer px-1 text-foreground/55"
+							class="terminal-link text-tone-soft cursor-pointer px-1"
 						>
 							[a]
 						</button>
@@ -270,7 +270,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 							type="button"
 							data-theme-option="light"
 							aria-keyshortcuts="l"
-							class="terminal-link cursor-pointer px-1 text-foreground/55"
+							class="terminal-link text-tone-soft cursor-pointer px-1"
 						>
 							[l]
 						</button>
@@ -278,7 +278,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 							type="button"
 							data-theme-option="dark"
 							aria-keyshortcuts="d"
-							class="terminal-link cursor-pointer px-1 text-foreground/55"
+							class="terminal-link text-tone-soft cursor-pointer px-1"
 						>
 							[d]
 						</button>
@@ -362,7 +362,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 					button.setAttribute("aria-pressed", isActive ? "true" : "false");
 					button.classList.toggle("text-foreground", isActive);
 					button.classList.toggle("underline", isActive);
-					button.classList.toggle("text-foreground/55", !isActive);
+					button.classList.toggle("text-tone-soft", !isActive);
 				});
 			};
 

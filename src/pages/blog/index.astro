@@ -1,4 +1,5 @@
 ---
+import SectionLabel from "@/components/SectionLabel.astro";
 import SiteLayout from "@/layouts/SiteLayout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 
@@ -12,22 +13,22 @@ const posts = await getBlogPosts();
 	previewPath="/blog/preview"
 >
 	<section class="space-y-4">
-		<p class="eyebrow">* blog</p>
-		<h1 class="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
+		<SectionLabel label="blog" />
+		<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
 			Small notes. Full-sized blog.
 		</h1>
-		<p class="max-w-3xl text-sm leading-8 text-foreground/65 sm:text-base">
+		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
 			Thoughts, experiments, and tiny posts that still deserve a permanent
 			URL.
 		</p>
 
 		{posts.length === 0 ? (
-			<p class="text-sm text-foreground/55">no posts yet.</p>
+			<p class="text-tone-soft text-sm">no posts yet.</p>
 		) : (
 			<ol class="space-y-5">
 				{posts.map((post, index) => (
 					<li class="space-y-1">
-						<p class="text-xs uppercase tracking-[0.28em] text-foreground/42">
+						<p class="text-tone-faint text-xs uppercase tracking-[0.28em]">
 							{formatDate(post.data.updatedDate ?? post.data.pubDate)}
 						</p>
 						<p class="text-base leading-8 sm:text-lg">
@@ -35,10 +36,10 @@ const posts = await getBlogPosts();
 								{post.data.title}
 							</a>
 							{index < 9 && (
-								<span class="text-foreground/35"> [{index + 1}]</span>
+								<span class="text-tone-faint"> [{index + 1}]</span>
 							)}
 						</p>
-						<p class="max-w-3xl text-sm leading-8 text-foreground/60 sm:text-base">
+						<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
 							{post.data.description}
 						</p>
 					</li>
@@ -47,8 +48,8 @@ const posts = await getBlogPosts();
 		)}
 
 		{posts.length > 0 && (
-			<p class="text-sm text-foreground/48">
-				use <span class="text-foreground/68">[1-9]</span> for the latest posts.
+			<p class="text-tone-soft text-sm">
+				use <span class="text-tone-mid">[1-9]</span> for the latest posts.
 			</p>
 		)}
 	</section>

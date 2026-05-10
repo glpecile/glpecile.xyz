@@ -1,0 +1,57 @@
+---
+import SectionLabel from "@/components/SectionLabel.astro";
+import SiteLayout from "@/layouts/SiteLayout.astro";
+
+export interface Props {
+	code: string;
+	title: string;
+	description: string;
+	hint?: string;
+	error?: unknown;
+	path?: string;
+}
+
+const { code, title, description, hint, error, path = "/" } = Astro.props;
+
+const details =
+	error instanceof Error
+		? error.message
+		: typeof error === "string"
+			? error
+			: undefined;
+---
+
+<SiteLayout title={`${code} | ${title}`} description={description} path={path}>
+	<section class="space-y-6">
+		<SectionLabel label="error" />
+		<div class="space-y-3">
+			<p class="text-tone-faint text-sm uppercase tracking-[0.32em]">{code}</p>
+			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
+				{title}
+			</h1>
+			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+				{description}
+			</p>
+			{hint && (
+				<p class="text-tone-soft max-w-3xl text-sm leading-8 sm:text-base">
+					{hint}
+				</p>
+			)}
+		</div>
+
+		<div class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm sm:text-base">
+			<a href="/" class="terminal-link inline-flex items-center gap-2">
+				<span class="text-tone-faint">[h]</span>
+				<span>home</span>
+			</a>
+			<a href="/blog" class="terminal-link inline-flex items-center gap-2">
+				<span class="text-tone-faint">[b]</span>
+				<span>blog</span>
+			</a>
+		</div>
+
+		{details && (
+			<pre class="text-tone-soft overflow-x-auto border-l border-foreground/18 pl-4 text-sm leading-7">{details}</pre>
+		)}
+	</section>
+</SiteLayout>

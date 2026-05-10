@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import { render, type CollectionEntry } from "astro:content";
 
+import SectionLabel from "@/components/SectionLabel.astro";
 import SiteLayout from "@/layouts/SiteLayout.astro";
 import { formatDate, getBlogPosts } from "@/lib/blog";
 
@@ -35,19 +36,19 @@ const postPath = `/blog/${post.id}`;
 	<article class="space-y-6">
 		<a
 			href="/blog"
-			class="terminal-link inline-flex items-center gap-2 text-sm text-foreground/65"
+			class="terminal-link text-tone-mid inline-flex items-center gap-2 text-sm"
 		>
 			<span aria-hidden="true">&larr;</span>
 			<span>Back to blog</span>
 		</a>
 
 		<header class="space-y-4">
-			<p class="eyebrow">* post</p>
-			<p class="text-sm text-foreground/50">{formatDate(displayDate)}</p>
-			<h1 class="max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
+			<SectionLabel label="post" />
+			<p class="text-tone-soft text-sm">{formatDate(displayDate)}</p>
+			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
 				{post.data.title}
 			</h1>
-			<p class="max-w-3xl text-sm leading-8 text-foreground/62 sm:text-base">
+			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
 				{post.data.description}
 			</p>
 		</header>

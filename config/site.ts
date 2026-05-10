@@ -15,8 +15,8 @@ export const siteConfig = {
 	shortName: "glpecile",
 	description: "Frontend engineer. Shipping websites and apps from time to time.",
 	emoji: "🧙",
-    backgroundColor: "#050505",
-    themeColor: "#050505",
+	backgroundColor: "#eff1f5",
+	themeColor: "#eff1f5",
     siteUrl: "https://glpecile.xyz",
     category: "personal site",
     mainNav: [

@@ -1,0 +1,14 @@
+---
+import ErrorPage from "@/components/ErrorPage.astro";
+
+const error = Astro.props.error;
+---
+
+<ErrorPage
+	code="500"
+	title="Something broke on our side."
+	description="The page failed before it could finish rendering."
+	hint="Try again in a moment, or head back home."
+	error={error}
+	path="/500"
+/>
