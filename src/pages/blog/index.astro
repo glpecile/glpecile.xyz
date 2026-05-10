@@ -45,9 +45,12 @@ const posts = await getBlogPosts();
 		)}
 
 		{posts.length > 0 && (
-			<p class="text-tone-soft text-sm">
-				use <span class="text-tone-mid">[1-9]</span> for the latest posts.
-			</p>
+			<div class="text-tone-soft space-y-1 text-sm">
+				<p>use <span class="text-tone-mid">[1-9]</span> for the latest posts.</p>
+				<p>
+					or subscribe via the <a class="terminal-link" href="/blog/rss.xml">rss feed</a>.
+				</p>
+			</div>
 		)}
 	</section>
 
