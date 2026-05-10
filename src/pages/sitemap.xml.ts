@@ -1,6 +1,6 @@
 import { getBlogPosts } from "@/lib/blog";
 
-import { siteConfig } from "../../config/site";
+import { siteConfig } from "#config/site";
 
 const formatSitemapDate = (date: Date) => date.toISOString().split("T")[0];
 
