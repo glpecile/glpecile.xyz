@@ -9,6 +9,7 @@ export const GET: APIRoute = async ({ request }) => {
 		"glpecile",
 		"Frontend Engineer",
 		request.url,
+		"light",
 	);
 
 	return new Response(png, {

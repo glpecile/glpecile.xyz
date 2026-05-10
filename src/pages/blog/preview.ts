@@ -9,6 +9,7 @@ export const GET: APIRoute = async ({ request }) => {
 		"glpecile",
 		"Thoughts, experiments, and tiny posts.",
 		request.url,
+		"dark",
 	);
 
 	return new Response(png, {

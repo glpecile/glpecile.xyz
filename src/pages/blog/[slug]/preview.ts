@@ -19,7 +19,12 @@ export const GET: APIRoute = async ({ params, request }) => {
 		return new Response(null, { status: 404 });
 	}
 
-	const png = await renderPreview(post.data.title, post.data.description, request.url);
+	const png = await renderPreview(
+		post.data.title,
+		post.data.description,
+		request.url,
+		"dark",
+	);
 
 	return new Response(png, {
 		headers: {

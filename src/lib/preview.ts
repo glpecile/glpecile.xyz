@@ -11,10 +11,40 @@ const size = {
 } as const;
 
 const avatarPath = "/images/me.png";
-const background = "#050505";
-const foreground = "#f4f4f5";
-const muted = "rgba(244, 244, 245, 0.7)";
 const fontName = "JetBrains Mono";
+
+type PreviewThemeName = "light" | "dark";
+
+type PreviewTheme = {
+	background: string;
+	border: string;
+	foreground: string;
+	heading: string;
+	muted: string;
+	section: string;
+	subtitle: string;
+};
+
+const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
+	light: {
+		background: "#dce0e8",
+		border: "rgba(92, 95, 119, 0.16)",
+		foreground: "#45475a",
+		heading: "#1d5fe3",
+		muted: "rgba(92, 95, 119, 0.82)",
+		section: "#1d5fe3",
+		subtitle: "#8839ef",
+	},
+	dark: {
+		background: "#1e1e2e",
+		border: "rgba(127, 132, 156, 0.3)",
+		foreground: "#cdd6f4",
+		heading: "#cba6f7",
+		muted: "rgba(186, 194, 222, 0.78)",
+		section: "#f9e2af",
+		subtitle: "#89b4fa",
+	},
+};
 
 let avatarPromise: Promise<string> | undefined;
 let fontPromise: Promise<ArrayBuffer> | undefined;
@@ -85,7 +115,12 @@ async function ensureSatori() {
 	await satoriInit;
 }
 
-function createPreview(title: string, subtitle: string, avatar: string) {
+function createPreview(
+	title: string,
+	subtitle: string,
+	avatar: string,
+	theme: PreviewTheme,
+) {
 	const titleSize = title.length > 22 ? 68 : 82;
 
 	return createElement(
@@ -93,8 +128,8 @@ function createPreview(title: string, subtitle: string, avatar: string) {
 		{
 			style: {
 				alignItems: "center",
-				background,
-				color: foreground,
+				background: theme.background,
+				color: theme.foreground,
 				display: "flex",
 				height: "100%",
 				justifyContent: "center",
@@ -109,6 +144,10 @@ function createPreview(title: string, subtitle: string, avatar: string) {
 					alignItems: "center",
 					display: "flex",
 					gap: "40px",
+					paddingBottom: "20px",
+					paddingTop: "20px",
+					borderBottom: `1px solid ${theme.border}`,
+					borderTop: `1px solid ${theme.border}`,
 					width: "100%",
 				},
 			},
@@ -128,13 +167,26 @@ function createPreview(title: string, subtitle: string, avatar: string) {
 					style: {
 						display: "flex",
 						flexDirection: "column",
-						gap: "14px",
+						gap: "16px",
 					},
 				},
 				createElement(
 					"div",
 					{
 						style: {
+							color: theme.section,
+							fontSize: 24,
+							letterSpacing: "0.28em",
+							textTransform: "uppercase",
+						},
+					},
+					"* preview",
+				),
+				createElement(
+					"div",
+					{
+						style: {
+							color: theme.heading,
 							fontSize: titleSize,
 							fontWeight: 700,
 							letterSpacing: "-0.05em",
@@ -148,7 +200,7 @@ function createPreview(title: string, subtitle: string, avatar: string) {
 					"div",
 					{
 						style: {
-							color: muted,
+							color: theme.subtitle,
 							fontSize: 34,
 							letterSpacing: "0.12em",
 							lineHeight: 1.3,
@@ -157,6 +209,19 @@ function createPreview(title: string, subtitle: string, avatar: string) {
 						},
 					},
 					subtitle,
+				),
+				createElement(
+					"div",
+					{
+						style: {
+							color: theme.muted,
+							fontSize: 22,
+							letterSpacing: "0.08em",
+							lineHeight: 1.4,
+							textTransform: "uppercase",
+						},
+					},
+					"glpecile.xyz",
 				),
 			),
 		),
@@ -167,9 +232,12 @@ export async function renderPreview(
 	title: string,
 	subtitle: string,
 	requestUrl: string,
+	themeName: PreviewThemeName = "dark",
 ) {
 	await ensureWasm();
 	await ensureSatori();
+
+	const theme = previewThemes[themeName];
 
 	const [avatar, font] = await Promise.all([
 		getAvatar(requestUrl),
@@ -177,7 +245,7 @@ export async function renderPreview(
 	]);
 
 	const svg = await satori(
-		createPreview(title, subtitle, avatar),
+		createPreview(title, subtitle, avatar, theme),
 		{
 			...size,
 			fonts: [
@@ -193,7 +261,7 @@ export async function renderPreview(
 
 	return new Uint8Array(
 		new Resvg(svg, {
-		background,
+		background: theme.background,
 		fitTo: {
 			mode: "width",
 			value: size.width,
