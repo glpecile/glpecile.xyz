@@ -10,10 +10,11 @@ type WorkExperience = {
 };
 
 export const siteConfig = {
-    name: "glpecile's personal site",
-    shortName: "glpecile",
-    description: "yet another personal site.",
-    emoji: "🧙",
+	author: "Gian Luca Pecile",
+	name: "glpecile's personal site",
+	shortName: "glpecile",
+	description: "Frontend engineer. Shipping websites and apps from time to time.",
+	emoji: "🧙",
     backgroundColor: "#050505",
     themeColor: "#050505",
     siteUrl: "https://glpecile.xyz",

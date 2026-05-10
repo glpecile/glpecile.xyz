@@ -21,7 +21,10 @@
 		"@astrojs/cloudflare": "^13.5.0",
 		"@astrojs/mdx": "^5.0.4",
 		"@astrojs/react": "^5.0.4",
+		"@fontsource/jetbrains-mono": "^5.2.8",
 		"@radix-ui/react-slot": "^1.2.4",
+		"@resvg/resvg-js": "^2.6.2",
+		"@resvg/resvg-wasm": "^2.6.2",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"astro": "^6.3.1",
@@ -29,6 +32,7 @@
 		"clsx": "^2.1.1",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6",
+		"satori": "^0.26.0",
 		"tailwind-merge": "^3.5.0"
 	},
 	"devDependencies": {

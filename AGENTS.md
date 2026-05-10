@@ -13,6 +13,8 @@ Project-specific guidance for working in this repo.
 - Run `bun run check` after `.astro` changes. Use `bun run lint` for TS, JS, and CSS changes that Biome covers.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
+- Never use `any`. Prefer concrete types, `unknown`, or small typed helpers instead.
+- Prefer `async`/`await` over `.then()` chains.
 
 ## Frontend Style
 

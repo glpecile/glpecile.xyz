@@ -28,6 +28,7 @@ const postPath = `/blog/${post.id}`;
 	title={post.data.title}
 	description={post.data.description}
 	path={postPath}
+	previewPath={`${postPath}/preview`}
 	type="article"
 	publishedTime={post.data.pubDate.toISOString()}
 >
