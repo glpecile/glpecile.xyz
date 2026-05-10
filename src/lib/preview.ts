@@ -1,9 +1,9 @@
 import jetBrainsMonoBoldUrl from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff?url";
+import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import resvgWasmModule from "@resvg/resvg-wasm/index_bg.wasm";
-import { Resvg, initWasm } from "@resvg/resvg-wasm";
+import { createElement } from "react";
 import satori, { init as initSatori } from "satori/standalone";
 import yogaWasmModule from "satori/yoga.wasm";
-import { createElement } from "react";
 
 const size = {
 	width: 1200,
