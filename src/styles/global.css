@@ -33,6 +33,7 @@
 	--color-heading: hsl(var(--heading));
 	--color-heading-soft: hsl(var(--heading-soft));
 	--color-section: hsl(var(--section));
+	--color-link: hsl(var(--link));
 	--color-tone-strong: hsl(var(--tone-strong));
 	--color-tone-mid: hsl(var(--tone-mid));
 	--color-tone-soft: hsl(var(--tone-soft));
@@ -91,6 +92,7 @@
 		--heading: 220 91% 46%;
 		--heading-soft: 231 97% 72%;
 		--section: 220 91% 46%;
+		--link: 192 60% 44%;
 		--selection: 223 16% 83%;
 		--selection-foreground: 234 21% 27%;
 		--tone-strong: 234 21% 27%;
@@ -138,6 +140,7 @@
 		--heading: 267 84% 81%;
 		--heading-soft: 232 97% 85%;
 		--section: 41 86% 83%;
+		--link: 172 39% 65%;
 		--selection: 237 16% 23%;
 		--selection-foreground: 226 64% 88%;
 		--tone-strong: 226 64% 88%;
@@ -211,6 +214,7 @@
 		}
 
 		.terminal-link {
+			color: var(--color-link);
 			text-decoration: none;
 		}
 
@@ -255,7 +259,7 @@
 		}
 
 		.blog-prose a {
-			color: hsl(var(--foreground));
+			color: var(--color-link);
 			text-decoration: underline;
 			text-decoration-thickness: 1px;
 		}
