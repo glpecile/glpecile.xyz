@@ -36,9 +36,13 @@ const postPath = `/blog/${post.id}`;
 	<article class="space-y-6">
 		<a
 			href="/blog"
-			class="terminal-link inline-flex items-center gap-2 text-sm"
+			class="blog-back-link terminal-link inline-flex items-center gap-2 text-sm"
 		>
-			<svg viewBox="0 0 16 16" aria-hidden="true" class="h-4 w-4 fill-current">
+			<svg
+				viewBox="0 0 16 16"
+				aria-hidden="true"
+				class="blog-back-link-icon h-4 w-4 fill-current"
+			>
 				<path d="M7.3 3.22a.75.75 0 0 1 1.06 1.06L5.65 7h7.6a.75.75 0 0 1 0 1.5h-7.6l2.71 2.72a.75.75 0 1 1-1.06 1.06L3.31 8.28a.75.75 0 0 1 0-1.06L7.3 3.22Z"></path>
 			</svg>
 			<span>Back to blog</span>
@@ -50,6 +54,15 @@ const postPath = `/blog/${post.id}`;
 			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
 				{post.data.title}
 			</h1>
+			<button
+				type="button"
+				class="blog-share-button text-tone-soft text-sm"
+				data-post-share
+				aria-label={`Copy link to post: ${post.data.title}`}
+				title={`Copy link to post: ${post.data.title}`}
+			>
+				<span class="blog-share-button-label">[share]</span>
+			</button>
 			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
 				{post.data.description}
 			</p>
@@ -61,9 +74,28 @@ const postPath = `/blog/${post.id}`;
 
 		<script is:inline>
 			const codeBlocks = document.querySelectorAll(".blog-prose pre.astro-code");
+			const postShareButton = document.querySelector("[data-post-share]");
+			const copyableHeadings = document.querySelectorAll(
+				".blog-prose h2[id], .blog-prose h3[id], .blog-prose h4[id], .blog-prose h5[id], .blog-prose h6[id]",
+			);
+			/** @typedef {{ idle: string; success: string; error: string }} CopyLabelSet */
+
+			/** @type {CopyLabelSet} */
 			const copyLabels = {
 				idle: "[copy]",
 				success: "[copied]",
+				error: "[unavailable]",
+			};
+			/** @type {CopyLabelSet} */
+			const headingLabels = {
+				idle: "[#]",
+				success: "[✔︎]",
+				error: "[unavailable]",
+			};
+			/** @type {CopyLabelSet} */
+			const shareLabels = {
+				idle: "[share]",
+				success: "[copied to clipboard]",
 				error: "[unavailable]",
 			};
 
@@ -113,6 +145,144 @@ const postPath = `/blog/${post.id}`;
 				throw new Error("copy unavailable");
 			};
 
+			const attachCopyState = ({
+				button,
+				getCopyText,
+				labels,
+				setLabel,
+				setState,
+				onBeforeCopy,
+				resetDelay = 1600,
+			}) => {
+				let resetTimer = 0;
+
+				button.addEventListener("click", async () => {
+					window.clearTimeout(resetTimer);
+
+					if (onBeforeCopy) {
+						onBeforeCopy();
+					}
+
+					try {
+						await copyText(getCopyText());
+						setLabel(labels.success);
+						setState("success");
+					} catch {
+						setLabel(labels.error);
+						setState("error");
+					}
+
+					resetTimer = window.setTimeout(() => {
+						setLabel(labels.idle);
+						setState();
+					}, resetDelay);
+				});
+			};
+
+			const getHeadingPermalink = (id) => {
+				const url = new URL(window.location.href);
+				url.hash = id;
+
+				return url.toString();
+			};
+
+			const getPostPermalink = () => new URL(window.location.pathname, window.location.origin).toString();
+
+			const attachCopyButton = (button, options) => {
+				if (!(button instanceof HTMLButtonElement) || button.dataset.copyButton === "true") {
+					return;
+				}
+
+				button.dataset.copyButton = "true";
+				const label = button.querySelector(".blog-share-button-label");
+
+				if (!(label instanceof HTMLElement)) {
+					return;
+				}
+
+				attachCopyState({
+					button,
+					getCopyText: options.getCopyText,
+					labels: options.labels,
+					setLabel: (nextLabel) => {
+						label.textContent = nextLabel;
+					},
+					setState: (nextState) => {
+						if (nextState) {
+							button.dataset.copyState = nextState;
+						} else {
+							delete button.dataset.copyState;
+						}
+					},
+				});
+			};
+
+			const enhanceCopyTarget = (heading, options) => {
+				if (!(heading instanceof HTMLElement) || heading.dataset.copyHeading === "true") {
+					return;
+				}
+
+				heading.dataset.copyHeading = "true";
+				heading.classList.add("blog-copy-heading");
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "blog-heading-button";
+
+				button.setAttribute("aria-label", options.ariaLabel);
+				button.setAttribute("title", options.ariaLabel);
+
+				const label = document.createElement("span");
+				label.className = "blog-heading-label";
+
+				while (heading.firstChild) {
+					label.append(heading.firstChild);
+				}
+
+				const status = document.createElement("span");
+				status.className = "blog-heading-status";
+				status.setAttribute("aria-hidden", "true");
+				status.textContent = options.labels.idle;
+
+				button.append(label, status);
+				heading.append(button);
+
+				attachCopyState({
+					button,
+					getCopyText: options.getCopyText,
+					labels: options.labels,
+					setLabel: (nextLabel) => {
+						status.textContent = nextLabel;
+					},
+					setState: (nextState) => {
+						if (nextState) {
+							heading.dataset.copyState = nextState;
+						} else {
+							delete heading.dataset.copyState;
+						}
+					},
+					onBeforeCopy: options.onBeforeCopy,
+				});
+			};
+
+			attachCopyButton(postShareButton, {
+				getCopyText: () => getPostPermalink(),
+				labels: shareLabels,
+			});
+
+			copyableHeadings.forEach((heading) => {
+				const headingText = (heading.textContent ?? heading.id).trim();
+
+				enhanceCopyTarget(heading, {
+					ariaLabel: `Copy link to section: ${headingText}`,
+					getCopyText: () => getHeadingPermalink(heading.id),
+					labels: headingLabels,
+					onBeforeCopy: () => {
+						window.history.replaceState(null, "", `#${heading.id}`);
+					},
+				});
+			});
+
 			codeBlocks.forEach((pre) => {
 				if (!(pre instanceof HTMLElement) || pre.parentElement?.classList.contains("code-frame")) {
 					return;
@@ -137,21 +307,20 @@ const postPath = `/blog/${post.id}`;
 				button.setAttribute("aria-label", "Copy code to clipboard");
 				button.textContent = copyLabels.idle;
 
-				let resetTimer = 0;
-
-				button.addEventListener("click", async () => {
-					window.clearTimeout(resetTimer);
-
-					try {
-						await copyText(getCodeText(pre));
-						button.textContent = copyLabels.success;
-					} catch {
-						button.textContent = copyLabels.error;
-					}
-
-					resetTimer = window.setTimeout(() => {
-						button.textContent = copyLabels.idle;
-					}, 1600);
+				attachCopyState({
+					button,
+					getCopyText: () => getCodeText(pre),
+					labels: copyLabels,
+					setLabel: (nextLabel) => {
+						button.textContent = nextLabel;
+					},
+					setState: (nextState) => {
+						if (nextState) {
+							button.dataset.copyState = nextState;
+						} else {
+							delete button.dataset.copyState;
+						}
+					},
 				});
 
 				toolbar.append(button);

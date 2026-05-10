@@ -94,7 +94,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 			rel="stylesheet"
 		/>
 		<script is:inline>
-			window.__glpecileTheme = {
+			const createThemeController = () => ({
 				storageKey: "glpecile-theme",
 				root: document.documentElement,
 				media: window.matchMedia("(prefers-color-scheme: dark)"),
@@ -102,9 +102,7 @@ const navItems = siteConfig.mainNav.map((item) => ({
 					return this.media.matches ? "dark" : "light";
 				},
 				apply(theme) {
-					const resolvedTheme = theme === "auto" ? this.getSystemTheme() : theme;
-
-					this.root.dataset.theme = resolvedTheme;
+					this.root.dataset.theme = theme === "auto" ? this.getSystemTheme() : theme;
 					this.root.dataset.themePreference = theme;
 				},
 				persist(theme) {
@@ -118,7 +116,9 @@ const navItems = siteConfig.mainNav.map((item) => ({
 						// Ignore browsers that block storage access.
 					}
 				},
-			};
+			});
+
+			window.__glpecileTheme = createThemeController();
 
 			try {
 				const storedTheme = localStorage.getItem(window.__glpecileTheme.storageKey);

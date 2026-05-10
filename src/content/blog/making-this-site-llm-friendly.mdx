@@ -165,35 +165,6 @@ For a portfolio site, your root document should stick to:
 
 This keeps retrieval costs low and makes path selection significantly easier for the agent navigating your site.
 
-## 6. Rendering details still matter
-
-While building this out, a standard frontend detail immediately popped up on a technical post with code samples: **lists need explicit markers.**
-
-Tailwind resets list styles by default. If your prose styles don't explicitly restore them, your bulleted and ordered lists will either look broken or disappear entirely.
-
-The fix is straightforward:
-
-```css
-.blog-prose ul,
-.blog-prose ol {
-    list-style-position: outside;
-    padding-left: 1.25rem;
-}
-
-.blog-prose ul {
-    list-style-type: disc;
-}
-
-.blog-prose ol {
-    list-style-type: decimal;
-}
-
-.blog-prose li::marker {
-    color: hsl(var(--tone-faint));
-}
-
-```
-
 ## Distilled Guidance
 
 A minimal, agent-friendly implementation for an Astro site comes down to a few core principles:
