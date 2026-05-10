@@ -1,0 +1,208 @@
+---
+title: making an astro site llm friendly
+description: A minimal implementation of llms.txt, markdown mirrors, and agent-readable exports for an Astro site.
+pubDate: 2026-05-10
+---
+
+A site can be perfectly intuitive for a human to navigate, yet completely inefficient for an AI agent to consume.
+
+When an agent visits a portfolio or documentation site, it rarely wants to "browse everything." Its goals are usually much more specific:
+
+* Identify what the site is actually about.
+* Find work history or public links.
+* Locate a specific, relevant article.
+* Pull a small quote or snippet with minimal background noise.
+
+This is exactly the use case `llms.txt` was built for. It acts as a curated root document for inference-time retrieval, pointing agents toward a smaller, higher-signal set of resources.
+
+Implementing this in Astro is surprisingly lightweight. The minimal approach boils down to this:
+
+* Add an `/llms.txt` file.
+* Create Markdown mirrors for your most important pages.
+* Advertise those alternate formats in your HTML.
+* Generate this agent-facing content from the exact same source data as your main site.
+
+## 1. Curate your `/llms.txt` (It's not a sitemap)
+
+A useful `llms.txt` is a routing document, not a generic sitemap. It needs to quickly answer two things: *What is this site?* and *What should the agent read next?*
+
+For a portfolio, the implementation can stay very close to the official spec:
+
+```txt
+# glpecile.xyz
+
+> Personal portfolio and blog for Gian Luca Pecile, a frontend engineer shipping websites and apps.
+
+For agents:
+
+1. Prefer markdown mirrors over HTML: `/index.html.md`, `/work/index.html.md`, `/blog/index.html.md`
+2. Use `/work` for experience and `/blog` for writing samples
+3. Follow post-level `index.html.md` links only when you need full article text
+
+## Portfolio
+
+- [Home](https://glpecile.xyz/index.html.md): Short profile, featured work, recent writing, and public links
+- [Work](https://glpecile.xyz/work/index.html.md): Full work history with role, company, period, location, and summaries
+
+## Writing
+
+- [Blog](https://glpecile.xyz/blog/index.html.md): Index of published blog posts with dates, descriptions, and markdown links
+
+## Optional
+
+- [making an astro site llm friendly](https://glpecile.xyz/blog/making-this-site-llm-friendly/index.html.md): Full article text
+
+```
+
+The Astro route for this is trivial. The heavy lifting is just deciding what actually belongs in the file.
+
+```ts
+import type { APIRoute } from "astro";
+
+import { getBlogPosts } from "@/lib/blog";
+import { llmsContentType, renderLlmsTxt } from "@/lib/llms";
+
+export const prerender = true;
+
+export const GET: APIRoute = async () => {
+    const posts = await getBlogPosts();
+
+    return new Response(renderLlmsTxt(posts), {
+       headers: {
+          "Content-Type": llmsContentType,
+       },
+    });
+};
+
+```
+
+## 2. Generate Markdown mirrors (Don't build a second site)
+
+Your agent-facing layer needs to be derived from the exact same content model as your human-facing site. If you treat it as a parallel documentation surface, it will inevitably drift out of sync.
+
+In this implementation, the exported routes look like this:
+
+* `/index.html.md`
+* `/work/index.html.md`
+* `/blog/index.html.md`
+* `/blog/[slug]/index.html.md`
+
+The path helper to generate these is intentionally small:
+
+```ts
+export function getMarkdownPath(path: string) {
+    const normalizedPath = path === "/" ? "/" : path.replace(/\/$/, "");
+
+    return normalizedPath === "/" ? "/index.html.md" : `${normalizedPath}/index.html.md`;
+}
+
+```
+
+You can then use this mapping both in the exported files themselves and in your HTML metadata.
+
+## 3. Expose alternate formats in the HTML
+
+If a page already knows its canonical URL and where its Markdown equivalent lives, it should broadcast both.
+
+```astro
+---
+const canonicalUrl = new URL(path, siteConfig.siteUrl).toString();
+const markdownUrl = new URL(getMarkdownPath(path), siteConfig.siteUrl).toString();
+const llmsUrl = new URL("/llms.txt", siteConfig.siteUrl).toString();
+---
+
+<link rel="canonical" href={canonicalUrl} />
+<link rel="alternate" type="text/markdown" href={markdownUrl} />
+<link rel="alternate" type="text/plain" href={llmsUrl} />
+
+```
+
+It’s a tiny addition, but it makes your alternate resources immediately discoverable to agents without altering the visible UI for humans.
+
+## 4. Keep your MDX exports clean
+
+MDX is incredibly convenient for authors, but it can be awkward for raw text exports.
+
+When an article is exported directly from its source, leading `import` or `export` lines tend to leak into the agent-facing text. These lines are implementation details, not actual content.
+
+For post-level Markdown mirrors, it helps to strip out this leading boilerplate before returning the body:
+
+```ts
+const cleanMarkdownBody = (body?: string) => {
+    if (!body) {
+       return "";
+    }
+
+    const lines = body.split("\n");
+    let start = 0;
+
+    while (
+       start < lines.length &&
+       (lines[start].trim() === "" ||
+          lines[start].startsWith("import ") ||
+          lines[start].startsWith("export "))
+    ) {
+       start += 1;
+    }
+
+    return lines.slice(start).join("\n").trim();
+};
+
+```
+
+This isn't meant to be a full MDX-to-Markdown compiler. It’s just enough cleanup to ensure the exported text closely matches what an agent expects when requesting the article.
+
+## 5. Keep `llms.txt` strictly curated
+
+The most common failure mode for `llms.txt` is turning it into a lightly reformatted sitemap. That gives the agent too much context and not nearly enough guidance.
+
+For a portfolio site, your root document should stick to:
+
+* A short project summary.
+* One or two operational instructions.
+* A very small set of high-signal links.
+* An optional section for deeper reading.
+
+This keeps retrieval costs low and makes path selection significantly easier for the agent navigating your site.
+
+## 6. Rendering details still matter
+
+While building this out, a standard frontend detail immediately popped up on a technical post with code samples: **lists need explicit markers.**
+
+Tailwind resets list styles by default. If your prose styles don't explicitly restore them, your bulleted and ordered lists will either look broken or disappear entirely.
+
+The fix is straightforward:
+
+```css
+.blog-prose ul,
+.blog-prose ol {
+    list-style-position: outside;
+    padding-left: 1.25rem;
+}
+
+.blog-prose ul {
+    list-style-type: disc;
+}
+
+.blog-prose ol {
+    list-style-type: decimal;
+}
+
+.blog-prose li::marker {
+    color: hsl(var(--tone-faint));
+}
+
+```
+
+## Distilled Guidance
+
+A minimal, agent-friendly implementation for an Astro site comes down to a few core principles:
+
+* Publish a curated `/llms.txt`.
+* Mirror your most important pages as Markdown.
+* Generate those mirrors from the same content source as the main site.
+* Expose alternate links from the HTML pages.
+* Keep full article text optional, rather than default.
+* Scrub authoring-specific noise (like MDX imports) from exported content.
+
+The goal isn't to maintain a second site for AI. The goal is to reduce retrieval noise while keeping your content model single-sourced. For a portfolio or personal blog, that is usually more than enough.

@@ -9,6 +9,7 @@ import { siteConfig } from "#config/site";
 
 const socialLinks = Object.entries(siteConfig.links);
 const posts = await getBlogPosts();
+const latestPosts = posts.slice(0, 3);
 const work = siteConfig.work;
 const featuredWork = work.slice(0, 3);
 const hasMoreWork = work.length > featuredWork.length;
@@ -25,11 +26,11 @@ const hasMoreWork = work.length > featuredWork.length;
 	<section class="space-y-4">
 		<SectionLabel label="blog" />
 
-		{posts.length === 0 ? (
+		{latestPosts.length === 0 ? (
 			<p class="text-tone-soft text-sm">no posts yet.</p>
 		) : (
 			<ol class="space-y-4">
-				{posts.map((post) => (
+				{latestPosts.map((post) => (
 					<li class="grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-5">
 						<p class="text-tone-faint text-sm leading-7 sm:text-base">
 							{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}

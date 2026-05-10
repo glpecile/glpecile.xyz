@@ -58,5 +58,105 @@ const postPath = `/blog/${post.id}`;
 		<div class="blog-prose">
 			<Content />
 		</div>
+
+		<script is:inline>
+			const codeBlocks = document.querySelectorAll(".blog-prose pre.astro-code");
+			const copyLabels = {
+				idle: "[copy]",
+				success: "[copied]",
+				error: "[unavailable]",
+			};
+
+			const formatLanguage = (value) => {
+				if (typeof value !== "string" || value.length === 0 || value === "plaintext") {
+					return "text";
+				}
+
+				return value.toLowerCase();
+			};
+
+			const getCodeText = (pre) => {
+				const code = pre.querySelector("code");
+
+				if (!(code instanceof HTMLElement)) {
+					return "";
+				}
+
+				const lines = Array.from(code.querySelectorAll(".line"));
+
+				if (lines.length === 0) {
+					return code.textContent ?? "";
+				}
+
+				return lines.map((line) => line.textContent ?? "").join("\n");
+			};
+
+			const copyText = async (text) => {
+				if (navigator.clipboard?.writeText) {
+					await navigator.clipboard.writeText(text);
+					return;
+				}
+
+				if (
+					typeof ClipboardItem !== "undefined" &&
+					navigator.clipboard?.write
+				) {
+					const blob = new Blob([text], { type: "text/plain" });
+					await navigator.clipboard.write([
+						new ClipboardItem({
+							"text/plain": blob,
+						}),
+					]);
+					return;
+				}
+
+				throw new Error("copy unavailable");
+			};
+
+			codeBlocks.forEach((pre) => {
+				if (!(pre instanceof HTMLElement) || pre.parentElement?.classList.contains("code-frame")) {
+					return;
+				}
+
+				const wrapper = document.createElement("div");
+				wrapper.className = "code-frame";
+				pre.parentNode?.insertBefore(wrapper, pre);
+
+				const toolbar = document.createElement("div");
+				toolbar.className = "code-toolbar";
+
+				const language = document.createElement("span");
+				language.className = "code-language";
+				language.textContent = formatLanguage(pre.dataset.language);
+
+				toolbar.append(language);
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "code-copy-button";
+				button.setAttribute("aria-label", "Copy code to clipboard");
+				button.textContent = copyLabels.idle;
+
+				let resetTimer = 0;
+
+				button.addEventListener("click", async () => {
+					window.clearTimeout(resetTimer);
+
+					try {
+						await copyText(getCodeText(pre));
+						button.textContent = copyLabels.success;
+					} catch {
+						button.textContent = copyLabels.error;
+					}
+
+					resetTimer = window.setTimeout(() => {
+						button.textContent = copyLabels.idle;
+					}, 1600);
+				});
+
+				toolbar.append(button);
+				wrapper.append(toolbar, pre);
+			});
+		</script>
 	</article>
 </SiteLayout>

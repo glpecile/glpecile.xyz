@@ -9,6 +9,16 @@ import react from "@astrojs/react";
 export default defineConfig({
 	site: "https://glpecile.xyz",
 
+	markdown: {
+		shikiConfig: {
+			defaultColor: false,
+			themes: {
+				light: "catppuccin-latte",
+				dark: "catppuccin-mocha",
+			},
+		},
+	},
+
 	vite: {
 		plugins: [tailwindcss()],
 	},
