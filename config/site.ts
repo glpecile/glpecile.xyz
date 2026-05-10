@@ -71,6 +71,7 @@ export const siteConfig = {
             company: "ITBA Computer Society",
             period: "Nov 2019 - Dec 2021",
             place: "Buenos Aires Province",
+            url: "https://csitba.web.app/",
         },
     ] satisfies WorkExperience[],
 } as const;
