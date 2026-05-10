@@ -30,7 +30,8 @@ const pageTitle =
 		? siteConfig.shortName
 		: `${title} | ${siteConfig.shortName}`;
 const canonicalUrl = new URL(path, siteConfig.siteUrl).toString();
-const ogImageUrl = new URL(previewPath, siteConfig.siteUrl).toString();
+const ogImageBase = import.meta.env.DEV ? Astro.url.origin : siteConfig.siteUrl;
+const ogImageUrl = new URL(previewPath, ogImageBase).toString();
 const shortcuts = siteConfig.mainNav.map(({ href, shortcut }) => ({
 	href,
 	shortcut,

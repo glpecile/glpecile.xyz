@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ request }) => {
 
 	return new Response(png, {
 		headers: {
-			"Cache-Control": "public, max-age=3600",
+			"Cache-Control": "public, max-age=0, must-revalidate",
 			"Content-Type": "image/png",
 		},
 	});
