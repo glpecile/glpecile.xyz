@@ -1,12 +1,20 @@
-import type { APIRoute } from "astro";
-
+import type { APIRoute, GetStaticPaths } from "astro";
 import { getEntry } from "astro:content";
 
+import { getBlogPosts } from "@/lib/blog";
 import { renderPreview } from "@/lib/preview";
 
-export const prerender = false;
+export const prerender = true;
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const getStaticPaths = (async () => {
+	const posts = await getBlogPosts();
+
+	return posts.map((post) => ({
+		params: { slug: post.id },
+	}));
+}) satisfies GetStaticPaths;
+
+export const GET: APIRoute = async ({ params, url }) => {
 	const slug = params.slug;
 
 	if (!slug) {
@@ -22,13 +30,12 @@ export const GET: APIRoute = async ({ params, request }) => {
 	const png = await renderPreview(
 		post.data.title,
 		post.data.description,
-		request.url,
+		url.toString(),
 		"dark",
 	);
 
 	return new Response(png, {
 		headers: {
-			"Cache-Control": "public, max-age=0, must-revalidate",
 			"Content-Type": "image/png",
 		},
 	});

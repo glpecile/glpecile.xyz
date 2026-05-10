@@ -2,19 +2,18 @@ import type { APIRoute } from "astro";
 
 import { renderPreview } from "@/lib/preview";
 
-export const prerender = false;
+export const prerender = true;
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ url }) => {
 	const png = await renderPreview(
 		"glpecile",
 		"Frontend Engineer",
-		request.url,
+		url.toString(),
 		"light",
 	);
 
 	return new Response(png, {
 		headers: {
-			"Cache-Control": "public, max-age=0, must-revalidate",
 			"Content-Type": "image/png",
 		},
 	});
