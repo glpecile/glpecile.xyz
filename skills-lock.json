@@ -19,6 +19,12 @@
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
     },
+    "llms-txt-generator": {
+      "source": "testacode/llm-toolkit",
+      "sourceType": "github",
+      "skillPath": "skills/llms-txt-generator/SKILL.md",
+      "computedHash": "d9a243d7ec5d6781480732b20230598b2d6cf15c6a7e2baf1f8e19700cf545ef"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
