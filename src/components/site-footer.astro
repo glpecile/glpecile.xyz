@@ -51,103 +51,105 @@ import { siteConfig } from "#config/site";
 </footer>
 
 <script is:inline>
-	const currentScript = document.currentScript;
-	const footer =
-		currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
+	(() => {
+		const currentScript = document.currentScript;
+		const footer =
+			currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
 
-	if (footer instanceof HTMLElement) {
-		const themePicker = footer.querySelector("[data-theme-picker]");
-		const themeButtons = Array.from(footer.querySelectorAll("[data-theme-option]"));
-		const themeEditableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+		if (footer instanceof HTMLElement) {
+			const themePicker = footer.querySelector("[data-theme-picker]");
+			const themeButtons = Array.from(footer.querySelectorAll("[data-theme-option]"));
+			const themeEditableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
-		const setThemeButtonState = (theme) => {
-			themeButtons.forEach((button) => {
-				if (!(button instanceof HTMLButtonElement)) {
+			const setThemeButtonState = (theme) => {
+				themeButtons.forEach((button) => {
+					if (!(button instanceof HTMLButtonElement)) {
+						return;
+					}
+
+					const isActive = button.dataset.themeOption === theme;
+
+					button.dataset.active = isActive ? "true" : "false";
+					button.setAttribute("aria-pressed", isActive ? "true" : "false");
+					button.classList.toggle("text-foreground", isActive);
+					button.classList.toggle("underline", isActive);
+					button.classList.toggle("text-tone-soft", !isActive);
+				});
+			};
+
+			const syncThemeButtons = (theme) => {
+				window.__glpecileTheme.apply(theme);
+				setThemeButtonState(theme);
+			};
+
+			const storedTheme =
+				window.__glpecileTheme.root.dataset.themePreference === "light" ||
+				window.__glpecileTheme.root.dataset.themePreference === "dark"
+					? window.__glpecileTheme.root.dataset.themePreference
+					: "auto";
+
+			syncThemeButtons(storedTheme);
+
+			window.__glpecileTheme.media.addEventListener("change", () => {
+				if (window.__glpecileTheme.root.dataset.themePreference === "auto") {
+					syncThemeButtons("auto");
+				}
+			});
+
+			if (themePicker instanceof HTMLElement) {
+				themePicker.addEventListener("click", (event) => {
+					const target = event.target;
+
+					if (!(target instanceof HTMLButtonElement)) {
+						return;
+					}
+
+					const theme = target.dataset.themeOption;
+
+					if (theme !== "auto" && theme !== "light" && theme !== "dark") {
+						return;
+					}
+
+					window.__glpecileTheme.persist(theme);
+					syncThemeButtons(theme);
+				});
+			}
+
+			document.addEventListener("keydown", (event) => {
+				if (
+					event.defaultPrevented ||
+					event.repeat ||
+					event.metaKey ||
+					event.ctrlKey ||
+					event.altKey
+				) {
 					return;
 				}
 
-				const isActive = button.dataset.themeOption === theme;
-
-				button.dataset.active = isActive ? "true" : "false";
-				button.setAttribute("aria-pressed", isActive ? "true" : "false");
-				button.classList.toggle("text-foreground", isActive);
-				button.classList.toggle("underline", isActive);
-				button.classList.toggle("text-tone-soft", !isActive);
-			});
-		};
-
-		const syncThemeButtons = (theme) => {
-			window.__glpecileTheme.apply(theme);
-			setThemeButtonState(theme);
-		};
-
-		const storedTheme =
-			window.__glpecileTheme.root.dataset.themePreference === "light" ||
-			window.__glpecileTheme.root.dataset.themePreference === "dark"
-				? window.__glpecileTheme.root.dataset.themePreference
-				: "auto";
-
-		syncThemeButtons(storedTheme);
-
-		window.__glpecileTheme.media.addEventListener("change", () => {
-			if (window.__glpecileTheme.root.dataset.themePreference === "auto") {
-				syncThemeButtons("auto");
-			}
-		});
-
-		if (themePicker instanceof HTMLElement) {
-			themePicker.addEventListener("click", (event) => {
 				const target = event.target;
 
-				if (!(target instanceof HTMLButtonElement)) {
+				if (
+					target instanceof HTMLElement &&
+					(themeEditableTags.has(target.tagName) || target.isContentEditable)
+				) {
 					return;
 				}
 
-				const theme = target.dataset.themeOption;
+				const themeMap = {
+					a: "auto",
+					l: "light",
+					d: "dark",
+				};
+				const theme = themeMap[event.key.toLowerCase()];
 
-				if (theme !== "auto" && theme !== "light" && theme !== "dark") {
+				if (!theme) {
 					return;
 				}
 
+				event.preventDefault();
 				window.__glpecileTheme.persist(theme);
 				syncThemeButtons(theme);
 			});
 		}
-
-		document.addEventListener("keydown", (event) => {
-			if (
-				event.defaultPrevented ||
-				event.repeat ||
-				event.metaKey ||
-				event.ctrlKey ||
-				event.altKey
-			) {
-				return;
-			}
-
-			const target = event.target;
-
-			if (
-				target instanceof HTMLElement &&
-				(themeEditableTags.has(target.tagName) || target.isContentEditable)
-			) {
-				return;
-			}
-
-			const themeMap = {
-				a: "auto",
-				l: "light",
-				d: "dark",
-			};
-			const theme = themeMap[event.key.toLowerCase()];
-
-			if (!theme) {
-				return;
-			}
-
-			event.preventDefault();
-			window.__glpecileTheme.persist(theme);
-			syncThemeButtons(theme);
-		});
-	}
+	})();
 </script>

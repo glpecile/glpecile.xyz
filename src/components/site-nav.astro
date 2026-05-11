@@ -96,58 +96,60 @@ const navItems = siteConfig.mainNav.map((item) => ({
 </div>
 
 <script is:inline>
-	const currentScript = document.currentScript;
-	const root =
-		currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
+	(() => {
+		const currentScript = document.currentScript;
+		const root =
+			currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
 
-	if (root instanceof HTMLElement) {
-		const mobileNav = root.querySelector("[data-mobile-nav]");
-		const toggle = root.querySelector("[data-mobile-nav-toggle]");
-		const panel = root.querySelector("[data-mobile-nav-panel]");
+		if (root instanceof HTMLElement) {
+			const mobileNav = root.querySelector("[data-mobile-nav]");
+			const toggle = root.querySelector("[data-mobile-nav-toggle]");
+			const panel = root.querySelector("[data-mobile-nav-panel]");
 
-		if (
-			mobileNav instanceof HTMLElement &&
-			toggle instanceof HTMLButtonElement &&
-			panel instanceof HTMLElement
-		) {
-			const setOpen = (open) => {
-				mobileNav.dataset.state = open ? "open" : "closed";
-				toggle.setAttribute("aria-expanded", open ? "true" : "false");
-				panel.setAttribute("aria-hidden", open ? "false" : "true");
-				panel.inert = !open;
-			};
+			if (
+				mobileNav instanceof HTMLElement &&
+				toggle instanceof HTMLButtonElement &&
+				panel instanceof HTMLElement
+			) {
+				const setOpen = (open) => {
+					mobileNav.dataset.state = open ? "open" : "closed";
+					toggle.setAttribute("aria-expanded", open ? "true" : "false");
+					panel.setAttribute("aria-hidden", open ? "false" : "true");
+					panel.inert = !open;
+				};
 
-			const close = () => {
+				const close = () => {
+					setOpen(false);
+				};
+
+				toggle.addEventListener("click", () => {
+					setOpen(mobileNav.dataset.state !== "open");
+				});
+
+				document.addEventListener("click", (event) => {
+					if (mobileNav.dataset.state !== "open") {
+						return;
+					}
+
+					const target = event.target;
+
+					if (target instanceof Node && !mobileNav.contains(target)) {
+						close();
+					}
+				});
+
+				document.addEventListener("keydown", (event) => {
+					if (event.key === "Escape") {
+						close();
+					}
+				});
+
+				panel.querySelectorAll("a").forEach((link) => {
+					link.addEventListener("click", close);
+				});
+
 				setOpen(false);
-			};
-
-			toggle.addEventListener("click", () => {
-				setOpen(mobileNav.dataset.state !== "open");
-			});
-
-			document.addEventListener("click", (event) => {
-				if (mobileNav.dataset.state !== "open") {
-					return;
-				}
-
-				const target = event.target;
-
-				if (target instanceof Node && !mobileNav.contains(target)) {
-					close();
-				}
-			});
-
-			document.addEventListener("keydown", (event) => {
-				if (event.key === "Escape") {
-					close();
-				}
-			});
-
-			panel.querySelectorAll("a").forEach((link) => {
-				link.addEventListener("click", close);
-			});
-
-			setOpen(false);
+			}
 		}
-	}
+	})();
 </script>

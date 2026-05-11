@@ -58,43 +58,45 @@ const posts = await getBlogPosts();
 		is:inline
 		define:vars={{ recentPostUrls: posts.slice(0, 9).map((post) => getBlogPostUrl(post.id)) }}
 	>
-		const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+		(() => {
+			const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
-		const onBlogShortcut = (event) => {
-			if (
-				event.defaultPrevented ||
-				event.repeat ||
-				event.metaKey ||
-				event.ctrlKey ||
-				event.altKey
-			) {
-				return;
-			}
+			const onBlogShortcut = (event) => {
+				if (
+					event.defaultPrevented ||
+					event.repeat ||
+					event.metaKey ||
+					event.ctrlKey ||
+					event.altKey
+				) {
+					return;
+				}
 
-			const target = event.target;
+				const target = event.target;
 
-			if (
-				target instanceof HTMLElement &&
-				(editableTags.has(target.tagName) || target.isContentEditable)
-			) {
-				return;
-			}
+				if (
+					target instanceof HTMLElement &&
+					(editableTags.has(target.tagName) || target.isContentEditable)
+				) {
+					return;
+				}
 
-			if (!/^\d$/.test(event.key)) {
-				return;
-			}
+				if (!/^\d$/.test(event.key)) {
+					return;
+				}
 
-			const index = Number(event.key) - 1;
-			const href = recentPostUrls[index];
+				const index = Number(event.key) - 1;
+				const href = recentPostUrls[index];
 
-			if (!href) {
-				return;
-			}
+				if (!href) {
+					return;
+				}
 
-			event.preventDefault();
-			window.location.assign(href);
-		};
+				event.preventDefault();
+				window.location.assign(href);
+			};
 
-		document.addEventListener("keydown", onBlogShortcut);
+			document.addEventListener("keydown", onBlogShortcut);
+		})();
 	</script>
 </SiteLayout>

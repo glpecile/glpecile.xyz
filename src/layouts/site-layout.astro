@@ -88,56 +88,60 @@ const shortcuts = siteConfig.mainNav.map(({ href, shortcut }) => ({
 			rel="stylesheet"
 		/>
 		<script is:inline>
-			const createThemeController = () => ({
-				storageKey: "glpecile-theme",
-				root: document.documentElement,
-				media: window.matchMedia("(prefers-color-scheme: dark)"),
-				getSystemTheme() {
-					return this.media.matches ? "dark" : "light";
-				},
-				apply(theme) {
-					this.root.dataset.theme = theme === "auto" ? this.getSystemTheme() : theme;
-					this.root.dataset.themePreference = theme;
-				},
-				persist(theme) {
-					try {
-						if (theme === "auto") {
-							localStorage.removeItem(this.storageKey);
-						} else {
-							localStorage.setItem(this.storageKey, theme);
+			(() => {
+				const createThemeController = () => ({
+					storageKey: "glpecile-theme",
+					root: document.documentElement,
+					media: window.matchMedia("(prefers-color-scheme: dark)"),
+					getSystemTheme() {
+						return this.media.matches ? "dark" : "light";
+					},
+					apply(theme) {
+						this.root.dataset.theme = theme === "auto" ? this.getSystemTheme() : theme;
+						this.root.dataset.themePreference = theme;
+					},
+					persist(theme) {
+						try {
+							if (theme === "auto") {
+								localStorage.removeItem(this.storageKey);
+							} else {
+								localStorage.setItem(this.storageKey, theme);
+							}
+						} catch {
+							// Ignore browsers that block storage access.
 						}
-					} catch {
-						// Ignore browsers that block storage access.
-					}
-				},
-			});
+					},
+				});
 
-			window.__glpecileTheme = createThemeController();
+				window.__glpecileTheme = createThemeController();
 
-			try {
-				const storedTheme = localStorage.getItem(window.__glpecileTheme.storageKey);
-				window.__glpecileTheme.apply(
-					storedTheme === "light" || storedTheme === "dark" ? storedTheme : "auto",
-				);
-			} catch {
-				window.__glpecileTheme.apply("auto");
-			}
-
-			window.__glpecileTheme.media.addEventListener("change", () => {
-				if (window.__glpecileTheme.root.dataset.themePreference === "auto") {
+				try {
+					const storedTheme = localStorage.getItem(window.__glpecileTheme.storageKey);
+					window.__glpecileTheme.apply(
+						storedTheme === "light" || storedTheme === "dark" ? storedTheme : "auto",
+					);
+				} catch {
 					window.__glpecileTheme.apply("auto");
 				}
-			});
+
+				window.__glpecileTheme.media.addEventListener("change", () => {
+					if (window.__glpecileTheme.root.dataset.themePreference === "auto") {
+						window.__glpecileTheme.apply("auto");
+					}
+				});
+			})();
 		</script>
 		<script is:inline>
-			try {
-				if (sessionStorage.getItem("glpecile-shortcut-nav") === "true") {
-					document.documentElement.dataset.shortcutNav = "true";
-					sessionStorage.removeItem("glpecile-shortcut-nav");
+			(() => {
+				try {
+					if (sessionStorage.getItem("glpecile-shortcut-nav") === "true") {
+						document.documentElement.dataset.shortcutNav = "true";
+						sessionStorage.removeItem("glpecile-shortcut-nav");
+					}
+				} catch {
+					// Ignore browsers that block storage access.
 				}
-			} catch {
-				// Ignore browsers that block storage access.
-			}
+			})();
 		</script>
 	</head>
 	<body class="min-h-screen bg-background text-foreground antialiased">
@@ -177,103 +181,107 @@ const shortcuts = siteConfig.mainNav.map(({ href, shortcut }) => ({
 		</div>
 
 		<script is:inline data-shortcuts={JSON.stringify(shortcuts)}>
-			const currentScript = document.currentScript;
-			const shortcuts = JSON.parse(
-				currentScript instanceof HTMLScriptElement
-					? currentScript.dataset.shortcuts ?? "[]"
-					: "[]",
-			);
-			const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
-
-			const onShortcut = (event) => {
-				if (
-					event.defaultPrevented ||
-					event.repeat ||
-					event.metaKey ||
-					event.ctrlKey ||
-					event.altKey
-				) {
-					return;
-				}
-
-				const target = event.target;
-
-				if (
-					target instanceof HTMLElement &&
-					(editableTags.has(target.tagName) || target.isContentEditable)
-				) {
-					return;
-				}
-
-				const shortcut = shortcuts.find(
-					(item) => item.shortcut.toLowerCase() === event.key.toLowerCase(),
+			(() => {
+				const currentScript = document.currentScript;
+				const shortcuts = JSON.parse(
+					currentScript instanceof HTMLScriptElement
+						? currentScript.dataset.shortcuts ?? "[]"
+						: "[]",
 				);
+				const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
-				if (!shortcut) {
-					return;
-				}
+				const onShortcut = (event) => {
+					if (
+						event.defaultPrevented ||
+						event.repeat ||
+						event.metaKey ||
+						event.ctrlKey ||
+						event.altKey
+					) {
+						return;
+					}
 
-				event.preventDefault();
+					const target = event.target;
 
-				if (window.location.pathname === shortcut.href) {
-					window.scrollTo({ top: 0 });
-					return;
-				}
+					if (
+						target instanceof HTMLElement &&
+						(editableTags.has(target.tagName) || target.isContentEditable)
+					) {
+						return;
+					}
 
-				try {
-					sessionStorage.setItem("glpecile-shortcut-nav", "true");
-				} catch {
-					// Ignore browsers that block storage access.
-				}
+					const shortcut = shortcuts.find(
+						(item) => item.shortcut.toLowerCase() === event.key.toLowerCase(),
+					);
 
-				window.location.assign(shortcut.href);
-			};
+					if (!shortcut) {
+						return;
+					}
 
-			document.addEventListener("keydown", onShortcut);
+					event.preventDefault();
+
+					if (window.location.pathname === shortcut.href) {
+						window.scrollTo({ top: 0 });
+						return;
+					}
+
+					try {
+						sessionStorage.setItem("glpecile-shortcut-nav", "true");
+					} catch {
+						// Ignore browsers that block storage access.
+					}
+
+					window.location.assign(shortcut.href);
+				};
+
+				document.addEventListener("keydown", onShortcut);
+			})();
 		</script>
 
 		<script is:inline>
-			const element = document.querySelector("[data-scramble]");
-			const text = element?.getAttribute("data-text") ?? "";
-			const prefersReducedMotion = window.matchMedia(
-				"(prefers-reduced-motion: reduce)",
-			).matches;
-			const skipScramble =
-				prefersReducedMotion ||
-				document.documentElement.dataset.shortcutNav === "true";
+			(() => {
+				const element = document.querySelector("[data-scramble]");
+				const text = element?.getAttribute("data-text") ?? "";
+				const prefersReducedMotion = window.matchMedia(
+					"(prefers-reduced-motion: reduce)",
+				).matches;
+				const skipScramble =
+					prefersReducedMotion ||
+					document.documentElement.dataset.shortcutNav === "true";
 
-			if (element instanceof HTMLElement && text) {
-				if (skipScramble) {
-					element.textContent = text;
-				} else {
-					const characters =
-						"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-					const scrambleFrames = 5;
-					let frame = 0;
+				if (element instanceof HTMLElement && text) {
+					if (skipScramble) {
+						element.textContent = text;
+					} else {
+						const characters =
+							"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+						const scrambleFrames = 5;
+						let frame = 0;
 
-					const interval = window.setInterval(() => {
-						const settled = Math.max(0, frame - scrambleFrames);
+						const interval = window.setInterval(() => {
+							const settled = Math.max(0, frame - scrambleFrames);
 
-						element.textContent = text
-							.split("")
-							.map((character, index) => {
-								if (index < settled) {
-									return character;
-								}
+							element.textContent = text
+								.split("")
+								.map((character, index) => {
+									if (index < settled) {
+										return character;
+									}
 
-								return characters[Math.floor(Math.random() * characters.length)];
-							})
-							.join("");
+									return characters[Math.floor(Math.random() * characters.length)];
+								})
+								.join("");
 
-						frame += 1;
+							frame += 1;
 
-						if (settled >= text.length) {
-							window.clearInterval(interval);
-							element.textContent = text;
-						}
-					}, 16);
+							if (settled >= text.length) {
+								window.clearInterval(interval);
+								element.textContent = text;
+							}
+						}, 16);
+					}
 				}
-			}
+			})();
 		</script>
 	</body>
 </html>
