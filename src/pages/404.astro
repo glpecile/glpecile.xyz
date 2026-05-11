@@ -1,11 +1,17 @@
 ---
 import ErrorPage from "@/components/error-page.astro";
+
+import { siteConfig } from "#config/site";
+
+const navHint = siteConfig.shortcuts.nav
+	.map((item) => `[${item.shortcut}] for ${item.title.toLowerCase()}`)
+	.join(", ");
 ---
 
 <ErrorPage
 	code="404"
 	title="Page not found."
 	description="That path does not exist here, or it moved somewhere else."
-	hint="Use [h] for home, [b] for blog, or [w] for work."
+	hint={`Use ${navHint}.`}
 	path="/404"
 />

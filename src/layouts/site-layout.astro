@@ -38,7 +38,7 @@ const markdownUrl = new URL(getMarkdownPath(path), siteConfig.siteUrl).toString(
 const llmsUrl = new URL("/llms.txt", siteConfig.siteUrl).toString();
 const ogImageBase = import.meta.env.DEV ? Astro.url.origin : siteConfig.siteUrl;
 const ogImageUrl = new URL(previewPath, ogImageBase).toString();
-const shortcuts = siteConfig.mainNav.map(({ href, shortcut }) => ({
+const shortcuts = siteConfig.shortcuts.nav.map(({ href, shortcut }) => ({
 	href,
 	shortcut,
 }));

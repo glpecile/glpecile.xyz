@@ -1,9 +1,16 @@
 ---
+import { siteConfig } from "#config/site";
+
 import PageIntro from "@/components/page-intro.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 
 const posts = await getBlogPosts();
+const latestPostCount = siteConfig.shortcuts.blog.latestPostCount;
+const latestPostRange = `1-${latestPostCount}`;
+const recentPostUrls = posts
+	.slice(0, latestPostCount)
+	.map((post) => getBlogPostUrl(post.id));
 ---
 
 <SiteLayout
@@ -32,7 +39,7 @@ const posts = await getBlogPosts();
 							<a class="terminal-link" href={getBlogPostUrl(post.id)}>
 								{post.data.title}
 							</a>
-							{index < 9 && (
+							{index < latestPostCount && (
 								<span class="text-tone-faint"> [{index + 1}]</span>
 							)}
 						</p>
@@ -46,7 +53,9 @@ const posts = await getBlogPosts();
 
 		{posts.length > 0 && (
 			<div class="text-tone-soft space-y-1 text-sm">
-				<p>use <span class="text-tone-mid">[1-9]</span> for the latest posts.</p>
+				<p>
+					use <span class="text-tone-mid">[{latestPostRange}]</span> for the latest posts.
+				</p>
 				<p>
 					or subscribe via the <a class="terminal-link" href="/blog/rss.xml">rss feed</a>.
 				</p>
@@ -56,7 +65,7 @@ const posts = await getBlogPosts();
 
 	<script
 		is:inline
-		define:vars={{ recentPostUrls: posts.slice(0, 9).map((post) => getBlogPostUrl(post.id)) }}
+		define:vars={{ recentPostUrls }}
 	>
 		(() => {
 			const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);

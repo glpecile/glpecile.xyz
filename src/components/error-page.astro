@@ -14,7 +14,7 @@ export interface Props {
 }
 
 const { code, title, description, hint, error, path = "/" } = Astro.props;
-const navItems = siteConfig.mainNav.map((item) => ({
+const navItems = siteConfig.shortcuts.nav.map((item) => ({
 	...item,
 	label: item.title.toLowerCase(),
 }));

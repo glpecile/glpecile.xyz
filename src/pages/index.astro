@@ -13,6 +13,13 @@ const latestPosts = posts.slice(0, 3);
 const work = siteConfig.work;
 const featuredWork = work.slice(0, 3);
 const hasMoreWork = work.length > featuredWork.length;
+const navShortcutCopy = siteConfig.shortcuts.nav
+	.map(
+		(item) =>
+			`<span class="text-tone-mid">[${item.shortcut}] ${item.title.toLowerCase()}</span>`,
+	)
+	.join('<span class="text-tone-faint"> / </span>');
+const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">are you an agent? start with <a class="terminal-link" href="/llms.txt">/llms.txt</a>.</span>`;
 ---
 
 <SiteLayout>
@@ -20,7 +27,7 @@ const hasMoreWork = work.length > featuredWork.length;
 		label="home"
 		title="Frontend Engineer."
 		description="Shipping websites and apps from time to time."
-		extra={'shortcut keys: <span class="text-tone-mid">[h] home</span><span class="text-tone-faint"> / </span><span class="text-tone-mid">[b] blog</span><span class="text-tone-faint"> / </span><span class="text-tone-mid">[w] work</span><span class="mt-2 block">are you an agent? start with <a class="terminal-link" href="/llms.txt">/llms.txt</a>.</span>'}
+		extra={introExtra}
 	/>
 
 	<section class="space-y-4">

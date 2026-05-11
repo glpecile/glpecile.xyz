@@ -1,5 +1,7 @@
 ---
 import { siteConfig } from "#config/site";
+
+const themeItems = siteConfig.shortcuts.theme;
 ---
 
 <footer class="text-tone-soft pt-12 text-sm">
@@ -22,30 +24,17 @@ import { siteConfig } from "#config/site";
 			data-theme-picker
 		>
 			<span class="text-tone-faint text-[0.72rem] uppercase tracking-[0.28em]">theme</span>
-			<button
-				type="button"
-				data-theme-option="auto"
-				aria-keyshortcuts="a"
-				class="terminal-link text-tone-soft cursor-pointer px-1"
-			>
-				[a]
-			</button>
-			<button
-				type="button"
-				data-theme-option="light"
-				aria-keyshortcuts="l"
-				class="terminal-link text-tone-soft cursor-pointer px-1"
-			>
-				[l]
-			</button>
-			<button
-				type="button"
-				data-theme-option="dark"
-				aria-keyshortcuts="d"
-				class="terminal-link text-tone-soft cursor-pointer px-1"
-			>
-				[d]
-			</button>
+			{themeItems.map((item) => (
+				<button
+					type="button"
+					data-theme-option={item.theme}
+					data-theme-shortcut={item.shortcut}
+					aria-keyshortcuts={item.shortcut}
+					class="terminal-link text-tone-soft cursor-pointer px-1"
+				>
+					[{item.shortcut}]
+				</button>
+			))}
 		</span>
 	</p>
 </footer>
@@ -60,6 +49,15 @@ import { siteConfig } from "#config/site";
 			const themePicker = footer.querySelector("[data-theme-picker]");
 			const themeButtons = Array.from(footer.querySelectorAll("[data-theme-option]"));
 			const themeEditableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+			const themeMap = new Map(
+				themeButtons.flatMap((button) =>
+					button instanceof HTMLButtonElement &&
+					typeof button.dataset.themeOption === "string" &&
+					typeof button.dataset.themeShortcut === "string"
+						? [[button.dataset.themeShortcut.toLowerCase(), button.dataset.themeOption]]
+						: [],
+				),
+			);
 
 			const setThemeButtonState = (theme) => {
 				themeButtons.forEach((button) => {
@@ -99,14 +97,16 @@ import { siteConfig } from "#config/site";
 			if (themePicker instanceof HTMLElement) {
 				themePicker.addEventListener("click", (event) => {
 					const target = event.target;
+					const button =
+						target instanceof Element ? target.closest("[data-theme-option]") : null;
 
-					if (!(target instanceof HTMLButtonElement)) {
+					if (!(button instanceof HTMLButtonElement)) {
 						return;
 					}
 
-					const theme = target.dataset.themeOption;
+					const theme = button.dataset.themeOption;
 
-					if (theme !== "auto" && theme !== "light" && theme !== "dark") {
+					if (!theme) {
 						return;
 					}
 
@@ -135,12 +135,7 @@ import { siteConfig } from "#config/site";
 					return;
 				}
 
-				const themeMap = {
-					a: "auto",
-					l: "light",
-					d: "dark",
-				};
-				const theme = themeMap[event.key.toLowerCase()];
+				const theme = themeMap.get(event.key.toLowerCase());
 
 				if (!theme) {
 					return;

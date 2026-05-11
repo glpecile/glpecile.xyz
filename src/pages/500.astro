@@ -1,14 +1,19 @@
 ---
 import ErrorPage from "@/components/error-page.astro";
 
+import { siteConfig } from "#config/site";
+
 const error = Astro.props.error;
+const navHint = siteConfig.shortcuts.nav
+	.map((item) => `[${item.shortcut}] for ${item.title.toLowerCase()}`)
+	.join(", ");
 ---
 
 <ErrorPage
 	code="500"
 	title="Something broke on our side."
 	description="The page failed before it could finish rendering."
-	hint="Try again in a moment, or use [h] for home, [b] for blog, or [w] for work."
+	hint={`Try again in a moment, or use ${navHint}.`}
 	error={error}
 	path="/500"
 />

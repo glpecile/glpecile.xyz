@@ -12,7 +12,7 @@ const isCurrentPath = (href: string) =>
 		? currentPath === "/"
 		: currentPath === href || currentPath.startsWith(`${href}/`);
 
-const navItems = siteConfig.mainNav.map((item) => ({
+const navItems = siteConfig.shortcuts.nav.map((item) => ({
 	...item,
 	isActive: isCurrentPath(item.href),
 }));
