@@ -11,6 +11,7 @@ Project-specific guidance for working in this repo.
 - Tailwind CSS is configured through `@tailwindcss/vite` and `src/styles/global.css`. Do not add `tailwind.config.*` unless there is a real project need.
 - Keep the `@/*` alias pointing to `./src/*`. New imports and generated files should use the `src`-based alias layout.
 - Run `bun run check` after `.astro` changes. Use `bun run lint` for TS, JS, and CSS changes that Biome covers.
+- In Astro, `script is:inline` blocks share the page scope after compilation. Wrap inline script bodies in an IIFE or otherwise isolate names; do not rely on component boundaries to prevent top-level redeclarations.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
 - Never use `any`. Prefer concrete types, `unknown`, or small typed helpers instead.
