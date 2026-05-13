@@ -1,24 +1,39 @@
 ---
 import PageIntro from "@/components/page-intro.astro";
+import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 
 import { siteConfig } from "#config/site";
+import type { CertificateItem, CvFile, EducationItem, WorkExperience } from "#config/site";
 
-const work = siteConfig.work;
+const work: readonly WorkExperience[] = siteConfig.work;
+const education: readonly EducationItem[] = siteConfig.education;
+const certificates: readonly CertificateItem[] = siteConfig.certificates;
+const cv: CvFile = siteConfig.cv;
 ---
 
 <SiteLayout
 	title="Work"
-	description="Work, teaching, and design across a few different corners of the internet."
+	description="Work history, education, certificates, and a downloadable CV."
 	path="/work"
 	previewPath="/work/preview"
 >
-	<section class="space-y-4">
+	<section class="space-y-6">
 		<PageIntro
 			label="work"
 			title="Past work experience."
-			description="A few places where I shipped frontend work, taught design patterns, or left things a little cleaner than I found them."
+			description="+ education & certificates."
 		/>
+
+		<p class="text-sm sm:text-base">
+			<a class="terminal-link inline-flex items-center gap-2" href={cv.href} download={cv.fileName}>
+				[{cv.label}]
+			</a>
+		</p>
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="roles" />
 
 		{work.length === 0 ? (
 			<p class="text-tone-soft text-sm">no work yet.</p>
@@ -53,6 +68,86 @@ const work = siteConfig.work;
 								{job.summary}
 							</p>
 						)}
+					</li>
+				))}
+			</ol>
+		)}
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="education" />
+
+		{education.length === 0 ? (
+			<p class="text-tone-soft text-sm">no education yet.</p>
+		) : (
+			<ol class="space-y-5">
+				{education.map((item) => (
+					<li class="space-y-1">
+						<p class="text-base leading-8 sm:text-lg">
+							{item.url ? (
+								<a
+									class="terminal-link"
+									href={item.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{item.school}
+								</a>
+							) : (
+								<span class="text-foreground">{item.school}</span>
+							)}
+						</p>
+						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							{item.credential}
+						</p>
+						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							{item.period}
+						</p>
+						{item.details?.map((detail) => (
+							<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+								{detail}
+							</p>
+						))}
+					</li>
+				))}
+			</ol>
+		)}
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="certificates" />
+
+		{certificates.length === 0 ? (
+			<p class="text-tone-soft text-sm">no certificates yet.</p>
+		) : (
+			<ol class="space-y-5">
+				{certificates.map((certificate) => (
+					<li class="space-y-1">
+						<p class="text-base leading-8 sm:text-lg">
+							{certificate.url ? (
+								<a
+									class="terminal-link"
+									href={certificate.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{certificate.title}
+								</a>
+							) : (
+								<span class="text-foreground">{certificate.title}</span>
+							)}
+						</p>
+						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							{certificate.issuer}
+						</p>
+						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							Issued {certificate.issued}
+						</p>
+						{certificate.details?.map((detail) => (
+							<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+								{detail}
+							</p>
+						))}
 					</li>
 				))}
 			</ol>

@@ -1,12 +1,35 @@
 export type SiteConfig = typeof siteConfig;
 
-type WorkExperience = {
-    role: string;
-    company: string;
-    period: string;
-    place: string;
-    url?: string;
-    summary?: string;
+export type WorkExperience = {
+	role: string;
+	company: string;
+	period: string;
+	place: string;
+	url?: string;
+	summary?: string;
+};
+
+export type EducationItem = {
+	school: string;
+	credential: string;
+	period: string;
+	url?: string;
+	details?: readonly string[];
+};
+
+export type CertificateItem = {
+	title: string;
+	issuer: string;
+	issued: string;
+	url?: string;
+	details?: readonly string[];
+};
+
+export type CvFile = {
+	href: string;
+	fileName: string;
+	label: string;
+	heading: string;
 };
 
 type NavItem = {
@@ -78,7 +101,7 @@ export const siteConfig = {
 	},
 	work: [
 		{
-			role: "Frontend Engineer",
+			role: "Software / Frontend Engineer",
 			company: "POAP - Proof Of Attendance Protocol",
 			period: "Jan 2025 - Present",
 			place: "Buenos Aires Province · Hybrid",
@@ -114,4 +137,47 @@ export const siteConfig = {
 			url: "https://csitba.web.app/",
 		},
 	] satisfies WorkExperience[],
+	education: [
+		{
+			school: "Instituto Tecnologico de Buenos Aires",
+			credential: "Software Engineering, Computer Software Engineering",
+			period: "Mar 2017 - Feb 2025",
+			url: "https://www.itba.edu.ar",
+		},
+		{
+			school: "Southern International School",
+			credential: "High School Diploma",
+			period: "2011 - 2016",
+		},
+	] satisfies EducationItem[],
+	certificates: [
+		{
+			title: "Animations on the Web Course",
+			issuer: "Emil Kowalski",
+			issued: "Aug 2024",
+			details: ["Certificate: Animations on the Web Course Certificate taught by Emil Kowalski"],
+		},
+		{
+			title: "Certificazione di Lingua Italiana come Lingua Straniera, livello C1 (CILS)",
+			issuer: "Universita per Stranieri di Siena",
+			issued: "Dec 2016",
+		},
+		{
+			title:
+				"International Baccalaureate (IB) Certificate (Economics, English, Italian, Portuguese, Spanish)",
+			issuer: "International Baccalaureate",
+			issued: "Nov 2016",
+		},
+		{
+			title: "International General Certificate of Secondary School (IGCSE)",
+			issuer: "University of Cambridge",
+			issued: "Nov 2014",
+		},
+	] satisfies CertificateItem[],
+	cv: {
+		href: "/work/cv.pdf",
+		fileName: "gian-luca-pecile-cv.pdf",
+		label: "download cv",
+		heading: "Software Engineer from ITBA.",
+	} satisfies CvFile,
 } as const;

@@ -16,8 +16,10 @@ const { label, title, description, extra } = Astro.props;
 	<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
 		{title}
 	</h1>
-	<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-		{description}
-	</p>
+	{description && (
+		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+			{description}
+		</p>
+	)}
 	{extra && <p class="text-tone-soft text-sm" set:html={extra} />}
 </section>

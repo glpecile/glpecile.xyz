@@ -1,8 +1,9 @@
 import { siteConfig } from "#config/site";
+import type { CertificateItem, EducationItem, WorkExperience } from "#config/site";
 import type { BlogPost } from "@/lib/blog";
 import { getBlogPostUrl } from "@/lib/blog";
 
-type WorkItem = (typeof siteConfig.work)[number];
+type WorkItem = WorkExperience;
 
 const siteHost = new URL(siteConfig.siteUrl).hostname;
 
@@ -26,10 +27,26 @@ const toIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 const renderCompanyLink = (job: WorkItem) =>
 	job.url ? `[${job.company}](${job.url})` : job.company;
 
+const renderTextLink = (label: string, url?: string) => (url ? `[${label}](${url})` : label);
+
 const renderWorkLine = (job: WorkItem) => {
 	const details = `${job.role} @ ${renderCompanyLink(job)} — ${job.period} — ${job.place}`;
 
 	return job.summary ? `- ${details}. ${job.summary}` : `- ${details}`;
+};
+
+const renderEducationLine = (item: EducationItem) => {
+	const details = `${renderTextLink(item.school, item.url)} — ${item.credential} — ${item.period}`;
+	const notes = item.details?.join(". ");
+
+	return notes ? `- ${details}. ${notes}` : `- ${details}`;
+};
+
+const renderCertificateLine = (item: CertificateItem) => {
+	const details = `${renderTextLink(item.title, item.url)} — ${item.issuer} — Issued ${item.issued}`;
+	const notes = item.details?.join(". ");
+
+	return notes ? `- ${details}. ${notes}` : `- ${details}`;
 };
 
 const formatSocialLabel = (label: string) =>
@@ -82,7 +99,8 @@ export function renderLlmsTxt(posts: BlogPost[]) {
 		"## Portfolio",
 		"",
 		`- [Home](${toAbsoluteUrl(getMarkdownPath("/"))}): Short profile, featured work, recent writing, and public links`,
-		`- [Work](${toAbsoluteUrl(getMarkdownPath("/work"))}): Full work history with role, company, period, location, and summaries when available`,
+		`- [Work](${toAbsoluteUrl(getMarkdownPath("/work"))}): Full work history, education, certificates, and the CV download link`,
+		`- [CV PDF](${toAbsoluteUrl(siteConfig.cv.href)}): Downloadable resume PDF generated from the same work page data; prefer the work markdown link for text extraction`,
 		"",
 		"## Writing",
 		"",
@@ -153,13 +171,26 @@ export function renderWorkMarkdown() {
 	return joinLines([
 		"# Work",
 		"",
-		`> Work history for ${siteConfig.author}.`,
+		`> Work history, education, certificates, and CV for ${siteConfig.author}.`,
 		"",
 		`- Canonical HTML: ${toAbsoluteUrl("/work")}`,
+		`- CV PDF: ${toAbsoluteUrl(siteConfig.cv.href)}`,
 		"",
 		"## Roles",
 		"",
 		...(siteConfig.work.length > 0 ? siteConfig.work.map(renderWorkLine) : ["No work entries yet."]),
+		"",
+		"## Education",
+		"",
+		...(siteConfig.education.length > 0
+			? siteConfig.education.map(renderEducationLine)
+			: ["No education entries yet."]),
+		"",
+		"## Certificates",
+		"",
+		...(siteConfig.certificates.length > 0
+			? siteConfig.certificates.map(renderCertificateLine)
+			: ["No certificates yet."]),
 	]);
 }
 
