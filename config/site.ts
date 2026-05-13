@@ -157,7 +157,7 @@ export const siteConfig = {
 			issuer: "Emil Kowalski",
 			issued: "Aug 2024",
 			details: ["Certificate: Animations on the Web Course Certificate taught by Emil Kowalski"],
-			url: "https://animations.dev/learn",
+			url: "https://animations.dev/",
 		},
 		{
 			title: "Certificazione di Lingua Italiana come Lingua Straniera, livello C1 (CILS)",
