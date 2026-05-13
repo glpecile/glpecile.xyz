@@ -148,6 +148,7 @@ export const siteConfig = {
 			school: "Southern International School",
 			credential: "High School Diploma",
 			period: "2011 - 2016",
+			url: "https://intschools.org/en/southern",
 		},
 	] satisfies EducationItem[],
 	certificates: [
@@ -156,22 +157,26 @@ export const siteConfig = {
 			issuer: "Emil Kowalski",
 			issued: "Aug 2024",
 			details: ["Certificate: Animations on the Web Course Certificate taught by Emil Kowalski"],
+			url: "https://animations.dev/learn",
 		},
 		{
 			title: "Certificazione di Lingua Italiana come Lingua Straniera, livello C1 (CILS)",
 			issuer: "Universita per Stranieri di Siena",
 			issued: "Dec 2016",
+			url: "https://cils.unistrasi.it/",
 		},
 		{
 			title:
 				"International Baccalaureate (IB) Certificate (Economics, English, Italian, Portuguese, Spanish)",
 			issuer: "International Baccalaureate",
 			issued: "Nov 2016",
+			url: "https://www.ibo.org/",
 		},
 		{
 			title: "International General Certificate of Secondary School (IGCSE)",
 			issuer: "University of Cambridge",
 			issued: "Nov 2014",
+			url: "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-upper-secondary/cambridge-igcse/",
 		},
 	] satisfies CertificateItem[],
 	cv: {
