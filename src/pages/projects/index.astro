@@ -1,0 +1,108 @@
+---
+import { siteConfig } from "#config/site";
+
+import PageIntro from "@/components/page-intro.astro";
+import SiteLayout from "@/layouts/site-layout.astro";
+import { formatProjectDate, getProjectPostUrl, getProjectPosts } from "@/lib/projects";
+
+const posts = await getProjectPosts();
+const latestPostCount = siteConfig.shortcuts.projects.latestPostCount;
+const latestPostRange = `1-${latestPostCount}`;
+const recentPostUrls = posts
+	.slice(0, latestPostCount)
+	.map((post) => getProjectPostUrl(post.id));
+---
+
+<SiteLayout
+	title="Projects"
+	description="Project notes, build logs, and tiny writeups for things I ship."
+	path="/projects"
+	previewPath="/projects/preview"
+>
+	<section class="space-y-4">
+		<PageIntro
+			label="projects"
+			title="Project notes, not case studies."
+			description="Build logs, implementation notes, and writeups for tools that started small and kept getting more useful."
+		/>
+
+		{posts.length === 0 ? (
+			<p class="text-tone-soft text-sm">no projects yet.</p>
+		) : (
+			<ol class="space-y-5">
+				{posts.map((post, index) => (
+					<li class="space-y-1">
+						<p class="text-tone-faint text-xs uppercase tracking-[0.28em]">
+							{formatProjectDate(post.data.updatedDate ?? post.data.pubDate)}
+						</p>
+						<p class="text-base leading-8 sm:text-lg">
+							<a class="terminal-link" href={getProjectPostUrl(post.id)}>
+								{post.data.title}
+							</a>
+							{index < latestPostCount && (
+								<span class="text-tone-faint"> [{index + 1}]</span>
+							)}
+						</p>
+						<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+							{post.data.description}
+						</p>
+					</li>
+				))}
+			</ol>
+		)}
+
+		{posts.length > 0 && (
+			<div class="text-tone-soft space-y-1 text-sm">
+				<p>
+					use <span class="text-tone-mid">[{latestPostRange}]</span> for the latest project notes.
+				</p>
+			</div>
+		)}
+	</section>
+
+	<script
+		is:inline
+		define:vars={{ recentPostUrls }}
+	>
+		(() => {
+			const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+
+			const onProjectShortcut = (event) => {
+				if (
+					event.defaultPrevented ||
+					event.repeat ||
+					event.metaKey ||
+					event.ctrlKey ||
+					event.altKey
+				) {
+					return;
+				}
+
+				const target = event.target;
+
+				if (
+					target instanceof HTMLElement &&
+					(editableTags.has(target.tagName) || target.isContentEditable)
+				) {
+					return;
+				}
+
+				if (!/^\d$/.test(event.key)) {
+					return;
+				}
+
+				const index = Number(event.key) - 1;
+				const href = recentPostUrls[index];
+
+				if (!href) {
+					return;
+				}
+
+				event.preventDefault();
+				window.location.assign(href);
+			};
+
+			document.addEventListener("keydown", onProjectShortcut);
+		})();
+	</script>
+</SiteLayout>

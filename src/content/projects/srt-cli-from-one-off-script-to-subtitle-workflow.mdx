@@ -1,0 +1,344 @@
+---
+title: "srt-cli: from one-off script to subtitle workflow"
+description: A tiny Bun CLI that started as a timestamp converter and slowly absorbed an entire subtitle workflow around it.
+pubDate: 2026-05-18
+---
+
+Some tools begin with a roadmap.
+
+This one began with annoyance.
+
+I wanted to watch `re:zero break time` clips with subtitles. Official subtitles were either missing or not easily available, but I kept finding YouTube comments by [`@KakoeiSbi`](https://www.youtube.com/@KakoeiSbi) with fan-translated dialogue written in a surprisingly structured timestamped format.
+
+That format was close enough to useful to be frustrating.
+
+Not because it was bad, but because it was *almost* an `.srt` already. Which meant every time I found one of those comments, I ended up doing the same small, boring job again: take timestamped lines, clean them up, convert them into subtitle cues, save a file, and then figure out what to do with the video itself.
+
+So [`srt-cli`](https://github.com/glpecile/text-to-sub) started as the smallest possible fix for that repetition.
+
+## The first version was barely a project
+
+The earliest version of the tool did one thing.
+
+You pasted subtitle text in, told it how long the video was, gave it an output filename, and it generated an `.srt`.
+
+That was it.
+
+If you pressed Enter at the first prompt instead of providing a URL, the CLI would:
+
+1. ask for the video length
+2. ask for subtitle text
+3. ask for an output filename
+4. write an `.srt`
+
+It solved the immediate problem well enough. It did not try to be smart. It just removed one small pocket of manual work.
+
+At that point, the project was basically a timestamp-to-SRT converter with a prompt layer.
+
+And honestly, that version was already useful.
+
+## The project grew for a boring reason
+
+The next phase happened for the most ordinary reason possible: once the converter existed, the rest of the workflow started feeling disproportionately annoying.
+
+The real cost was no longer generating the `.srt`. The real cost was everything around it.
+
+I still had to:
+
+1. copy the video URL around
+2. figure out the duration
+3. find the translation comment again
+4. download the video separately
+5. mux subtitles afterward
+
+This is the kind of thing that happens to a lot of tiny utilities. You solve the part that looks like the problem, then realize the actual pain lives in the steps before and after it.
+
+So the tool started pulling more of the workflow inward.
+
+The first major shift was allowing a YouTube URL as input.
+
+Once that happened, the CLI could use [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) to fetch metadata, infer the duration automatically, and use the downloaded filename as the basis for the output name. Suddenly the manual mode was still there, but it was no longer the only interesting path through the tool.
+
+That was the moment `srt-cli` stopped being just a converter.
+
+## Then it got more opinionated
+
+The next leap was not really about video metadata. It was about trust.
+
+If the tool already knew the video URL, then it could also inspect the comments. And if it could inspect the comments, then it could try to find the translation directly instead of waiting for me to paste it in.
+
+That sounds like a straightforward feature until you remember that YouTube comments are messy.
+
+At first, the matching logic was naive. It looked for an exact match against `@KakoeiSbi`. That worked only when the data happened to arrive in exactly the format I expected.
+
+Over time, that logic got less brittle.
+
+The matcher now normalizes several fields:
+
+1. `author`
+2. `author_id`
+3. `author_url`
+4. raw handle forms like `@KakoeiSbi`
+5. YouTube profile URL variants
+
+Normalization strips URL prefixes, removes `@`, ignores punctuation, and collapses case differences.
+
+That is not a flashy feature, but it is exactly the sort of thing that determines whether a CLI feels “surprisingly solid” or “kind of flaky.”
+
+The parser had to learn a similar lesson.
+
+The useful comments were not always pristine blocks of subtitle text. Sometimes they also contained translator notes, a short intro, or some other explanatory aside. Requiring the entire comment to be perfectly subtitle-shaped would have been technically cleaner, but practically worse.
+
+So the importer shifted from “validate the whole comment” to “extract the lines that clearly look like subtitle lines.”
+
+That change felt small in code, but big in spirit. The tool stopped demanding ideal input and started taking more responsibility for dealing with real input.
+
+## Readability became part of the job
+
+One of my favorite changes in the project arrived later and had nothing to do with networking, downloading, or parsing YouTube data.
+
+It had to do with embarrassment.
+
+Some generated subtitle files were technically correct and still awful to read.
+
+The problem was long dialogue. A giant subtitle cue can be perfectly valid as an `.srt` and still be miserable in practice. The viewer does not care that the timestamps are correct if the subtitle appears as a small essay.
+
+So the CLI added automatic cue splitting.
+
+Now it can:
+
+1. detect overly long dialogue
+2. prefer sentence-boundary splitting
+3. fall back to word chunking when needed
+4. preserve cue ordering
+5. distribute the original duration across the generated chunks
+6. add a tiny inter-chunk gap for readability
+
+The current defaults are modest:
+
+```ts
+MAX_DIALOGUE_CHARS = 84
+AUTO_CHUNK_GAP_SECONDS = 0.12
+```
+
+This was one of those changes that made the project feel more mature without making it feel bigger.
+
+It is easy to obsess over the ingestion path of a tool like this. It turned out the display path mattered just as much.
+
+## The tool also needed a conscience
+
+Once the CLI started pulling translation text directly from someone else’s comment, it felt wrong for the output to silently absorb that work with no attribution.
+
+So when subtitles come from a matching `KakoeiSbi` comment, the tool appends a final subtitle near the end of the video:
+
+```txt
+Subtitle translation credits: @KakoeiSbi
+```
+
+That cue appears roughly three seconds before the end.
+
+I like this detail because it says something about the project’s values.
+
+The goal was never to erase the human part of the workflow. The goal was to automate the repetition around it.
+
+That distinction matters.
+
+## The prompt layer stayed boring on purpose
+
+As the project gained features, I spent some time thinking about whether it wanted to become a more elaborate terminal UI.
+
+There is a very believable alternate version of this tool that turns into a full-screen TUI with richer panels, navigation, progress regions, and status views. I even considered whether something like [OpenTUI](https://github.com/sst/opentui) was the right next step.
+
+But the more I looked at the project, the less convincing that felt.
+
+The complexity here is not in layout. It is in orchestration.
+
+The hard parts are:
+
+1. parsing subtitle text
+2. dealing with comments that are only partially structured
+3. running `yt-dlp`
+4. running `ffmpeg`
+5. handling cancellation correctly
+6. preserving recoverable state when something fails
+
+So instead of chasing a bigger UI, the project got a better prompt flow.
+
+The original stdin handling gave way to a line-based `readline` setup. That made pasted multi-line input more reliable, simplified prompt orchestration, and made cancellation behavior much less ugly.
+
+The CLI also picked up lightweight loading states for long-running steps like metadata fetch, comment lookup, download, subtitle parsing, SRT writing, and muxing.
+
+It is still not a TUI. It just behaves more like a thoughtful command-line tool.
+
+That feels like the right level of ambition.
+
+## The rough edges were weirdly educational
+
+A lot of the memorable bugs in the project were not subtitle bugs at all.
+
+One of the strangest was someone trying to run `src/index.ts` directly in the shell, only for the shell to interpret the top-level `import` as ImageMagick’s `import` command. The result was a pile of confusing output that had absolutely nothing to do with the CLI.
+
+That bug was a good reminder that “works on my machine” is sometimes just shorthand for “I invoked it the way I meant to.”
+
+The fix was simple:
+
+1. add a [Bun](https://bun.sh/) shebang
+2. keep the intended invocation obvious
+
+```bash
+bun run src/index.ts "https://www.youtube.com/watch?v=..."
+```
+
+Another small but meaningful improvement was letting the user pass the YouTube URL as the first positional argument.
+
+That change sounds tiny until you remember how annoying shell quoting gets around `?` and `&`, especially in `zsh`. Supporting direct URL arguments removed a surprising amount of friction for something that barely changed the surface area of the program.
+
+Cancellation got a similar treatment.
+
+The CLI now exits cleanly on:
+
+1. `Ctrl+C`
+2. `Esc` in TTY mode
+3. closed stdin or cancelled input
+
+Instead of exploding with something like:
+
+```txt
+Input stream closed before the prompt was answered.
+```
+
+it now says:
+
+```txt
+Cancelled.
+```
+
+It also interrupts active child processes like [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) and [`ffmpeg`](https://ffmpeg.org/), which matters a lot more than the message itself.
+
+And then there were the packaging problems, which felt almost comically mundane.
+
+At one point the scripts included:
+
+```json
+"publish": "npm publish"
+```
+
+which is a great way to discover that `publish` is itself an npm lifecycle hook.
+
+That script effectively tried to publish twice. Renaming it to `release` fixed the recursion.
+
+There was also the usual npm OTP / 2FA friction during publish attempts, which is not really a code problem, but absolutely *is* part of shipping a real CLI.
+
+## The architecture mostly refused to sprawl
+
+The project is still compact.
+
+Most of the behavior lives in [`src/index.ts`](https://github.com/glpecile/text-to-sub/blob/main/src/index.ts), with [`src/cli.ts`](https://github.com/glpecile/text-to-sub/blob/main/src/cli.ts) acting as the thin executable entrypoint that runs `main()`, reports top-level failures, and exits non-zero when needed.
+
+I usually do not romanticize “one big file” as an architecture, but I also think developers overestimate how quickly small tools need to fragment into modules.
+
+In this case, the compactness still feels earned.
+
+The helpers are doing real work, and there are enough of them now to hint at the shape of the project:
+
+1. `parseTimestamp`
+2. `formatSRTTimestamp`
+3. `formatDurationLabel`
+4. `splitLongDialogue`
+5. `generateSRT`
+6. `splitCompositeSubtitleLine`
+7. `parseSubtitleLine`
+8. `parseSubtitles`
+9. `normalizeCommentAuthor`
+10. `getCommentAuthorCandidates`
+11. `isMatchingCommentAuthor`
+12. `extractCommentText`
+13. `extractSubtitleTextFromComment`
+14. `findSubtitleComment`
+15. `appendCreditSubtitle`
+16. `getEmbeddedVideoPath`
+
+And the main async flow still revolves around a few core orchestration functions:
+
+1. `runCommand`
+2. `fetchVideoMetadata`
+3. `fetchYouTubeComments`
+4. `downloadVideo`
+5. `embedSubtitles`
+6. `readSubtitleText`
+7. `promptUser`
+8. `main`
+
+That is not minimal in the sense of “tiny,” but it is still minimal in the sense of “not pretending to be a framework.”
+
+## Tests showed up when the project earned them
+
+The project did not begin with tests.
+
+That was fine at first. There was not much to protect.
+
+But once the parsing, matching, splitting, and credit logic became more opinionated, it started feeling reckless to keep making changes without a tighter feedback loop.
+
+So a Bun-based test suite eventually landed in [`src/index.test.ts`](https://github.com/glpecile/text-to-sub/blob/main/src/index.test.ts).
+
+It now covers things like:
+
+1. timestamp parsing
+2. subtitle parsing
+3. `#`-separated subtitle parsing
+4. ignoring invalid subtitle lines when warnings are disabled
+5. SRT generation timing behavior
+6. long dialogue splitting
+7. embedded output path generation
+8. fuzzy `KakoeiSbi` author matching
+9. extracting subtitle lines from mixed-content comments
+10. preferring pinned comments
+11. appending credit subtitles
+
+At the time of writing, that suite has 14 tests.
+
+It is not a giant CI system. It is just enough protection to let the project evolve without making every change feel like a coin flip.
+
+```bash
+bun run ci
+```
+
+That still feels like the right amount of ceremony for a tool this size.
+
+## What the tool is now
+
+The current package version is [`0.3.3`](https://github.com/glpecile/text-to-sub/blob/main/package.json), which feels about right. It is still a small project. It is just no longer a single-purpose one.
+
+At this point, `srt-cli` is a compact Bun CLI that can:
+
+1. accept a YouTube URL or work manually
+2. fetch metadata with `yt-dlp`
+3. infer video duration automatically
+4. search comments for a structured fan translation by `@KakoeiSbi`
+5. extract subtitle-like lines from mixed-content comments
+6. generate an `.srt`
+7. split long cues for readability
+8. append translator credit when appropriate
+9. download the video
+10. mux subtitles into a final `.subbed.mkv` with `ffmpeg`
+11. clean up intermediate files when the embedding step succeeds
+
+That is a lot more capability than the original version had, but it still feels like the same project to me.
+
+Maybe that is the part I like most.
+
+It did not grow because I set out to build a more ambitious tool. It grew because each new layer was a response to one specific repeated annoyance.
+
+First it was “I do not want to manually convert this comment into an SRT.”
+
+Then it was “I do not want to manually figure out the duration.”
+
+Then it was “I do not want to go digging for the comment every time.”
+
+Then it was “these subtitles technically work, but they are unreadable.”
+
+Then it was “if someone else did the translation work, the final output should say that.”
+
+That is my favorite kind of automation.
+
+Not the kind that tries to look magical. The kind that quietly removes repeated effort until the workflow starts feeling obvious in retrospect.
