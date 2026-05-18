@@ -1,0 +1,331 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render, type CollectionEntry } from "astro:content";
+
+import SectionLabel from "@/components/section-label.astro";
+import SiteLayout from "@/layouts/site-layout.astro";
+import { formatProjectDate, getProjectPosts } from "@/lib/projects";
+
+export const getStaticPaths = (async () => {
+	const posts = await getProjectPosts();
+
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: { post },
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = {
+	post: CollectionEntry<"projects">;
+};
+
+const { post } = Astro.props as Props;
+const { Content } = await render(post);
+const displayDate = post.data.updatedDate ?? post.data.pubDate;
+const postPath = `/projects/${post.id}`;
+---
+
+<SiteLayout
+	title={post.data.title}
+	description={post.data.description}
+	path={postPath}
+	previewPath={`${postPath}/preview`}
+	type="article"
+	publishedTime={post.data.pubDate.toISOString()}
+>
+	<article class="space-y-6">
+		<a
+			href="/projects"
+			class="blog-back-link terminal-link inline-flex items-center gap-2 text-sm"
+		>
+			<svg
+				viewBox="0 0 16 16"
+				aria-hidden="true"
+				class="blog-back-link-icon h-4 w-4 fill-current"
+			>
+				<path d="M7.3 3.22a.75.75 0 0 1 1.06 1.06L5.65 7h7.6a.75.75 0 0 1 0 1.5h-7.6l2.71 2.72a.75.75 0 1 1-1.06 1.06L3.31 8.28a.75.75 0 0 1 0-1.06L7.3 3.22Z"></path>
+			</svg>
+			<span>Back to projects</span>
+		</a>
+
+		<header class="space-y-4">
+			<SectionLabel label="project" />
+			<p class="text-tone-soft text-sm">{formatProjectDate(displayDate)}</p>
+			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
+				{post.data.title}
+			</h1>
+			<button
+				type="button"
+				class="blog-share-button text-tone-soft text-sm"
+				data-post-share
+				aria-label={`Copy link to project: ${post.data.title}`}
+				title={`Copy link to project: ${post.data.title}`}
+			>
+				<span class="blog-share-button-label">[share]</span>
+			</button>
+			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+				{post.data.description}
+			</p>
+		</header>
+
+		<div class="blog-prose">
+			<Content />
+		</div>
+
+		<script is:inline>
+			(() => {
+				const codeBlocks = document.querySelectorAll(".blog-prose pre.astro-code");
+				const postShareButton = document.querySelector("[data-post-share]");
+				const copyableHeadings = document.querySelectorAll(
+					".blog-prose h2[id], .blog-prose h3[id], .blog-prose h4[id], .blog-prose h5[id], .blog-prose h6[id]",
+				);
+				const copyLabels = {
+					idle: "[copy]",
+					success: "[copied]",
+					error: "[unavailable]",
+				};
+				const headingLabels = {
+					idle: "[#]",
+					success: "[✔︎]",
+					error: "[unavailable]",
+				};
+				const shareLabels = {
+					idle: "[share]",
+					success: "[copied to clipboard]",
+					error: "[unavailable]",
+				};
+
+				const formatLanguage = (value) => {
+					if (typeof value !== "string" || value.length === 0 || value === "plaintext") {
+						return "text";
+					}
+
+					return value.toLowerCase();
+				};
+
+				const getCodeText = (pre) => {
+					const code = pre.querySelector("code");
+
+					if (!(code instanceof HTMLElement)) {
+						return "";
+					}
+
+					const lines = Array.from(code.querySelectorAll(".line"));
+
+					if (lines.length === 0) {
+						return code.textContent ?? "";
+					}
+
+					return lines.map((line) => line.textContent ?? "").join("\n");
+				};
+
+				const copyText = async (text) => {
+					if (navigator.clipboard?.writeText) {
+						await navigator.clipboard.writeText(text);
+						return;
+					}
+
+					if (
+						typeof ClipboardItem !== "undefined" &&
+						navigator.clipboard?.write
+					) {
+						const blob = new Blob([text], { type: "text/plain" });
+						await navigator.clipboard.write([
+							new ClipboardItem({
+								"text/plain": blob,
+							}),
+						]);
+						return;
+					}
+
+					throw new Error("copy unavailable");
+				};
+
+				const attachCopyState = ({
+					button,
+					getCopyText,
+					labels,
+					setLabel,
+					setState,
+					onBeforeCopy,
+					resetDelay = 1600,
+				}) => {
+					let resetTimer = 0;
+
+					button.addEventListener("click", async () => {
+						window.clearTimeout(resetTimer);
+
+						if (onBeforeCopy) {
+							onBeforeCopy();
+						}
+
+						try {
+							await copyText(getCopyText());
+							setLabel(labels.success);
+							setState("success");
+						} catch {
+							setLabel(labels.error);
+							setState("error");
+						}
+
+						resetTimer = window.setTimeout(() => {
+							setLabel(labels.idle);
+							setState();
+						}, resetDelay);
+					});
+				};
+
+				const getHeadingPermalink = (id) => {
+					const url = new URL(window.location.href);
+					url.hash = id;
+
+					return url.toString();
+				};
+
+				const getPostPermalink = () =>
+					new URL(window.location.pathname, window.location.origin).toString();
+
+				const attachCopyButton = (button, options) => {
+					if (
+						!(button instanceof HTMLButtonElement) ||
+						button.dataset.copyButton === "true"
+					) {
+						return;
+					}
+
+					button.dataset.copyButton = "true";
+					const label = button.querySelector(".blog-share-button-label");
+
+					if (!(label instanceof HTMLElement)) {
+						return;
+					}
+
+					attachCopyState({
+						button,
+						getCopyText: options.getCopyText,
+						labels: options.labels,
+						setLabel: (nextLabel) => {
+							label.textContent = nextLabel;
+						},
+						setState: (nextState) => {
+							if (nextState) {
+								button.dataset.copyState = nextState;
+							} else {
+								delete button.dataset.copyState;
+							}
+						},
+					});
+				};
+
+				const enhanceCopyTarget = (heading, options) => {
+					if (!(heading instanceof HTMLElement) || heading.dataset.copyHeading === "true") {
+						return;
+					}
+
+					heading.dataset.copyHeading = "true";
+					heading.classList.add("blog-copy-heading");
+
+					const button = document.createElement("button");
+					button.type = "button";
+					button.className = "blog-heading-button";
+
+					button.setAttribute("aria-label", options.ariaLabel);
+					button.setAttribute("title", options.ariaLabel);
+
+					const label = document.createElement("span");
+					label.className = "blog-heading-label";
+
+					while (heading.firstChild) {
+						label.append(heading.firstChild);
+					}
+
+					const status = document.createElement("span");
+					status.className = "blog-heading-status";
+					status.setAttribute("aria-hidden", "true");
+					status.textContent = options.labels.idle;
+
+					button.append(label, status);
+					heading.append(button);
+
+					attachCopyState({
+						button,
+						getCopyText: options.getCopyText,
+						labels: options.labels,
+						setLabel: (nextLabel) => {
+							status.textContent = nextLabel;
+						},
+						setState: (nextState) => {
+							if (nextState) {
+								heading.dataset.copyState = nextState;
+							} else {
+								delete heading.dataset.copyState;
+							}
+						},
+						onBeforeCopy: options.onBeforeCopy,
+					});
+				};
+
+				attachCopyButton(postShareButton, {
+					getCopyText: () => getPostPermalink(),
+					labels: shareLabels,
+				});
+
+				copyableHeadings.forEach((heading) => {
+					const headingText = (heading.textContent ?? heading.id).trim();
+
+					enhanceCopyTarget(heading, {
+						ariaLabel: `Copy link to section: ${headingText}`,
+						getCopyText: () => getHeadingPermalink(heading.id),
+						labels: headingLabels,
+						onBeforeCopy: () => {
+							window.history.replaceState(null, "", `#${heading.id}`);
+						},
+					});
+				});
+
+				codeBlocks.forEach((pre) => {
+					if (
+						!(pre instanceof HTMLElement) ||
+						pre.parentElement?.classList.contains("code-frame")
+					) {
+						return;
+					}
+
+					const wrapper = document.createElement("div");
+					wrapper.className = "code-frame";
+					pre.parentNode?.insertBefore(wrapper, pre);
+					const toolbar = document.createElement("div");
+					toolbar.className = "code-toolbar";
+					const language = document.createElement("span");
+					language.className = "code-language";
+					language.textContent = formatLanguage(pre.dataset.language);
+					toolbar.append(language);
+					const button = document.createElement("button");
+					button.type = "button";
+					button.className = "code-copy-button";
+					button.setAttribute("aria-label", "Copy code to clipboard");
+					button.textContent = copyLabels.idle;
+
+					attachCopyState({
+						button,
+						getCopyText: () => getCodeText(pre),
+						labels: copyLabels,
+						setLabel: (nextLabel) => {
+							button.textContent = nextLabel;
+						},
+						setState: (nextState) => {
+							if (nextState) {
+								button.dataset.copyState = nextState;
+							} else {
+								delete button.dataset.copyState;
+							}
+						},
+					});
+
+					toolbar.append(button);
+					wrapper.append(toolbar, pre);
+				});
+			})();
+		</script>
+	</article>
+</SiteLayout>

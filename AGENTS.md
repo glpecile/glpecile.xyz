@@ -16,6 +16,7 @@ Project-specific guidance for working in this repo.
 - In Astro, `script is:inline` blocks share the page scope after compilation. Wrap inline script bodies in an IIFE or otherwise isolate names; do not rely on component boundaries to prevent top-level redeclarations.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
+- Prefer shorter, clearer `.md` and `.mdx` filenames for content slugs. Avoid overly long post filenames when a concise slug like `srt-cli.mdx` would stay clear.
 - Never use `any`. Prefer concrete types, `unknown`, or small typed helpers instead.
 - Prefer `async`/`await` over `.then()` chains.
 - Use kebab-case for component, layout, and route-related filenames. Avoid PascalCase filenames like `SiteLayout.astro` or `SectionLabel.astro`.

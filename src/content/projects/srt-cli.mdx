@@ -1,0 +1,184 @@
+---
+title: "srt-cli: from one-off script to subtitle workflow"
+description: A tiny Bun CLI that started as a timestamp converter and slowly absorbed an entire subtitle workflow around it.
+pubDate: 2026-05-18
+---
+
+Some tools begin with a roadmap.
+
+This one began with annoyance.
+
+I wanted to watch [*Re:Zero kara Hajimeru Kyuukei Jikan Break Time 3rd Season*](https://anilist.co/anime/182417/ReZero-kara-Hajimeru-Kyuukei-Jikan-Break-Time-3rd-Season/), which came out in 2025, with subtitles. Official subtitles were either missing or not easily available, but I kept finding YouTube comments by [`@KakoeiSbi`](https://www.youtube.com/@KakoeiSbi) with fan-translated dialogue written in a surprisingly structured timestamped format.
+
+That format was close enough to useful to be frustrating.
+
+Not because it was bad, but because it was *almost* an `.srt` already. Which meant every time I found one of those comments, I ended up doing the same small, boring job again: take timestamped lines, clean them up, convert them into subtitle cues, save a file, and then figure out what to do with the video itself.
+
+So [`srt-cli`](https://github.com/glpecile/text-to-sub) started as the smallest possible fix for that repetition.
+
+One thing I wanted almost immediately was for it to live as a normal package on [npm](https://www.npmjs.com/package/srt-cli), not as a weird repo-local script with special instructions. Part of the appeal was that it should feel disposable in the good way: something small enough to invoke from anywhere with `npx srt-cli`, use for one job, and forget about until the next time I needed it.
+
+## The first version was barely a project
+
+The earliest version of the tool did one thing.
+
+You pasted subtitle text in, told it how long the video was, gave it an output filename, and it generated an `.srt`.
+
+That was it.
+
+If you pressed Enter at the first prompt instead of providing a URL, the CLI would:
+
+1. ask for the video length
+2. ask for subtitle text
+3. ask for an output filename
+4. write an `.srt`
+
+It solved the immediate problem well enough. It did not try to be smart. It just removed one small pocket of manual work.
+
+At that point, the project was basically a timestamp-to-SRT converter with a prompt layer.
+
+And honestly, that version was already useful. When I was watching *Break Time* weekly, a small manual helper was good enough.
+
+## The project grew for a boring reason
+
+The next phase happened for the most ordinary reason possible: once the converter existed, the rest of the workflow started feeling disproportionately annoying.
+
+The real cost was no longer generating the `.srt`. The real cost was everything around it.
+
+I still had to:
+
+1. copy the video URL around
+2. figure out the duration
+3. find the translation comment again
+4. download the video separately
+5. mux subtitles afterward
+
+This is the kind of thing that happens to a lot of tiny utilities. You solve the part that looks like the problem, then realize the actual pain lives in the steps before and after it.
+
+That became especially obvious in 2026 when [*Re:Zero kara Hajimeru Kyuukei Jikan Break Time 4th Season*](https://anilist.co/anime/210687/ReZero-kara-Hajimeru-Kyuukei-Jikan-Break-Time-4th-Season/) rolled around. The first time through, doing the work episode by episode felt tolerable because I was keeping up weekly. The second time, I found myself six episodes behind and had absolutely no interest in repeating the same boring sequence by hand six more times. That backlog did more to push the project forward than any abstract desire to "improve the tool."
+
+So the tool started pulling more of the workflow inward.
+
+The first major shift was allowing a YouTube URL as input.
+
+Once that happened, the CLI could use [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) to fetch metadata, infer the duration automatically, and use the downloaded filename as the basis for the output name. Suddenly the manual mode was still there, but it was no longer the only interesting path through the tool.
+
+That was the moment `srt-cli` stopped being just a converter.
+
+## Then it got more opinionated
+
+The next leap was not really about video metadata. It was about trust.
+
+If the tool already knew the video URL, then it could also inspect the comments. And if it could inspect the comments, then it could try to find the translation directly instead of waiting for me to paste it in.
+
+In practice, that works through [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)'s JSON output. The CLI calls it with `--dump-single-json --write-comments --skip-download`, then reads the returned `comments` array looking for a likely `KakoeiSbi` match. It does not just compare one field, because YouTube author data is annoyingly inconsistent. The matcher normalizes `author`, `author_id`, and `author_url`, strips URL prefixes and punctuation, collapses case, and then compares those candidates against a small set of expected `KakoeiSbi` forms. If there are multiple matches, pinned comments win.
+
+The second half is making sure the comment is actually usable. The importer does not assume the entire comment is subtitle text. It splits the comment into lines, keeps only the ones that match the subtitle-like pattern the tool already understands, and then runs that extracted text back through `parseSubtitles()` with warnings disabled just to confirm it still parses into valid entries. That way the tool can survive comments that mix real subtitle lines with translator notes or intro text instead of requiring a perfect wall of machine-ready dialogue.
+
+That ended up mattering more than it sounds, because YouTube comments are messy enough that a feature like this is either a little forgiving or mostly useless.
+
+## Then it had to produce the actual thing I wanted
+
+At some point, generating an `.srt` stopped feeling like the end of the workflow.
+
+It started feeling like an intermediate file.
+
+What I actually wanted was a video I could save somewhere, play later, and not think about again. I did not want to remember which subtitle file belonged to which download. I did not want a folder full of almost-finished artifacts.
+
+So the next major step was adding [`ffmpeg`](https://ffmpeg.org/) and treating subtitle generation as a staging step instead of the final result.
+
+The CLI now:
+
+1. writes a temporary `.srt`
+2. uses `ffmpeg` to mux it as a soft subtitle track
+3. produces a final `*.subbed.mkv`
+
+That ended up being more useful than I expected.
+
+Once the output became a single final video file, it got much easier to archive, move around, and reproduce later in normal players or on media servers like [Jellyfin](https://jellyfin.org/). A loose subtitle file is fine when you are experimenting. A single final artifact is much nicer when you actually want to keep the thing.
+
+I also liked the failure mode here. If muxing succeeds, the CLI deletes the downloaded source video and temporary `.srt`. If muxing fails, it leaves the intermediate files behind so the user still has something recoverable.
+
+That felt like the right kind of automation: helpful when everything works, forgiving when it does not.
+
+## Readability became part of the job
+
+Once the tool could produce a final video, another problem became harder to ignore: some subtitles were technically correct and still terrible to watch.
+
+The problem was long dialogue. A huge subtitle cue can be perfectly valid as an `.srt` and still be miserable in practice. The viewer does not care that the timestamps are correct if the subtitle shows up as a paragraph.
+
+So the CLI added automatic cue splitting.
+
+Now it can:
+
+1. detect overly long dialogue
+2. prefer sentence-boundary splitting
+3. fall back to word chunking when needed
+4. preserve cue ordering
+5. distribute the original duration across the generated chunks
+6. add a tiny inter-chunk gap for readability
+
+The current defaults are still modest:
+
+```ts
+MAX_DIALOGUE_CHARS = 84
+AUTO_CHUNK_GAP_SECONDS = 0.12
+```
+
+This was one of those changes that made the project feel more mature without making it feel bigger.
+
+It is easy to obsess over the ingestion path of a tool like this. It turned out the display path mattered just as much.
+
+## The tool also needed a conscience
+
+Once the CLI started pulling translation text directly from someone else’s comment, it felt wrong for the output to silently absorb that work with no attribution.
+
+So when subtitles come from a matching `KakoeiSbi` comment, the tool appends a final subtitle near the end of the video:
+
+```txt
+Subtitle translation credits: @KakoeiSbi
+```
+
+That cue appears roughly three seconds before the end.
+
+The goal was never to erase the human part of the workflow. The goal was to automate the repetition around it.
+
+That distinction matters.
+
+## What the tool is now
+
+The current package version is [`0.3.3`](https://github.com/glpecile/text-to-sub/blob/main/package.json), which feels about right. It is still a small project. It is just no longer a single-purpose one.
+
+At this point, `srt-cli` is a compact Bun CLI that can:
+
+1. accept a YouTube URL or work manually
+2. fetch metadata with `yt-dlp`
+3. infer video duration automatically
+4. search comments for a structured fan translation by `@KakoeiSbi`
+5. extract subtitle-like lines from mixed-content comments
+6. generate an `.srt`
+7. split long cues for readability
+8. append translator credit when appropriate
+9. download the video
+10. mux subtitles into a final `.subbed.mkv` with `ffmpeg`
+11. clean up intermediate files when the embedding step succeeds
+
+That is a lot more capability than the original version had, but it still feels like the same project to me.
+
+Maybe that is the part I like most.
+
+It did not grow because I set out to build a more ambitious tool. It grew because each new layer was a response to one specific repeated annoyance.
+
+First it was “I do not want to manually convert this comment into an SRT.”
+
+Then it was “I do not want to manually figure out the duration.”
+
+Then it was “I do not want to go digging for the comment every time.”
+
+Then it was “these subtitles technically work, but they are unreadable.”
+
+Then it was “if someone else did the translation work, the final output should say that.”
+
+That is my favorite kind of automation.
+
+Not the kind that tries to look magical. The kind that quietly removes repeated effort until the workflow starts feeling obvious in retrospect.

@@ -4,12 +4,15 @@ import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
+import { getProjectPostUrl, getProjectPosts } from "@/lib/projects";
 
 import { siteConfig } from "#config/site";
 
 const socialLinks = Object.entries(siteConfig.links);
 const posts = await getBlogPosts();
+const projectPosts = await getProjectPosts();
 const latestPosts = posts.slice(0, 3);
+const latestProjects = projectPosts.slice(0, 3);
 const work = siteConfig.work;
 const featuredWork = work.slice(0, 3);
 const hasMoreWork = work.length > featuredWork.length;
@@ -53,6 +56,31 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		)}
 
 		{posts.length > 0 && <MoreLink href="/blog" />}
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="projects" />
+
+		{latestProjects.length === 0 ? (
+			<p class="text-tone-soft text-sm">no projects yet.</p>
+		) : (
+			<ol class="space-y-4">
+				{latestProjects.map((post) => (
+					<li class="grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-5">
+						<p class="text-tone-faint text-sm leading-7 sm:text-base">
+							{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
+						</p>
+						<p class="text-base leading-8 sm:text-lg">
+							<a class="terminal-link" href={getProjectPostUrl(post.id)}>
+								{post.data.title}
+							</a>
+						</p>
+					</li>
+				))}
+			</ol>
+		)}
+
+		{projectPosts.length > 0 && <MoreLink href="/projects" />}
 	</section>
 
 	<section class="space-y-4">
