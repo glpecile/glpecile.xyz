@@ -71,31 +71,11 @@ The next leap was not really about video metadata. It was about trust.
 
 If the tool already knew the video URL, then it could also inspect the comments. And if it could inspect the comments, then it could try to find the translation directly instead of waiting for me to paste it in.
 
-That sounds like a straightforward feature until you remember that YouTube comments are messy.
+In practice, that works through [`yt-dlp`](https://github.com/yt-dlp/yt-dlp)'s JSON output. The CLI calls it with `--dump-single-json --write-comments --skip-download`, then reads the returned `comments` array looking for a likely `KakoeiSbi` match. It does not just compare one field, because YouTube author data is annoyingly inconsistent. The matcher normalizes `author`, `author_id`, and `author_url`, strips URL prefixes and punctuation, collapses case, and then compares those candidates against a small set of expected `KakoeiSbi` forms. If there are multiple matches, pinned comments win.
 
-At first, the matching logic was naive. It looked for an exact match against `@KakoeiSbi`. That worked only when the data happened to arrive in exactly the format I expected.
+The second half is making sure the comment is actually usable. The importer does not assume the entire comment is subtitle text. It splits the comment into lines, keeps only the ones that match the subtitle-like pattern the tool already understands, and then runs that extracted text back through `parseSubtitles()` with warnings disabled just to confirm it still parses into valid entries. That way the tool can survive comments that mix real subtitle lines with translator notes or intro text instead of requiring a perfect wall of machine-ready dialogue.
 
-Over time, that logic got less brittle.
-
-The matcher now normalizes several fields:
-
-1. `author`
-2. `author_id`
-3. `author_url`
-4. raw handle forms like `@KakoeiSbi`
-5. YouTube profile URL variants
-
-Normalization strips URL prefixes, removes `@`, ignores punctuation, and collapses case differences.
-
-That is not a flashy feature, but it is exactly the sort of thing that determines whether a CLI feels “surprisingly solid” or “kind of flaky.”
-
-The parser had to learn a similar lesson.
-
-The useful comments were not always pristine blocks of subtitle text. Sometimes they also contained translator notes, a short intro, or some other explanatory aside. Requiring the entire comment to be perfectly subtitle-shaped would have been technically cleaner, but practically worse.
-
-So the importer shifted from “validate the whole comment” to “extract the lines that clearly look like subtitle lines.”
-
-That change felt small in code, but big in spirit. The tool stopped demanding ideal input and started taking more responsibility for dealing with real input.
+That ended up mattering more than it sounds, because YouTube comments are messy enough that a feature like this is either a little forgiving or mostly useless.
 
 ## Then it had to produce the actual thing I wanted
 
