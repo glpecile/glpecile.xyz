@@ -18,7 +18,7 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^13.5.1",
+		"@astrojs/cloudflare": "^13.5.4",
 		"@astrojs/mdx": "^5.0.6",
 		"@astrojs/react": "^5.0.5",
 		"@fontsource/geist-mono": "^5.2.8",
@@ -28,7 +28,7 @@
 		"@resvg/resvg-wasm": "^2.6.2",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"astro": "^6.3.3",
+		"astro": "^6.3.7",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"pdf-lib": "^1.17.1",
@@ -47,6 +47,6 @@
 		"husky": "^9.1.7",
 		"tailwindcss": "^4.3.0",
 		"typescript": "^5.9.3",
-		"wrangler": "^4.92.0"
+		"wrangler": "^4.94.0"
 	}
 }
