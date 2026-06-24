@@ -7,13 +7,14 @@ import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 import { getProjectPostUrl, getProjectPosts } from "@/lib/projects";
 
 import { siteConfig } from "#config/site";
+import type { WorkExperience } from "#config/site";
 
 const socialLinks = Object.entries(siteConfig.links);
 const posts = await getBlogPosts();
 const projectPosts = await getProjectPosts();
 const latestPosts = posts.slice(0, 3);
 const latestProjects = projectPosts.slice(0, 3);
-const work = siteConfig.work;
+const work: readonly WorkExperience[] = siteConfig.work;
 const featuredWork = work.slice(0, 3);
 const hasMoreWork = work.length > featuredWork.length;
 const navShortcutCopy = siteConfig.shortcuts.nav
@@ -110,9 +111,9 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 					<p class="text-tone-soft text-sm leading-7 sm:text-base">
 						{job.place}
 					</p>
-					{job.summary && (
+					{(job.summary ?? job.highlights?.[0]) && (
 						<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-							{job.summary}
+							{job.summary ?? job.highlights?.[0]}
 						</p>
 					)}
 				</li>

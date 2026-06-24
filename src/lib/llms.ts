@@ -1,5 +1,12 @@
 import { siteConfig } from "#config/site";
-import type { CertificateItem, EducationItem, WorkExperience } from "#config/site";
+import type {
+	CertificateItem,
+	EducationItem,
+	LanguageItem,
+	ProjectEntry,
+	SkillGroup,
+	WorkExperience,
+} from "#config/site";
 import type { BlogPost } from "@/lib/blog";
 import { getBlogPostUrl } from "@/lib/blog";
 import type { ProjectPost } from "@/lib/projects";
@@ -14,6 +21,7 @@ const socialLabelMap: Record<string, string> = {
 	bluesky: "Bluesky",
 	github: "GitHub",
 	letterboxd: "Letterboxd",
+	linkedin: "LinkedIn",
 };
 
 export const llmsContentType = "text/plain; charset=utf-8";
@@ -33,9 +41,31 @@ const renderTextLink = (label: string, url?: string) => (url ? `[${label}](${url
 
 const renderWorkLine = (job: WorkItem) => {
 	const details = `${job.role} @ ${renderCompanyLink(job)} — ${job.period} — ${job.place}`;
+	const note = job.summary ?? job.highlights?.[0];
 
-	return job.summary ? `- ${details}. ${job.summary}` : `- ${details}`;
+	return note ? `- ${details}. ${note}` : `- ${details}`;
 };
+
+const renderWorkEntry = (job: WorkItem) => {
+	const head = `- ${job.role} @ ${renderCompanyLink(job)} — ${job.period} — ${job.place}`;
+	const bullets = (job.highlights ?? (job.summary ? [job.summary] : [])).map(
+		(highlight) => `  - ${highlight}`,
+	);
+
+	return [head, ...bullets].join("\n");
+};
+
+const renderProjectEntry = (project: ProjectEntry) => {
+	const period = project.period ? ` — ${project.period}` : "";
+	const head = `- ${renderTextLink(project.name, project.url)} — ${project.stack}${period}`;
+	const bullets = project.highlights.map((highlight) => `  - ${highlight}`);
+
+	return [head, ...bullets].join("\n");
+};
+
+const renderSkillLine = (group: SkillGroup) => `- ${group.category}: ${group.items.join(", ")}`;
+
+const renderLanguageLine = (item: LanguageItem) => `- ${item.language}: ${item.level}`;
 
 const renderEducationLine = (item: EducationItem) => {
 	const details = `${renderTextLink(item.school, item.url)} — ${item.credential} — ${item.period}`;
@@ -208,13 +238,29 @@ export function renderWorkMarkdown() {
 		"",
 		"## Roles",
 		"",
-		...(siteConfig.work.length > 0 ? siteConfig.work.map(renderWorkLine) : ["No work entries yet."]),
+		...(siteConfig.work.length > 0 ? siteConfig.work.map(renderWorkEntry) : ["No work entries yet."]),
+		"",
+		"## Projects",
+		"",
+		...(siteConfig.projects.length > 0
+			? siteConfig.projects.map(renderProjectEntry)
+			: ["No projects yet."]),
+		"",
+		"## Skills",
+		"",
+		...(siteConfig.skills.length > 0 ? siteConfig.skills.map(renderSkillLine) : ["No skills yet."]),
 		"",
 		"## Education",
 		"",
 		...(siteConfig.education.length > 0
 			? siteConfig.education.map(renderEducationLine)
 			: ["No education entries yet."]),
+		"",
+		"## Languages",
+		"",
+		...(siteConfig.languages.length > 0
+			? siteConfig.languages.map(renderLanguageLine)
+			: ["No languages yet."]),
 		"",
 		"## Certificates",
 		"",

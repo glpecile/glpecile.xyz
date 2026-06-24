@@ -2,19 +2,34 @@
 import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
+import { cvDownloadName } from "@/lib/cv";
 
 import { siteConfig } from "#config/site";
-import type { CertificateItem, CvFile, EducationItem, WorkExperience } from "#config/site";
+import type {
+	CertificateItem,
+	ContactInfo,
+	CvFile,
+	EducationItem,
+	LanguageItem,
+	ProjectEntry,
+	SkillGroup,
+	WorkExperience,
+} from "#config/site";
 
 const work: readonly WorkExperience[] = siteConfig.work;
+const projects: readonly ProjectEntry[] = siteConfig.projects;
+const skills: readonly SkillGroup[] = siteConfig.skills;
 const education: readonly EducationItem[] = siteConfig.education;
+const languages: readonly LanguageItem[] = siteConfig.languages;
 const certificates: readonly CertificateItem[] = siteConfig.certificates;
 const cv: CvFile = siteConfig.cv;
+const contact: ContactInfo = siteConfig.contact;
+const cvFileName = cvDownloadName();
 ---
 
 <SiteLayout
 	title="Work"
-	description="Work history, education, certificates, and a downloadable CV."
+	description="Work history, projects, skills, education, languages, certificates, and a downloadable CV."
 	path="/work"
 	previewPath="/work/preview"
 >
@@ -22,14 +37,21 @@ const cv: CvFile = siteConfig.cv;
 		<PageIntro
 			label="work"
 			title="Past work experience."
-			description="+ education & certificates."
+			description="+ projects, skills, education & certificates."
 		/>
 
-		<p class="text-sm sm:text-base">
-			<a class="terminal-link inline-flex items-center gap-2" href={cv.href} download={cv.fileName}>
-				[{cv.label}]
-			</a>
-		</p>
+		<div class="space-y-1">
+			<p class="text-sm sm:text-base">
+				<a
+					class="terminal-link inline-flex items-center gap-2"
+					href={cv.href}
+					download={cvFileName}
+				>
+					[{cv.label}]
+				</a>
+			</p>
+			<p class="text-tone-faint text-sm">{contact.email} · {contact.location}</p>
+		</div>
 	</section>
 
 	<section class="space-y-4">
@@ -63,15 +85,85 @@ const cv: CvFile = siteConfig.cv;
 						<p class="text-tone-soft text-sm leading-7 sm:text-base">
 							{job.place}
 						</p>
-						{job.summary && (
-							<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-								{job.summary}
-							</p>
+						{job.highlights ? (
+							<ul class="space-y-1 pt-1">
+								{job.highlights.map((highlight) => (
+									<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
+										<span class="text-tone-faint">- </span>
+										{highlight}
+									</li>
+								))}
+							</ul>
+						) : (
+							job.summary && (
+								<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+									{job.summary}
+								</p>
+							)
 						)}
 					</li>
 				))}
 			</ol>
 		)}
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="projects" />
+
+		{projects.length === 0 ? (
+			<p class="text-tone-soft text-sm">no projects yet.</p>
+		) : (
+			<ol class="space-y-5">
+				{projects.map((project) => (
+					<li class="space-y-1">
+						<p class="text-base leading-8 sm:text-lg">
+							{project.url ? (
+								<a
+									class="terminal-link"
+									href={project.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{project.name}
+								</a>
+							) : (
+								<span class="text-foreground">{project.name}</span>
+							)}
+							<span class="text-tone-faint"> · </span>
+							<span class="text-tone-soft">{project.stack}</span>
+						</p>
+						{project.period && (
+							<p class="text-tone-soft text-sm leading-7 sm:text-base">
+								{project.period}
+							</p>
+						)}
+						<ul class="space-y-1 pt-1">
+							{project.highlights.map((highlight) => (
+								<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
+									<span class="text-tone-faint">- </span>
+									{highlight}
+								</li>
+							))}
+						</ul>
+					</li>
+				))}
+			</ol>
+		)}
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="skills" />
+
+		<ul class="grid gap-x-10 gap-y-2 sm:grid-cols-2">
+			{skills.map((group) => (
+				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
+					<p class="text-foreground text-sm sm:text-base">{group.category}</p>
+					<p class="text-tone-soft text-sm leading-7 sm:text-base">
+						{group.items.join(", ")}
+					</p>
+				</li>
+			))}
+		</ul>
 	</section>
 
 	<section class="space-y-4">
@@ -112,6 +204,19 @@ const cv: CvFile = siteConfig.cv;
 				))}
 			</ol>
 		)}
+	</section>
+
+	<section class="space-y-4">
+		<SectionLabel label="languages" />
+
+		<ul class="grid gap-x-10 gap-y-2 sm:grid-cols-2">
+			{languages.map((item) => (
+				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
+					<p class="text-foreground text-sm sm:text-base">{item.language}</p>
+					<p class="text-tone-soft text-sm leading-7 sm:text-base">{item.level}</p>
+				</li>
+			))}
+		</ul>
 	</section>
 
 	<section class="space-y-4">

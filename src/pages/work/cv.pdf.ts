@@ -1,39 +1,66 @@
-import { PDFDocument } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import { PDFDocument, PDFName, PDFString, rgb } from "pdf-lib";
+import type { PDFFont, PDFPage } from "pdf-lib";
 import type { APIRoute } from "astro";
 
 import geistMonoBoldDataUrl from "@fontsource/geist-mono/files/geist-mono-latin-700-normal.woff?inline";
 import geistMonoRegularDataUrl from "@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff?inline";
-import { initWasm, Resvg } from "@resvg/resvg-wasm";
-import resvgWasmModule from "@resvg/resvg-wasm/index_bg.wasm";
-import satori, { init as initSatori } from "satori/standalone";
-import yogaWasmModule from "satori/yoga.wasm";
 
+import { cvDownloadName } from "@/lib/cv";
 import { siteConfig } from "#config/site";
-import type { CertificateItem, EducationItem, WorkExperience } from "#config/site";
+import type {
+	CertificateItem,
+	ContactInfo,
+	EducationItem,
+	LanguageItem,
+	ProjectEntry,
+	SkillGroup,
+	WorkExperience,
+} from "#config/site";
 
 export const prerender = true;
 
 type CvEntry = {
 	title: string;
-	meta: string;
-	details?: readonly string[];
+	titleUrl?: string;
+	titleMeta?: string;
+	subtitle?: string;
+	subtitleMeta?: string;
+	bullets?: readonly string[];
 };
 
-type CvSection = {
-	title: string;
-	entries: CvEntry[];
+type CvInlineRow = {
+	label: string;
+	value: string;
 };
 
-type CvStyle = Record<string, string | number>;
-type CvNode = {
-	type: string;
-	props: {
-		style?: CvStyle;
-		children?: CvChild | CvChild[];
-		[key: string]: unknown;
-	};
+type CvSection =
+	| { kind: "entries"; title: string; entries: CvEntry[] }
+	| { kind: "inline"; title: string; rows: CvInlineRow[] };
+
+type ContactSegment = {
+	text: string;
+	url?: string;
 };
-type CvChild = CvNode | string;
+
+type Ctx = {
+	pdf: PDFDocument;
+	regular: PDFFont;
+	bold: PDFFont;
+};
+
+// A measured, atomic chunk of the document. "section" blocks are kept together
+// with the entry that follows so a heading never lands alone at a page foot.
+type Block = {
+	kind: "header" | "section" | "entry";
+	height: number;
+	draw: (page: PDFPage, top: number) => void;
+};
+
+type PageItem = {
+	block: Block;
+	marginTop: number;
+};
 
 const size = {
 	width: 1240,
@@ -43,10 +70,10 @@ const size = {
 const layout = {
 	pagePaddingX: 64,
 	pagePaddingY: 58,
-	pageGap: 34,
-	headerGap: 8,
-	sectionGap: 16,
-	entryGap: 6,
+	pageGap: 30,
+	headerGap: 10,
+	sectionGap: 14,
+	entryGap: 7,
 	sectionTitleSize: 20,
 	entryTitleSize: 17,
 	entryMetaSize: 14,
@@ -54,396 +81,530 @@ const layout = {
 	headerTitleSize: 40,
 	headerBodySize: 18,
 	headerLinkSize: 15,
-	headerTitleLineHeight: 1,
+	headerTitleLineHeight: 1.1,
 	headerBodyLineHeight: 1.35,
 	headerLinkLineHeight: 1.3,
-	entryTitleLineHeight: 1.2,
-	entryMetaLineHeight: 1.3,
-	detailLineHeight: 1.3,
+	entryTitleLineHeight: 1.25,
+	entryMetaLineHeight: 1.4,
+	detailLineHeight: 1.4,
+	sectionTitleLineHeight: 1.2,
 	entryDividerSpace: 12,
-	entryBulletGap: 10,
 	detailBulletGap: 8,
 	entryIndent: 28,
-	titleMaxWidth: 1060,
-	metaMaxWidth: 1060,
-	detailMaxWidth: 1030,
+	inlineLabelWidth: 150,
+	inlineColumnGap: 12,
+	inlineRowGap: 8,
+	// Distance from the top of a line box down to the text baseline.
+	baselineFactor: 0.78,
+	// Headroom so a block never spills past the bottom margin.
+	pageSafetyMargin: 36,
 };
 
-const pageTheme = {
-	background: "#f4f4f5",
-	foreground: "#18181b",
-	muted: "#52525b",
-	border: "#d4d4d8",
+const colors = {
+	background: rgb(0xf4 / 255, 0xf4 / 255, 0xf5 / 255),
+	foreground: rgb(0x18 / 255, 0x18 / 255, 0x1b / 255),
+	muted: rgb(0x52 / 255, 0x52 / 255, 0x5b / 255),
+	border: rgb(0xd4 / 255, 0xd4 / 255, 0xd8 / 255),
 };
 
-let wasmInit: Promise<void> | undefined;
-let satoriInit: Promise<void> | undefined;
-let fontPromise: Promise<{ regular: ArrayBuffer; bold: ArrayBuffer }> | undefined;
+const x0 = layout.pagePaddingX;
+const rightEdge = size.width - layout.pagePaddingX;
+const contentWidth = size.width - layout.pagePaddingX * 2;
 
 const work: readonly WorkExperience[] = siteConfig.work;
 const education: readonly EducationItem[] = siteConfig.education;
+const projects: readonly ProjectEntry[] = siteConfig.projects;
+const skills: readonly SkillGroup[] = siteConfig.skills;
+const languages: readonly LanguageItem[] = siteConfig.languages;
 const certificates: readonly CertificateItem[] = siteConfig.certificates;
+const contact: ContactInfo = siteConfig.contact;
 
-const sections: CvSection[] = [
+const stripUrl = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+const contactSegments: ContactSegment[] = [
+	{ text: contact.email, url: `mailto:${contact.email}` },
+	contact.phone ? { text: contact.phone, url: `tel:${contact.phone.replace(/\s+/g, "")}` } : null,
+	{ text: contact.location },
+	{ text: stripUrl(siteConfig.siteUrl), url: siteConfig.siteUrl },
+	{ text: stripUrl(siteConfig.links.github), url: siteConfig.links.github },
+	contact.linkedin ? { text: stripUrl(contact.linkedin), url: contact.linkedin } : null,
+].filter((segment): segment is ContactSegment => segment !== null);
+
+const allSections: CvSection[] = [
 	{
-		title: "WORK",
+		kind: "entries",
+		title: "EXPERIENCE",
 		entries: work.map((job) => ({
-			title: `${job.role} @ ${job.company}`,
-			meta: `${job.period} | ${job.place}`,
-			details: job.summary ? [job.summary] : undefined,
+			title: job.company,
+			titleUrl: job.url,
+			titleMeta: job.place,
+			subtitle: job.role,
+			subtitleMeta: job.period,
+			bullets: job.highlights ?? (job.summary ? [job.summary] : undefined),
 		})),
 	},
 	{
+		kind: "entries",
+		title: "PROJECTS",
+		entries: projects.map((project) => ({
+			title: project.name,
+			titleUrl: project.url,
+			titleMeta: project.stack,
+			subtitleMeta: project.period,
+			bullets: project.highlights,
+		})),
+	},
+	{
+		kind: "inline",
+		title: "SKILLS",
+		rows: skills.map((group) => ({ label: group.category, value: group.items.join(", ") })),
+	},
+	{
+		kind: "entries",
 		title: "EDUCATION",
 		entries: education.map((item) => ({
 			title: item.school,
-			meta: `${item.credential} | ${item.period}`,
-			details: item.details,
+			titleUrl: item.url,
+			titleMeta: item.location,
+			subtitle: item.credential,
+			subtitleMeta: item.period,
+			bullets: item.details,
 		})),
 	},
 	{
+		kind: "inline",
+		title: "LANGUAGES",
+		rows: languages.map((item) => ({ label: item.language, value: item.level })),
+	},
+	{
+		kind: "entries",
 		title: "CERTIFICATES",
 		entries: certificates.map((item) => ({
 			title: item.title,
-			meta: `${item.issuer} | Issued ${item.issued}`,
-			details: item.details,
+			titleUrl: item.url,
+			subtitle: item.issuer,
+			subtitleMeta: `Issued ${item.issued}`,
+			bullets: item.details,
 		})),
 	},
 ];
 
+const sections: CvSection[] = allSections.filter((section) =>
+	section.kind === "entries" ? section.entries.length > 0 : section.rows.length > 0,
+);
+
 const decodeDataUrl = (dataUrl: string) => {
 	const payload = dataUrl.includes(",") ? dataUrl.slice(dataUrl.indexOf(",") + 1) : dataUrl;
 
-	return Uint8Array.from(atob(payload), (character) => character.charCodeAt(0)).buffer;
+	return Uint8Array.from(atob(payload), (character) => character.charCodeAt(0));
 };
 
-const approximateCharsPerLine = (maxWidth: number, fontSize: number) =>
-	Math.max(12, Math.floor(maxWidth / (fontSize * 0.62)));
+const lineBox = (fontSize: number, lineHeight: number) => fontSize * lineHeight;
 
-const countWrappedLines = (text: string, maxWidth: number, fontSize: number) => {
+// Greedy word-wrap using the embedded font's real metrics, so measured heights
+// and drawn positions agree exactly.
+function wrapText(font: PDFFont, text: string, fontSize: number, maxWidth: number): string[] {
 	const words = text.trim().split(/\s+/).filter(Boolean);
 
 	if (words.length === 0) {
-		return 1;
+		return [""];
 	}
 
-	const maxChars = approximateCharsPerLine(maxWidth, fontSize);
-	let lines = 1;
+	const lines: string[] = [];
 	let current = "";
 
 	for (const word of words) {
 		const next = current.length === 0 ? word : `${current} ${word}`;
 
-		if (next.length <= maxChars || current.length === 0) {
+		if (current.length === 0 || font.widthOfTextAtSize(next, fontSize) <= maxWidth) {
 			current = next;
 			continue;
 		}
 
-		lines += 1;
+		lines.push(current);
 		current = word;
 	}
 
+	lines.push(current);
+
 	return lines;
+}
+
+function addLink(ctx: Ctx, page: PDFPage, rect: [number, number, number, number], url: string) {
+	const annotation = ctx.pdf.context.obj({
+		Type: "Annot",
+		Subtype: "Link",
+		Rect: rect,
+		Border: [0, 0, 0],
+		A: { Type: "Action", S: "URI", URI: PDFString.of(url) },
+	});
+	const ref = ctx.pdf.context.register(annotation);
+	const existing = page.node.Annots();
+
+	if (existing) {
+		existing.push(ref);
+	} else {
+		page.node.set(PDFName.of("Annots"), ctx.pdf.context.obj([ref]));
+	}
+}
+
+type DrawOptions = {
+	font: PDFFont;
+	size: number;
+	color: ReturnType<typeof rgb>;
+	url?: string;
 };
 
-const getLineHeight = (fontSize: number, multiplier: number) => fontSize * multiplier;
+// Draws text whose baseline sits `size * baselineFactor` below `top`, so callers
+// can advance by whole line boxes. Registers a link hotspot when `url` is given.
+function drawLineText(
+	ctx: Ctx,
+	page: PDFPage,
+	text: string,
+	x: number,
+	top: number,
+	options: DrawOptions,
+) {
+	const baseline = top - options.size * layout.baselineFactor;
+	page.drawText(text, { x, y: baseline, size: options.size, font: options.font, color: options.color });
 
-const estimateEntryHeight = (entry: CvEntry) => {
-	let height = layout.entryDividerSpace;
-	height +=
-		countWrappedLines(entry.title, layout.titleMaxWidth, layout.entryTitleSize) *
-		getLineHeight(layout.entryTitleSize, layout.entryTitleLineHeight);
-	height += layout.entryGap;
-	height +=
-		countWrappedLines(entry.meta, layout.metaMaxWidth, layout.entryMetaSize) *
-		getLineHeight(layout.entryMetaSize, layout.entryMetaLineHeight);
+	if (options.url) {
+		const width = options.font.widthOfTextAtSize(text, options.size);
+		addLink(ctx, page, [x, baseline - options.size * 0.25, x + width, baseline + options.size * 0.82], options.url);
+	}
+}
 
-	for (const detail of entry.details ?? []) {
-		height += layout.entryGap;
-		height +=
-			countWrappedLines(detail, layout.detailMaxWidth, layout.detailSize) *
-			getLineHeight(layout.detailSize, layout.detailLineHeight);
+function buildHeaderBlock(ctx: Ctx): Block {
+	const headingLines = wrapText(ctx.regular, siteConfig.cv.heading, layout.headerBodySize, contentWidth);
+	const height =
+		lineBox(layout.headerTitleSize, layout.headerTitleLineHeight) +
+		layout.headerGap +
+		headingLines.length * lineBox(layout.headerBodySize, layout.headerBodyLineHeight) +
+		layout.headerGap +
+		lineBox(layout.headerLinkSize, layout.headerLinkLineHeight);
+
+	const draw = (page: PDFPage, top: number) => {
+		let y = top;
+
+		drawLineText(ctx, page, siteConfig.author, x0, y, {
+			font: ctx.bold,
+			size: layout.headerTitleSize,
+			color: colors.foreground,
+		});
+		y -= lineBox(layout.headerTitleSize, layout.headerTitleLineHeight) + layout.headerGap;
+
+		for (const line of headingLines) {
+			drawLineText(ctx, page, line, x0, y, {
+				font: ctx.regular,
+				size: layout.headerBodySize,
+				color: colors.muted,
+			});
+			y -= lineBox(layout.headerBodySize, layout.headerBodyLineHeight);
+		}
+		y -= layout.headerGap;
+
+		const baseline = y - layout.headerLinkSize * layout.baselineFactor;
+		const separator = "  |  ";
+		let cursor = x0;
+
+		contactSegments.forEach((segment, index) => {
+			drawLineText(ctx, page, segment.text, cursor, y, {
+				font: ctx.regular,
+				size: layout.headerLinkSize,
+				color: colors.muted,
+				url: segment.url,
+			});
+			cursor += ctx.regular.widthOfTextAtSize(segment.text, layout.headerLinkSize);
+
+			if (index < contactSegments.length - 1) {
+				page.drawText(separator, {
+					x: cursor,
+					y: baseline,
+					size: layout.headerLinkSize,
+					font: ctx.regular,
+					color: colors.muted,
+				});
+				cursor += ctx.regular.widthOfTextAtSize(separator, layout.headerLinkSize);
+			}
+		});
+	};
+
+	return { kind: "header", height, draw };
+}
+
+function buildSectionTitleBlock(ctx: Ctx, title: string): Block {
+	const height = lineBox(layout.sectionTitleSize, layout.sectionTitleLineHeight);
+
+	const draw = (page: PDFPage, top: number) => {
+		drawLineText(ctx, page, title, x0, top, {
+			font: ctx.bold,
+			size: layout.sectionTitleSize,
+			color: colors.foreground,
+		});
+	};
+
+	return { kind: "section", height, draw };
+}
+
+function buildEntryBlock(ctx: Ctx, entry: CvEntry): Block {
+	const titleRowHeight = lineBox(layout.entryTitleSize, layout.entryTitleLineHeight);
+	const hasSubtitleRow = Boolean(entry.subtitle || entry.subtitleMeta);
+	const subtitleRowHeight = hasSubtitleRow ? lineBox(layout.entryMetaSize, layout.entryMetaLineHeight) : 0;
+
+	const dashWidth = ctx.regular.widthOfTextAtSize("-", layout.detailSize);
+	const bulletTextX = x0 + layout.entryIndent + dashWidth + layout.detailBulletGap;
+	const bulletTextWidth = rightEdge - bulletTextX;
+	const bulletLineGroups = (entry.bullets ?? []).map((bullet) =>
+		wrapText(ctx.regular, bullet, layout.detailSize, bulletTextWidth),
+	);
+	const bulletsHeight = bulletLineGroups.reduce(
+		(total, lines) => total + layout.entryGap + lines.length * lineBox(layout.detailSize, layout.detailLineHeight),
+		0,
+	);
+
+	const height =
+		layout.entryDividerSpace +
+		titleRowHeight +
+		(hasSubtitleRow ? layout.entryGap + subtitleRowHeight : 0) +
+		bulletsHeight;
+
+	const draw = (page: PDFPage, top: number) => {
+		page.drawLine({
+			start: { x: x0, y: top },
+			end: { x: rightEdge, y: top },
+			thickness: 1,
+			color: colors.border,
+		});
+
+		let y = top - layout.entryDividerSpace;
+		const titleBaseline = y - layout.entryTitleSize * layout.baselineFactor;
+
+		drawLineText(ctx, page, entry.title, x0, y, {
+			font: ctx.bold,
+			size: layout.entryTitleSize,
+			color: colors.foreground,
+			url: entry.titleUrl,
+		});
+
+		if (entry.titleMeta) {
+			const metaWidth = ctx.regular.widthOfTextAtSize(entry.titleMeta, layout.entryMetaSize);
+			page.drawText(entry.titleMeta, {
+				x: rightEdge - metaWidth,
+				y: titleBaseline,
+				size: layout.entryMetaSize,
+				font: ctx.regular,
+				color: colors.muted,
+			});
+		}
+		y -= titleRowHeight;
+
+		if (hasSubtitleRow) {
+			y -= layout.entryGap;
+			const subtitleBaseline = y - layout.entryMetaSize * layout.baselineFactor;
+
+			if (entry.subtitle) {
+				page.drawText(entry.subtitle, {
+					x: x0,
+					y: subtitleBaseline,
+					size: layout.entryMetaSize,
+					font: ctx.regular,
+					color: colors.foreground,
+				});
+			}
+
+			if (entry.subtitleMeta) {
+				const metaWidth = ctx.regular.widthOfTextAtSize(entry.subtitleMeta, layout.entryMetaSize);
+				page.drawText(entry.subtitleMeta, {
+					x: rightEdge - metaWidth,
+					y: subtitleBaseline,
+					size: layout.entryMetaSize,
+					font: ctx.regular,
+					color: colors.muted,
+				});
+			}
+			y -= subtitleRowHeight;
+		}
+
+		for (const lines of bulletLineGroups) {
+			y -= layout.entryGap;
+
+			lines.forEach((line, lineIndex) => {
+				if (lineIndex === 0) {
+					drawLineText(ctx, page, "-", x0 + layout.entryIndent, y, {
+						font: ctx.regular,
+						size: layout.detailSize,
+						color: colors.muted,
+					});
+				}
+
+				drawLineText(ctx, page, line, bulletTextX, y, {
+					font: ctx.regular,
+					size: layout.detailSize,
+					color: colors.muted,
+				});
+				y -= lineBox(layout.detailSize, layout.detailLineHeight);
+			});
+		}
+	};
+
+	return { kind: "entry", height, draw };
+}
+
+function buildInlineGridBlock(ctx: Ctx, rows: CvInlineRow[]): Block {
+	const cellWidth = contentWidth / 2;
+	const valueX = layout.inlineLabelWidth + layout.inlineColumnGap;
+	const valueWidth = cellWidth - valueX;
+	const valueLineGroups = rows.map((row) =>
+		wrapText(ctx.regular, row.value, layout.entryMetaSize, valueWidth),
+	);
+
+	const pairHeight = (index: number) => {
+		const leftLines = valueLineGroups[index]?.length ?? 1;
+		const rightLines = valueLineGroups[index + 1]?.length ?? 0;
+		return Math.max(leftLines, rightLines) * lineBox(layout.entryMetaSize, layout.entryMetaLineHeight) + layout.inlineRowGap;
+	};
+
+	let height = 0;
+	for (let index = 0; index < rows.length; index += 2) {
+		height += pairHeight(index);
 	}
 
-	return height;
-};
+	const draw = (page: PDFPage, top: number) => {
+		let y = top;
 
-const estimateSectionHeight = (section: CvSection) => {
-	let height = getLineHeight(layout.sectionTitleSize, 1.2);
+		for (let index = 0; index < rows.length; index += 2) {
+			const drawCell = (row: CvInlineRow | undefined, lines: string[] | undefined, cellX: number) => {
+				if (!row) {
+					return;
+				}
 
-	for (const entry of section.entries) {
-		height += layout.sectionGap;
-		height += estimateEntryHeight(entry);
-	}
+				const labelBaseline = y - layout.entryMetaSize * layout.baselineFactor;
+				page.drawText(row.label, {
+					x: cellX,
+					y: labelBaseline,
+					size: layout.entryMetaSize,
+					font: ctx.bold,
+					color: colors.foreground,
+				});
 
-	return height;
-};
+				let lineY = y;
+				for (const line of lines ?? [row.value]) {
+					page.drawText(line, {
+						x: cellX + valueX,
+						y: lineY - layout.entryMetaSize * layout.baselineFactor,
+						size: layout.entryMetaSize,
+						font: ctx.regular,
+						color: colors.muted,
+					});
+					lineY -= lineBox(layout.entryMetaSize, layout.entryMetaLineHeight);
+				}
+			};
 
-const estimateCvHeight = () => {
-	let height = layout.pagePaddingY * 2;
-	height += getLineHeight(layout.headerTitleSize, layout.headerTitleLineHeight);
-	height += layout.headerGap;
-	height += getLineHeight(layout.headerBodySize, layout.headerBodyLineHeight);
-	height += layout.headerGap;
-	height += getLineHeight(layout.headerLinkSize, layout.headerLinkLineHeight);
+			drawCell(rows[index], valueLineGroups[index], x0);
+			drawCell(rows[index + 1], valueLineGroups[index + 1], x0 + cellWidth);
+
+			y -= pairHeight(index);
+		}
+	};
+
+	return { kind: "entry", height, draw };
+}
+
+function buildBlocks(ctx: Ctx): Block[] {
+	const blocks: Block[] = [buildHeaderBlock(ctx)];
 
 	for (const section of sections) {
-		height += layout.pageGap;
-		height += estimateSectionHeight(section);
-	}
+		blocks.push(buildSectionTitleBlock(ctx, section.title));
 
-	return Math.max(size.height, Math.ceil(height + layout.pagePaddingY));
-};
-
-async function ensureWasm() {
-	if (!wasmInit) {
-		wasmInit = initWasm(resvgWasmModule).catch((error: unknown) => {
-			const message = error instanceof Error ? error.message : String(error);
-
-			if (!message.includes("Already initialized")) {
-				throw error;
+		if (section.kind === "entries") {
+			for (const entry of section.entries) {
+				blocks.push(buildEntryBlock(ctx, entry));
 			}
-		});
+		} else {
+			blocks.push(buildInlineGridBlock(ctx, section.rows));
+		}
 	}
 
-	await wasmInit;
+	return blocks;
 }
 
-async function ensureSatori() {
-	if (!satoriInit) {
-		satoriInit = initSatori(yogaWasmModule).catch((error: unknown) => {
-			const message = error instanceof Error ? error.message : String(error);
+// Greedily pack measured blocks into pages, breaking only between blocks so no
+// entry is split and no section heading is orphaned at a page foot.
+function paginate(blocks: Block[]): PageItem[][] {
+	const usable = size.height - layout.pagePaddingY * 2 - layout.pageSafetyMargin;
+	const gapBefore = (block: Block) => (block.kind === "section" ? layout.pageGap : layout.sectionGap);
 
-			if (!message.includes("already initialized") && !message.includes("Already initialized")) {
-				throw error;
+	const pages: PageItem[][] = [];
+	let page: PageItem[] = [];
+	let used = 0;
+
+	for (let index = 0; index < blocks.length; index += 1) {
+		const block = blocks[index];
+
+		if (page.length === 0) {
+			page.push({ block, marginTop: 0 });
+			used = block.height;
+			continue;
+		}
+
+		const gap = gapBefore(block);
+		let need = gap + block.height;
+
+		if (block.kind === "section") {
+			const next = blocks[index + 1];
+			if (next) {
+				need += layout.sectionGap + next.height;
 			}
-		});
+		}
+
+		if (used + need > usable) {
+			pages.push(page);
+			page = [{ block, marginTop: 0 }];
+			used = block.height;
+		} else {
+			page.push({ block, marginTop: gap });
+			used += gap + block.height;
+		}
 	}
 
-	await satoriInit;
-}
-
-async function getFonts() {
-	if (!fontPromise) {
-		fontPromise = Promise.resolve({
-			regular: decodeDataUrl(geistMonoRegularDataUrl),
-			bold: decodeDataUrl(geistMonoBoldDataUrl),
-		});
+	if (page.length > 0) {
+		pages.push(page);
 	}
 
-	return await fontPromise;
-}
-
-const textNode = (text: string, style: CvStyle): CvNode => ({
-	type: "div",
-	props: {
-		style,
-		children: text,
-	},
-});
-
-const rowNode = (children: CvChild[], style: CvStyle): CvNode => ({
-	type: "div",
-	props: {
-		style,
-		children,
-	},
-});
-
-function createDetailNode(detail: string): CvNode {
-	return rowNode(
-		[
-			textNode("-", {
-				fontSize: layout.detailSize,
-				lineHeight: layout.detailLineHeight,
-			}),
-			textNode(detail, {
-				fontSize: layout.detailSize,
-				lineHeight: layout.detailLineHeight,
-				maxWidth: `${layout.detailMaxWidth}px`,
-			}),
-		],
-		{
-			alignItems: "baseline",
-			color: pageTheme.muted,
-			display: "flex",
-			gap: `${layout.detailBulletGap}px`,
-			marginLeft: `${layout.entryIndent}px`,
-			maxWidth: `${layout.metaMaxWidth}px`,
-		},
-	);
-}
-
-function createEntryNode(entry: CvEntry): CvNode {
-	const children: CvChild[] = [
-		rowNode(
-			[
-				textNode("-", {
-					color: pageTheme.foreground,
-					fontSize: layout.entryTitleSize,
-					fontWeight: 700,
-					lineHeight: layout.entryTitleLineHeight,
-				}),
-				textNode(entry.title, {
-					color: pageTheme.foreground,
-					fontSize: layout.entryTitleSize,
-					fontWeight: 700,
-					lineHeight: layout.entryTitleLineHeight,
-					maxWidth: `${layout.titleMaxWidth}px`,
-				}),
-			],
-			{
-				alignItems: "baseline",
-				display: "flex",
-				gap: `${layout.entryBulletGap}px`,
-			},
-		),
-		textNode(entry.meta, {
-			color: pageTheme.muted,
-			display: "flex",
-			fontSize: layout.entryMetaSize,
-			lineHeight: layout.entryMetaLineHeight,
-			marginLeft: `${layout.entryIndent}px`,
-			maxWidth: `${layout.metaMaxWidth}px`,
-		}),
-	];
-
-	for (const detail of entry.details ?? []) {
-		children.push(createDetailNode(detail));
-	}
-
-	return rowNode(children, {
-		borderTop: `1px solid ${pageTheme.border}`,
-		display: "flex",
-		flexDirection: "column",
-		gap: `${layout.entryGap}px`,
-		paddingTop: `${layout.entryDividerSpace}px`,
-	});
-}
-
-function createSectionNode(section: CvSection): CvNode {
-	return rowNode(
-		[
-			textNode(section.title, {
-				color: pageTheme.foreground,
-				fontSize: layout.sectionTitleSize,
-				fontWeight: 700,
-				letterSpacing: "0.16em",
-			}),
-			...section.entries.map(createEntryNode),
-		],
-		{
-			display: "flex",
-			flexDirection: "column",
-			gap: `${layout.sectionGap}px`,
-		},
-	);
-}
-
-function createCvNode(height: number): CvNode {
-	return rowNode(
-		[
-			rowNode(
-				[
-					textNode(siteConfig.author, {
-						color: pageTheme.foreground,
-						fontSize: layout.headerTitleSize,
-						fontWeight: 700,
-						letterSpacing: "-0.04em",
-						lineHeight: layout.headerTitleLineHeight,
-					}),
-					textNode(siteConfig.cv.heading, {
-						color: pageTheme.muted,
-						fontSize: layout.headerBodySize,
-						lineHeight: layout.headerBodyLineHeight,
-					}),
-					textNode(siteConfig.siteUrl, {
-						color: pageTheme.muted,
-						fontSize: layout.headerLinkSize,
-						lineHeight: layout.headerLinkLineHeight,
-					}),
-				],
-				{
-					display: "flex",
-					flexDirection: "column",
-					gap: `${layout.headerGap}px`,
-				},
-			),
-			...sections.map(createSectionNode),
-		],
-		{
-			backgroundColor: pageTheme.background,
-			color: pageTheme.foreground,
-			display: "flex",
-			flexDirection: "column",
-			gap: `${layout.pageGap}px`,
-			height: `${height}px`,
-			padding: `${layout.pagePaddingY}px ${layout.pagePaddingX}px`,
-			width: "100%",
-		},
-	);
-}
-
-async function renderCvPng() {
-	await ensureWasm();
-	await ensureSatori();
-
-	const fonts = await getFonts();
-	const renderHeight = estimateCvHeight();
-	const svg = await satori(createCvNode(renderHeight) as unknown as Parameters<typeof satori>[0], {
-		width: size.width,
-		height: renderHeight,
-		fonts: [
-			{
-				data: fonts.regular,
-				name: "Geist Mono",
-				style: "normal",
-				weight: 400,
-			},
-			{
-				data: fonts.bold,
-				name: "Geist Mono",
-				style: "normal",
-				weight: 700,
-			},
-		],
-	});
-
-	return new Uint8Array(
-		new Resvg(svg, {
-			background: pageTheme.background,
-			fitTo: {
-				mode: "width",
-				value: size.width,
-			},
-			font: {
-				defaultFontFamily: "Geist Mono",
-				monospaceFamily: "Geist Mono",
-			},
-		}).render().asPng(),
-	);
+	return pages;
 }
 
 export const GET: APIRoute = async () => {
-	const png = await renderCvPng();
 	const pdf = await PDFDocument.create();
+	pdf.registerFontkit(fontkit);
 	pdf.setTitle(`${siteConfig.author} CV`);
 	pdf.setAuthor(siteConfig.author);
 
-	const image = await pdf.embedPng(png);
-	const pageDoc = pdf.addPage([size.width, size.height]);
-	const scale = Math.min(size.width / image.width, size.height / image.height);
-	const drawWidth = image.width * scale;
-	const drawHeight = image.height * scale;
-	const offsetX = (size.width - drawWidth) / 2;
-	const offsetY = size.height - drawHeight;
+	const ctx: Ctx = {
+		pdf,
+		regular: await pdf.embedFont(decodeDataUrl(geistMonoRegularDataUrl), { subset: true }),
+		bold: await pdf.embedFont(decodeDataUrl(geistMonoBoldDataUrl), { subset: true }),
+	};
 
-	pageDoc.drawImage(image, {
-		x: offsetX,
-		y: offsetY,
-		width: drawWidth,
-		height: drawHeight,
-	});
+	const pages = paginate(buildBlocks(ctx));
+
+	for (const items of pages) {
+		const page = pdf.addPage([size.width, size.height]);
+		page.drawRectangle({
+			x: 0,
+			y: 0,
+			width: size.width,
+			height: size.height,
+			color: colors.background,
+		});
+
+		let y = size.height - layout.pagePaddingY;
+		for (const item of items) {
+			y -= item.marginTop;
+			item.block.draw(page, y);
+			y -= item.block.height;
+		}
+	}
 
 	const bytes = await pdf.save();
 	const copy = Uint8Array.from(bytes);
@@ -451,7 +612,7 @@ export const GET: APIRoute = async () => {
 	return new Response(copy, {
 		headers: {
 			"Content-Type": "application/pdf",
-			"Content-Disposition": `attachment; filename="${siteConfig.cv.fileName}"`,
+			"Content-Disposition": `attachment; filename="${cvDownloadName()}"`,
 		},
 	});
 };
