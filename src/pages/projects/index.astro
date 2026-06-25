@@ -27,9 +27,9 @@ const recentPostUrls = posts
 		/>
 
 		{posts.length === 0 ? (
-			<p class="text-tone-soft text-sm">no projects yet.</p>
+			<p class="text-tone-soft text-sm" data-reveal>no projects yet.</p>
 		) : (
-			<ol class="space-y-5">
+			<ol class="space-y-5" data-reveal>
 				{posts.map((post, index) => (
 					<li class="space-y-1">
 						<p class="text-tone-faint text-xs uppercase tracking-[0.28em]">
@@ -52,7 +52,7 @@ const recentPostUrls = posts
 		)}
 
 		{posts.length > 0 && (
-			<div class="text-tone-soft space-y-1 text-sm">
+			<div class="text-tone-soft space-y-1 text-sm" data-reveal>
 				<p>
 					use <span class="text-tone-mid">[{latestPostRange}]</span> for the latest project notes.
 				</p>

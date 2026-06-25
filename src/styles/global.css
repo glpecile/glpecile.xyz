@@ -101,6 +101,9 @@
 		--tone-faint: 231 10% 51%;
 
 		--radius: 0.5rem;
+
+		/* Strong ease-out (Emil Kowalski) for the page-enter cascade. */
+		--ease-reveal: cubic-bezier(0.23, 1, 0.32, 1);
 	}
 
 	:root[data-theme="light"] {
@@ -548,3 +551,40 @@
 			}
 		}
 	}
+
+/*
+	Staggered page-enter reveal: content streams in with a blur + rise + fade
+	while the header chrome stays put. Gated by JS-set root attributes so it
+	never runs for no-JS, reduced-motion, or keyboard-shortcut navigation.
+
+	- [data-reveal-ready] hides targets the moment they parse (set in <head>),
+	  so there is no flash of content before the animation starts.
+	- [data-reveal-go] is set after per-element --reveal-index is assigned,
+	  guaranteeing the cascade order is correct before anything animates.
+*/
+@media (prefers-reduced-motion: no-preference) {
+	:root[data-reveal-ready] [data-reveal] {
+		opacity: 0;
+		filter: blur(8px);
+		transform: translateY(0.4rem);
+	}
+
+	:root[data-reveal-go] [data-reveal] {
+		animation: reveal-enter 0.5s var(--ease-reveal) both;
+		animation-delay: calc(var(--reveal-index, 0) * 50ms);
+	}
+}
+
+@keyframes reveal-enter {
+	from {
+		opacity: 0;
+		filter: blur(8px);
+		transform: translateY(0.4rem);
+	}
+
+	to {
+		opacity: 1;
+		filter: blur(0);
+		transform: translateY(0);
+	}
+}

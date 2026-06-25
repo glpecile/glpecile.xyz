@@ -34,7 +34,7 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		extra={introExtra}
 	/>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="blog" />
 
 		{latestPosts.length === 0 ? (
@@ -59,7 +59,7 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		{posts.length > 0 && <MoreLink href="/blog" />}
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="projects" />
 
 		{latestProjects.length === 0 ? (
@@ -84,7 +84,7 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		{projectPosts.length > 0 && <MoreLink href="/projects" />}
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="work" />
 		<ol class="space-y-5">
 			{featuredWork.map((job) => (
@@ -122,7 +122,7 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		{hasMoreWork && <MoreLink href="/work" />}
 	</section>
 
-	<section class="space-y-3">
+	<section class="space-y-3" data-reveal>
 		<SectionLabel label="socials" />
 		<ul class="space-y-2 text-sm sm:text-base">
 			{socialLinks.map(([label, href]) => (

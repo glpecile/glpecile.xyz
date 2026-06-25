@@ -143,6 +143,22 @@ const shortcuts = siteConfig.shortcuts.nav.map(({ href, shortcut }) => ({
 				}
 			})();
 		</script>
+		<script is:inline>
+			(() => {
+				const root = document.documentElement;
+				const prefersReducedMotion = window.matchMedia(
+					"(prefers-reduced-motion: reduce)",
+				).matches;
+				const skipReveal =
+					prefersReducedMotion || root.dataset.shortcutNav === "true";
+
+				// Hide reveal targets before they paint. Skipping this leaves
+				// them fully visible for no-JS, reduced-motion, and shortcut nav.
+				if (!skipReveal) {
+					root.dataset.revealReady = "";
+				}
+			})();
+		</script>
 	</head>
 	<body class="min-h-screen bg-background text-foreground antialiased">
 		<div class="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-6 py-8 sm:px-8 md:py-12">
@@ -281,6 +297,26 @@ const shortcuts = siteConfig.shortcuts.nav.map(({ href, shortcut }) => ({
 						}, 16);
 					}
 				}
+			})();
+		</script>
+
+		<script is:inline>
+			(() => {
+				const root = document.documentElement;
+
+				// Only run when the head decided the cascade should play.
+				if (root.dataset.revealReady !== "") {
+					return;
+				}
+
+				// Number the targets in DOM order so the cascade flows
+				// top-to-bottom across intro lines and the sections below.
+				document.querySelectorAll("[data-reveal]").forEach((element, index) => {
+					element.style.setProperty("--reveal-index", String(index));
+				});
+
+				// Indices are set — release the animation.
+				root.dataset.revealGo = "";
 			})();
 		</script>
 	</body>

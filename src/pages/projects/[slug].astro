@@ -37,6 +37,7 @@ const postPath = `/projects/${post.id}`;
 		<a
 			href="/projects"
 			class="blog-back-link terminal-link inline-flex items-center gap-2 text-sm"
+			data-reveal
 		>
 			<svg
 				viewBox="0 0 16 16"
@@ -49,26 +50,30 @@ const postPath = `/projects/${post.id}`;
 		</a>
 
 		<header class="space-y-4">
-			<SectionLabel label="project" />
-			<p class="text-tone-soft text-sm">{formatProjectDate(displayDate)}</p>
-			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
+			<SectionLabel label="project" data-reveal />
+			<p class="text-tone-soft text-sm" data-reveal>{formatProjectDate(displayDate)}</p>
+			<h1
+				class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl"
+				data-reveal
+			>
 				{post.data.title}
 			</h1>
 			<button
 				type="button"
 				class="blog-share-button text-tone-soft text-sm"
 				data-post-share
+				data-reveal
 				aria-label={`Copy link to project: ${post.data.title}`}
 				title={`Copy link to project: ${post.data.title}`}
 			>
 				<span class="blog-share-button-label">[share]</span>
 			</button>
-			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base" data-reveal>
 				{post.data.description}
 			</p>
 		</header>
 
-		<div class="blog-prose">
+		<div class="blog-prose" data-reveal>
 			<Content />
 		</div>
 

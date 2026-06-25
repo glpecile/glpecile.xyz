@@ -1,9 +1,10 @@
 ---
 export interface Props {
 	label: string;
+	[key: string]: unknown;
 }
 
-const { label } = Astro.props;
+const { label, ...rest } = Astro.props;
 ---
 
-<p class="section-label">* {label}</p>
+<p class="section-label" {...rest}>* {label}</p>

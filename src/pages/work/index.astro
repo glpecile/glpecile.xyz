@@ -40,7 +40,7 @@ const cvFileName = cvDownloadName();
 			description="+ projects, skills, education & certificates."
 		/>
 
-		<div class="space-y-1">
+		<div class="space-y-1" data-reveal>
 			<p class="text-sm sm:text-base">
 				<a
 					class="terminal-link inline-flex items-center gap-2"
@@ -54,7 +54,7 @@ const cvFileName = cvDownloadName();
 		</div>
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="roles" />
 
 		{work.length === 0 ? (
@@ -107,7 +107,7 @@ const cvFileName = cvDownloadName();
 		)}
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="projects" />
 
 		{projects.length === 0 ? (
@@ -151,7 +151,7 @@ const cvFileName = cvDownloadName();
 		)}
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="skills" />
 
 		<ul class="grid gap-x-10 gap-y-2 sm:grid-cols-2">
@@ -166,7 +166,7 @@ const cvFileName = cvDownloadName();
 		</ul>
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="education" />
 
 		{education.length === 0 ? (
@@ -206,7 +206,7 @@ const cvFileName = cvDownloadName();
 		)}
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="languages" />
 
 		<ul class="grid gap-x-10 gap-y-2 sm:grid-cols-2">
@@ -219,7 +219,7 @@ const cvFileName = cvDownloadName();
 		</ul>
 	</section>
 
-	<section class="space-y-4">
+	<section class="space-y-4" data-reveal>
 		<SectionLabel label="certificates" />
 
 		{certificates.length === 0 ? (

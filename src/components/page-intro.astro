@@ -12,14 +12,17 @@ const { label, title, description, extra } = Astro.props;
 ---
 
 <section class="space-y-4">
-	<SectionLabel label={label} />
-	<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
+	<SectionLabel label={label} data-reveal />
+	<h1
+		class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl"
+		data-reveal
+	>
 		{title}
 	</h1>
 	{description && (
-		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base" data-reveal>
 			{description}
 		</p>
 	)}
-	{extra && <p class="text-tone-soft text-sm" set:html={extra} />}
+	{extra && <p class="text-tone-soft text-sm" set:html={extra} data-reveal />}
 </section>
