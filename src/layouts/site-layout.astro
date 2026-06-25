@@ -1,6 +1,5 @@
 ---
-import { Image } from "astro:assets";
-
+import meAvatar from "@/assets/me-avatar.webp?inline";
 import SiteFooter from "@/components/site-footer.astro";
 import SiteNav from "@/components/site-nav.astro";
 import { getMarkdownPath } from "@/lib/llms";
@@ -168,13 +167,15 @@ const shortcuts = siteConfig.shortcuts.nav.map(({ href, shortcut }) => ({
 					href="/"
 					class="inline-flex w-fit items-center gap-3 no-underline"
 				>
-					<Image
-						src="/images/me.png"
+					<img
+						src={meAvatar}
 						alt="Portrait of Gian Luca Pecile"
 						width={28}
 						height={28}
 						loading="eager"
-						class="rounded-full"
+						decoding="sync"
+						fetchpriority="high"
+						class="h-7 w-7 shrink-0 rounded-full"
 					/>
 					<span>
 						<span
