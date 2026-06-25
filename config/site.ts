@@ -168,7 +168,7 @@ export const siteConfig = {
 			place: "Buenos Aires · Hybrid",
 			url: "https://explorer.alignedlayer.com",
 			highlights: [
-				"Designed and built explorer.alignedlayer.com end to end in Elixir / Phoenix — a block explorer for a zero-knowledge proof verification layer.",
+				"Designed and built Elixir / Phoenix website block explorer for zero-knowledge proofs in the aligned verification layer.",
 				"Built backend services and data pipelines that index and aggregate on-chain proof and batch data for real-time exploration.",
 				"Owned the product from concept to production across backend, protocol API integration, and the user-facing interface.",
 			],
