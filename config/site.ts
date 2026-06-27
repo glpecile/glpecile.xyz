@@ -112,7 +112,7 @@ export const siteConfig = {
 	author: "Gian Luca Pecile",
 	name: "glpecile's personal site",
 	shortName: "glpecile",
-	description: "Frontend engineer. Shipping websites and apps from time to time.",
+	description: "Frontend engineer focused on design systems and high-craft product UI.",
 	emoji: "🧙",
 	backgroundColor: "#eff1f5",
 	themeColor: "#eff1f5",
@@ -146,8 +146,8 @@ export const siteConfig = {
 			place: "Buenos Aires · Hybrid",
 			url: "https://poap.xyz",
 			highlights: [
-				"Ship and maintain production TypeScript/React applications for POAP — the protocol for issuing digital collectibles (NFTs) that prove attendance and participation.",
-				"Own features end to end — implementation, code review, and release — improving the reliability and performance of high-traffic web apps.",
+				"Build and own reusable React/TypeScript components and shared UI patterns for POAP — the web3 protocol for issuing digital collectibles (NFTs) — keeping the interface consistent and high-quality at scale.",
+				"Ship polished, high-traffic collectible (NFT) interfaces end to end — from UI implementation through code review and release — improving reliability, performance, and product feel.",
 			],
 		},
 		{
@@ -168,9 +168,8 @@ export const siteConfig = {
 			place: "Buenos Aires · Hybrid",
 			url: "https://explorer.alignedlayer.com",
 			highlights: [
-				"Designed and built Elixir / Phoenix website block explorer for zero-knowledge proofs in the aligned verification layer.",
-				"Built backend services and data pipelines that index and aggregate on-chain proof and batch data for real-time exploration.",
-				"Owned the product from concept to production across backend, protocol API integration, and the user-facing interface.",
+				"Designed and built the user-facing block explorer for zero-knowledge proofs in the Aligned verification layer — turning dense, real-time on-chain proof and batch data into a clear, legible interface.",
+				"Owned the product from concept to production across the user-facing interface, protocol API integration, and the backend services / data pipelines that index and aggregate on-chain data.",
 			],
 		},
 		{
@@ -180,8 +179,8 @@ export const siteConfig = {
 			place: "Remote",
 			url: "https://constellationnetwork.io",
 			highlights: [
-				"Developed production React/TypeScript interfaces for a distributed-ledger network.",
-				"Delivered features end to end against evolving protocol APIs.",
+				"Designed and built an anonymous chat app authenticated with a web wallet — wallet-based sign-in was novel at the time — owning the product UI end to end.",
+				"Developed production React/TypeScript interfaces for a web3 distributed-ledger network, delivering features against evolving protocol APIs.",
 			],
 		},
 		{
@@ -216,6 +215,24 @@ export const siteConfig = {
 	] satisfies EducationItem[],
 	projects: [
 		{
+			name: "glpecile.xyz — Personal site & design system",
+			stack: "Astro / TypeScript / Tailwind CSS",
+			url: "https://glpecile.xyz",
+			highlights: [
+				"Designed and built this site as a hand-crafted component system — consistent type, color, and motion tokens driving every page from a single config.",
+				"Engineered a custom CV generator that renders a typeset PDF programmatically (pdf-lib) from the same content source as the live site.",
+				"Sweated the details: reveal/stagger animations, keyboard shortcuts, dark/light theming, and an /llms.txt export for agents.",
+			],
+		},
+		{
+			name: "lugia",
+			stack: "React Native / Expo",
+			url: "https://github.com/glpecile/lugia",
+			highlights: [
+				"Built a cross-platform (iOS / Android / web) blog application with Expo from a single shared UI codebase.",
+			],
+		},
+		{
 			name: "Human-in-Picture — Privacy-Preserving CNN (Thesis)",
 			stack: "Python / PyTorch / Concrete ML (FHE)",
 			url: "https://github.com/Memento-Research/human-in-picture-concrete-ml",
@@ -243,14 +260,6 @@ export const siteConfig = {
 			],
 		},
 		{
-			name: "lugia",
-			stack: "React Native / Expo",
-			url: "https://github.com/glpecile/lugia",
-			highlights: [
-				"Built a cross-platform (iOS / Android / web) blog application with Expo.",
-			],
-		},
-		{
 			name: "ITBA Systems Coursework",
 			stack: "C / Java / PostgreSQL / Redis",
 			url: "https://github.com/glpecile",
@@ -261,7 +270,29 @@ export const siteConfig = {
 	] satisfies ProjectEntry[],
 	skills: [
 		{
-			category: "Programming",
+			category: "Frontend & UI",
+			items: [
+				"React",
+				"Next.js",
+				"TypeScript",
+				"CSS",
+				"Tailwind CSS",
+				"React Native / Expo",
+				"Astro",
+				"Responsive & accessible UI",
+			],
+		},
+		{
+			category: "Design Systems & Craft",
+			items: [
+				"Reusable component libraries",
+				"Design tokens & consistency at scale",
+				"Animation, motion & interaction design",
+				"Information-dense UI",
+			],
+		},
+		{
+			category: "Languages",
 			items: ["TypeScript", "JavaScript", "Python", "Elixir", "Java", "C", "SQL"],
 		},
 		{
@@ -269,23 +300,14 @@ export const siteConfig = {
 			items: ["Phoenix (Elixir)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
 		},
 		{
-			category: "Frontend",
-			items: ["React", "Next.js", "React Native / Expo", "Astro", "Tailwind CSS"],
-		},
-		{
-			// Backed by the FHE thesis + SIA coursework. Add RAG/agents back only if
-			// you build something real with them.
 			category: "AI / ML",
 			items: [
 				"Machine learning (PyTorch)",
-				"CNNs, model training & evaluation",
 				"Privacy-preserving ML (FHE, Concrete ML)",
 				"LLM application patterns",
-				"Prompt engineering",
 			],
 		},
 		{
-			// TODO(gian): add "Google Cloud (Vertex AI)" here if you have genuine exposure — the role wants GCP.
 			category: "Cloud & Tooling",
 			items: ["Cloudflare Workers", "Vercel", "Git", "CI/CD"],
 		},
@@ -328,6 +350,6 @@ export const siteConfig = {
 		href: "/work/cv.pdf",
 		fileName: "gian-luca-pecile-cv.pdf",
 		label: "download cv",
-		heading: "Software engineer shipping production web & AI-driven products.",
+		heading: "Frontend engineer building design systems and high-craft product interfaces.",
 	} satisfies CvFile,
 } as const;
