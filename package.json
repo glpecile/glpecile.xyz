@@ -40,7 +40,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@biomejs/biome": "2.5.0",
+		"@biomejs/biome": "2.5.1",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"@tailwindcss/vite": "^4.3.1",
@@ -48,6 +48,6 @@
 		"husky": "^9.1.7",
 		"tailwindcss": "^4.3.1",
 		"typescript": "^5.9.3",
-		"wrangler": "^4.103.0"
+		"wrangler": "^4.105.0"
 	}
 }
