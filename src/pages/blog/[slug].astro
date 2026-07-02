@@ -2,9 +2,11 @@
 import type { GetStaticPaths } from "astro";
 import { render, type CollectionEntry } from "astro:content";
 
+import PostAuthors from "@/components/post-authors.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPosts } from "@/lib/blog";
+import { formatReadingTime, getReadingTimeMinutes } from "@/lib/reading-time";
 
 export const getStaticPaths = (async () => {
 	const posts = await getBlogPosts();
@@ -22,6 +24,7 @@ type Props = {
 const { post } = Astro.props as Props;
 const { Content } = await render(post);
 const displayDate = post.data.updatedDate ?? post.data.pubDate;
+const readingTime = formatReadingTime(getReadingTimeMinutes(post.body));
 const postPath = `/blog/${post.id}`;
 ---
 
@@ -51,13 +54,16 @@ const postPath = `/blog/${post.id}`;
 
 		<header class="space-y-4">
 			<SectionLabel label="post" data-reveal />
-			<p class="text-tone-soft text-sm" data-reveal>{formatDate(displayDate)}</p>
+			<p class="text-tone-soft text-sm" data-reveal>
+				{formatDate(displayDate)} · {readingTime}
+			</p>
 			<h1
 				class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl"
 				data-reveal
 			>
 				{post.data.title}
 			</h1>
+			<PostAuthors authorIds={post.data.authors} data-reveal />
 			<button
 				type="button"
 				class="blog-share-button text-tone-soft text-sm"

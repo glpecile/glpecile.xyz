@@ -1,0 +1,43 @@
+---
+import { type AuthorId, getAuthors } from "@/lib/authors";
+
+export interface Props {
+	authorIds: AuthorId[];
+	[key: string]: unknown;
+}
+
+const { authorIds, ...rest } = Astro.props;
+const postAuthors = getAuthors(authorIds);
+---
+
+<div
+	class="text-tone-soft flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
+	{...rest}
+>
+	<span>by</span>
+	{postAuthors.map((author) => (
+		<span class="inline-flex items-center gap-2">
+			{author.avatar.kind === "image" ? (
+				<img
+					src={author.avatar.src}
+					alt={`Avatar of ${author.name}`}
+					width={20}
+					height={20}
+					loading="lazy"
+					decoding="async"
+					class="h-5 w-5 shrink-0 rounded-full"
+				/>
+			) : (
+				<svg
+					viewBox="0 0 24 24"
+					role="img"
+					aria-label={`${author.avatar.title} logo`}
+					class="h-5 w-5 shrink-0 fill-current"
+				>
+					<path d={author.avatar.path}></path>
+				</svg>
+			)}
+			<span class="text-tone-mid">{author.name}</span>
+		</span>
+	))}
+</div>

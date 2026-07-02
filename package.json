@@ -12,6 +12,7 @@
 		"start": "astro preview",
 		"lint": "biome lint .",
 		"check": "astro check",
+		"test": "vitest run",
 		"prepare": "husky",
 		"deploy": "bun run build && wrangler deploy",
 		"preview": "bun run build && wrangler dev",
@@ -31,12 +32,11 @@
 		"@types/react-dom": "^19.2.3",
 		"astro": "^6.4.8",
 		"class-variance-authority": "^0.7.1",
-		"clsx": "^2.1.1",
+		"cnfast": "^0.0.8",
 		"pdf-lib": "^1.17.1",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6",
-		"satori": "^0.26.0",
-		"tailwind-merge": "^3.6.0"
+		"satori": "^0.26.0"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
@@ -48,6 +48,7 @@
 		"husky": "^9.1.7",
 		"tailwindcss": "^4.3.1",
 		"typescript": "^5.9.3",
-		"wrangler": "^4.105.0"
+		"wrangler": "^4.105.0",
+		"vitest": "^4.1.9"
 	}
 }
