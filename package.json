@@ -19,9 +19,9 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^14.1.0",
-		"@astrojs/mdx": "^7.0.1",
-		"@astrojs/react": "^6.0.0",
+		"@astrojs/cloudflare": "^14.1.2",
+		"@astrojs/mdx": "^7.0.2",
+		"@astrojs/react": "^6.0.1",
 		"@fontsource/geist-mono": "^5.2.8",
 		"@fontsource/jetbrains-mono": "^5.2.8",
 		"@pdf-lib/fontkit": "^1.1.1",
@@ -31,7 +31,7 @@
 		"@types/mapbox-gl": "^3.5.0",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"astro": "^7.0.5",
+		"astro": "^7.0.7",
 		"class-variance-authority": "^0.7.1",
 		"cnfast": "^0.0.8",
 		"mapbox-gl": "^3.26.0",
@@ -43,17 +43,17 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@biomejs/biome": "2.5.1",
+		"@biomejs/biome": "2.5.3",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
-		"@tailwindcss/vite": "^4.3.1",
+		"@tailwindcss/vite": "^4.3.2",
 		"@types/geojson": "^7946.0.16",
-		"@types/node": "^22.20.0",
+		"@types/node": "^22.20.1",
 		"husky": "^9.1.7",
-		"tailwindcss": "^4.3.1",
+		"tailwindcss": "^4.3.2",
 		"typescript": "^5.9.3",
-		"vite": "^8.0.13",
-		"vitest": "^4.1.9",
-		"wrangler": "^4.105.0"
+		"vite": "^8.1.4",
+		"vitest": "^4.1.10",
+		"wrangler": "^4.110.0"
 	}
 }
