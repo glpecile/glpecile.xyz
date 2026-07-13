@@ -58,6 +58,9 @@
 		"wrangler": "^4.110.0"
 	},
 	"trustedDependencies": [
-		"rustywind"
+		"esbuild",
+		"rustywind",
+		"sharp",
+		"workerd"
 	]
 }
