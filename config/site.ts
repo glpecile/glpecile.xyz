@@ -137,7 +137,6 @@ export const siteConfig = {
 	contact: {
 		email: "hello@glpecile.xyz",
 		location: "Buenos Aires, Argentina",
-		linkedin: "https://www.linkedin.com/in/glpecile",
 	} satisfies ContactInfo,
 	work: [
 		{
@@ -147,8 +146,8 @@ export const siteConfig = {
 			place: "Buenos Aires · Hybrid",
 			url: "https://poap.xyz",
 			highlights: [
-				"Ship production features end to end for POAP — the web3 protocol for issuing digital collectibles (NFTs) — from TypeScript implementation through API integration, code review, and release on high-traffic minting and collection surfaces.",
-				"Own reusable React/TypeScript components and shared patterns across the protocol's products, improving reliability, performance, and consistency at scale.",
+				"Build and own reusable React/TypeScript components and shared UI patterns for POAP — the web3 protocol for issuing digital collectibles (NFTs) — keeping the interface consistent and high-quality at scale.",
+				"Ship polished, high-traffic collectible (NFT) interfaces end to end — from UI implementation through code review and release — improving reliability, performance, and product feel.",
 			],
 		},
 		{
@@ -158,8 +157,8 @@ export const siteConfig = {
 			place: "Buenos Aires · Remote",
 			url: "https://www.itba.edu.ar",
 			highlights: [
-				"Led technical sessions and code reviews on multiplatform mobile development, guiding engineering teams toward production-grade practices.",
-				"Mentored student teams through architecting, debugging, and shipping apps across iOS and Android — explaining complex technical trade-offs to mixed-experience audiences.",
+				"Led technical sessions and code reviews on multiplatform mobile development, instilling production-grade engineering best practices.",
+				"Mentored students through architecting and shipping apps across iOS and Android.",
 			],
 		},
 		{
@@ -169,9 +168,8 @@ export const siteConfig = {
 			place: "Buenos Aires · Hybrid",
 			url: "https://explorer.alignedlayer.com",
 			highlights: [
-				"Designed and built the block explorer for Aligned, a zero-knowledge proof verification layer on Ethereum — turning dense, real-time on-chain proof and batch data into a clear, legible product.",
-				"Owned the system from concept to production: backend services and data pipelines (Elixir/Phoenix, PostgreSQL) indexing and aggregating on-chain data, protocol API integration, and the user-facing interface.",
-				"Diagnosed and resolved production issues spanning the explorer, its indexers, and the underlying blockchain network.",
+				"Designed and built the user-facing block explorer for zero-knowledge proofs in the Aligned verification layer — turning dense, real-time on-chain proof and batch data into a clear, legible interface.",
+				"Owned the product from concept to production across the user-facing interface, protocol API integration, and the backend services / data pipelines that index and aggregate on-chain data.",
 			],
 		},
 		{
@@ -181,8 +179,8 @@ export const siteConfig = {
 			place: "Remote",
 			url: "https://constellationnetwork.io",
 			highlights: [
-				"Designed and built an anonymous chat app authenticated with a web wallet — wallet-based sign-in was novel at the time — owning the product end to end.",
-				"Delivered production React/TypeScript features for a web3 distributed-ledger network, integrating against evolving protocol APIs and shifting requirements.",
+				"Designed and built an anonymous chat app authenticated with a web wallet — wallet-based sign-in was novel at the time — owning the product UI end to end.",
+				"Developed production React/TypeScript interfaces for a web3 distributed-ledger network, delivering features against evolving protocol APIs.",
 			],
 		},
 		{
@@ -272,13 +270,25 @@ export const siteConfig = {
 	] satisfies ProjectEntry[],
 	skills: [
 		{
-			category: "Web3 & Blockchain",
+			category: "Frontend & UI",
 			items: [
-				"NFT infrastructure (POAP)",
-				"Zero-knowledge proof systems (Aligned)",
-				"On-chain data indexing",
-				"Wallet-based authentication",
-				"Ethereum ecosystem",
+				"React",
+				"Next.js",
+				"TypeScript",
+				"CSS",
+				"Tailwind CSS",
+				"React Native / Expo",
+				"Astro",
+				"Responsive & accessible UI",
+			],
+		},
+		{
+			category: "Design Systems & Craft",
+			items: [
+				"Reusable component libraries",
+				"Design tokens & consistency at scale",
+				"Animation, motion & interaction design",
+				"Information-dense UI",
 			],
 		},
 		{
@@ -286,14 +296,8 @@ export const siteConfig = {
 			items: ["TypeScript", "JavaScript", "Python", "Elixir", "Java", "C", "SQL"],
 		},
 		{
-			category: "Backend & APIs",
-			items: [
-				"REST API design & integration",
-				"Phoenix (Elixir)",
-				"Data pipelines & indexing",
-				"PostgreSQL",
-				"Redis",
-			],
+			category: "Backend & Data",
+			items: ["Phoenix (Elixir)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
 		},
 		{
 			category: "AI / ML",
@@ -301,19 +305,6 @@ export const siteConfig = {
 				"Machine learning (PyTorch)",
 				"Privacy-preserving ML (FHE, Concrete ML)",
 				"LLM application patterns",
-				"AI-assisted development tooling",
-			],
-		},
-		{
-			category: "Frontend & UI",
-			items: [
-				"React",
-				"Next.js",
-				"Astro",
-				"Tailwind CSS",
-				"React Native / Expo",
-				"Reusable component libraries",
-				"Responsive & accessible UI",
 			],
 		},
 		{
@@ -359,7 +350,6 @@ export const siteConfig = {
 		href: "/work/cv.pdf",
 		fileName: "gian-luca-pecile-cv.pdf",
 		label: "download cv",
-		heading:
-			"Software engineer shipping web3 products end to end — NFT infrastructure, zero-knowledge proof explorers, and wallet-native apps — from APIs and on-chain data pipelines to high-craft interfaces.",
+		heading: "Frontend engineer building design systems and high-craft product interfaces.",
 	} satisfies CvFile,
 } as const;

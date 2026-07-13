@@ -10,7 +10,7 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"start": "astro preview",
-		"lint": "biome lint .",
+		"lint": "oxlint && rustywind --check-formatted src",
 		"check": "astro check",
 		"test": "vitest run",
 		"prepare": "husky",
@@ -43,17 +43,21 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@biomejs/biome": "2.5.3",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"@tailwindcss/vite": "^4.3.2",
 		"@types/geojson": "^7946.0.16",
 		"@types/node": "^22.20.1",
 		"husky": "^9.1.7",
+		"oxlint": "^1.73.0",
+		"rustywind": "^0.25.2",
 		"tailwindcss": "^4.3.2",
 		"typescript": "^5.9.3",
 		"vite": "^8.1.4",
 		"vitest": "^4.1.10",
 		"wrangler": "^4.110.0"
-	}
+	},
+	"trustedDependencies": [
+		"rustywind"
+	]
 }

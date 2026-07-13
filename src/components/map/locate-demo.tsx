@@ -62,14 +62,14 @@ export function LocateDemo() {
 						>
 							<span
 								aria-hidden="true"
-								className="font-mono text-[hsl(var(--link))] text-base leading-none"
+								className="font-mono text-base leading-none text-[hsl(var(--link))]"
 							>
 								●
 							</span>
 						</Marker>
 					) : null}
 				</MapGL>
-				<div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 font-mono text-tone-soft text-xs">
+				<div className="text-tone-soft flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 font-mono text-xs">
 					<span>
 						state:{" "}
 						<code className="text-tone-mid">

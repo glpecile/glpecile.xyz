@@ -125,7 +125,7 @@ export function FlyToDemo() {
 						</Marker>
 					))}
 				</MapGL>
-				<ul className="divide-y divide-[hsl(var(--tone-faint)/0.18)] border-t border-border font-mono text-xs">
+				<ul className="border-border divide-y divide-[hsl(var(--tone-faint)/0.18)] border-t font-mono text-xs">
 					{places.map((place) => {
 						const isActive = activeId === place.id;
 

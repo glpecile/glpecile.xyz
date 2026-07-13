@@ -1,1 +1,1 @@
-biome lint
+bun run lint

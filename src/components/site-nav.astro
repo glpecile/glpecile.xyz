@@ -26,14 +26,14 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 			aria-controls="mobile-primary-nav"
 			aria-expanded="false"
 			data-mobile-nav-toggle
-			class="text-tone-mid inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors duration-200 ease-out hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 motion-reduce:transition-none"
+			class="text-tone-mid hover:text-foreground focus-visible:ring-foreground/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors duration-200 ease-out focus-visible:ring-1 focus-visible:outline-none motion-reduce:transition-none"
 		>
 			<span aria-hidden="true" class="relative block h-5 w-5">
 				<span
-					class="absolute left-0 top-0.5 block h-px w-5 bg-current transition-transform duration-200 ease-out group-data-[state=open]:translate-y-[8px] group-data-[state=open]:rotate-45 motion-reduce:transition-none"
+					class="absolute top-0.5 left-0 block h-px w-5 bg-current transition-transform duration-200 ease-out group-data-[state=open]:translate-y-[8px] group-data-[state=open]:rotate-45 motion-reduce:transition-none"
 				></span>
 				<span
-					class="absolute left-0 top-1/2 block h-px w-5 -translate-y-1/2 bg-current transition-opacity duration-150 ease-out group-data-[state=open]:opacity-0 motion-reduce:transition-none"
+					class="absolute top-1/2 left-0 block h-px w-5 -translate-y-1/2 bg-current transition-opacity duration-150 ease-out group-data-[state=open]:opacity-0 motion-reduce:transition-none"
 				></span>
 				<span
 					class="absolute bottom-0.5 left-0 block h-px w-5 bg-current transition-transform duration-200 ease-out group-data-[state=open]:-translate-y-[8px] group-data-[state=open]:-rotate-45 motion-reduce:transition-none"
@@ -46,7 +46,7 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 			aria-label="Mobile primary"
 			aria-hidden="true"
 			data-mobile-nav-panel
-			class="pointer-events-none absolute right-0 top-full z-10 mt-3 min-w-44 origin-top-right translate-y-1 border border-foreground/10 bg-background px-4 py-3 opacity-0 transition-[opacity,transform] duration-200 ease-out group-data-[state=open]:pointer-events-auto group-data-[state=open]:translate-y-0 group-data-[state=open]:opacity-100 motion-reduce:transition-none"
+			class="border-foreground/10 bg-background pointer-events-none absolute top-full right-0 z-10 mt-3 min-w-44 origin-top-right translate-y-1 border px-4 py-3 opacity-0 transition-[opacity,transform] duration-200 ease-out group-data-[state=open]:pointer-events-auto group-data-[state=open]:translate-y-0 group-data-[state=open]:opacity-100 motion-reduce:transition-none"
 		>
 			<ul class="flex flex-col gap-3 text-left text-sm">
 				{navItems.map((item) => (

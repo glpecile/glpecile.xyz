@@ -16,8 +16,8 @@ type MapFrameProps = {
  */
 export function MapFrame({ label, children }: MapFrameProps) {
 	return (
-		<figure className="map-frame overflow-hidden rounded-md border border-border text-sm">
-			<figcaption className="border-border border-b bg-muted/40 px-3 py-1.5 font-mono text-tone-soft text-xs">
+		<figure className="map-frame border-border my-10 overflow-hidden rounded-md border text-sm">
+			<figcaption className="border-border bg-muted/40 text-tone-soft border-b px-3 py-1.5 font-mono text-xs">
 				{label}
 			</figcaption>
 			{children}

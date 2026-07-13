@@ -12,7 +12,7 @@ Project-specific guidance for working in this repo.
 - Keep the `@/*` alias pointing to `./src/*` and `#config/*` pointing to `./config/*`. New imports and generated files should use the `src`-based alias layout, and config imports should use `#config/*`.
 - Treat `config/site.ts` as the source of truth for site-wide nav, links, metadata, and work entries. Prefer updating config over duplicating literals in pages/components.
 - Keep shared keyboard shortcuts in `config/site.ts` under `siteConfig.shortcuts` and derive labels/handlers from that config instead of hardcoding keys across pages/components.
-- Run `bun run check` after `.astro` changes. Use `bun run lint` for TS, JS, and CSS changes that Biome covers.
+- Run `bun run check` after `.astro` changes. Use `bun run lint` for TS and JS changes that oxlint covers (config in `.oxlintrc.json`).
 - In Astro, `script is:inline` blocks share the page scope after compilation. Wrap inline script bodies in an IIFE or otherwise isolate names; do not rely on component boundaries to prevent top-level redeclarations.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.

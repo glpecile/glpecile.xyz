@@ -100,7 +100,7 @@ export function SearchDemo() {
 	return (
 		<MapTokenGate>
 			<MapFrame label="react-map-gl · geocoding search">
-				<div className="relative border-border border-b bg-muted/30">
+				<div className="border-border bg-muted/30 relative border-b">
 					<div className="flex items-center gap-2 px-3 py-2 font-mono text-sm">
 						<span aria-hidden="true" className="text-tone-faint">
 							&gt;
@@ -113,17 +113,17 @@ export function SearchDemo() {
 								setQuery(event.currentTarget.value)
 							}
 							aria-label="Search a location"
-							className="flex-1 bg-transparent font-mono text-sm text-tone-mid placeholder:text-tone-faint focus:outline-none"
+							className="text-tone-mid placeholder:text-tone-faint flex-1 bg-transparent font-mono text-sm focus:outline-none"
 						/>
 					</div>
 					{results.length > 0 ? (
-						<ul className="absolute inset-x-0 top-full z-10 border-border border-y bg-background">
+						<ul className="border-border bg-background absolute inset-x-0 top-full z-10 border-y">
 							{results.map((feature) => (
 								<li key={feature.id}>
 									<button
 										type="button"
 										onClick={() => selectFeature(feature)}
-										className="block w-full px-4 py-2 text-left font-mono text-tone-soft text-xs hover:bg-muted hover:text-tone-mid"
+										className="text-tone-soft hover:bg-muted hover:text-tone-mid block w-full px-4 py-2 text-left font-mono text-xs"
 									>
 										{feature.place_name}
 									</button>
@@ -153,7 +153,7 @@ export function SearchDemo() {
 						>
 							<span
 								aria-hidden="true"
-								className="font-mono text-[hsl(var(--link))] text-base leading-none"
+								className="font-mono text-base leading-none text-[hsl(var(--link))]"
 							>
 								●
 							</span>

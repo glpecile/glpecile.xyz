@@ -11,7 +11,7 @@ export async function getProjectPosts(): Promise<ProjectPost[]> {
 
 	return posts
 		.filter((post) => !post.data.draft)
-		.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+		.toSorted((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
 
 export function getProjectPostUrl(id: string) {

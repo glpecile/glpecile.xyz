@@ -147,14 +147,14 @@ export function CircleDemo() {
 						>
 							<span
 								aria-hidden="true"
-								className="font-mono text-[hsl(var(--link))] text-base leading-none"
+								className="font-mono text-base leading-none text-[hsl(var(--link))]"
 							>
 								●
 							</span>
 						</Marker>
 					</MapGL>
 				</div>
-				<div className="flex items-center gap-3 px-4 py-3 font-mono text-tone-soft text-xs">
+				<div className="text-tone-soft flex items-center gap-3 px-4 py-3 font-mono text-xs">
 					<label htmlFor="circle-radius" className="shrink-0">
 						radius
 					</label>
@@ -172,7 +172,7 @@ export function CircleDemo() {
 						}
 						className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-[hsl(var(--tone-faint)/0.3)] accent-[hsl(var(--link))]"
 					/>
-					<code className="shrink-0 text-tone-mid tabular-nums">
+					<code className="text-tone-mid shrink-0 tabular-nums">
 						{radius} km
 					</code>
 				</div>
