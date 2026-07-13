@@ -31,7 +31,7 @@ const details =
 	<section class="space-y-6">
 		<SectionLabel label="error" />
 		<div class="space-y-3">
-			<p class="text-tone-faint text-sm uppercase tracking-[0.32em]">{code}</p>
+			<p class="text-tone-faint text-sm tracking-[0.32em] uppercase">{code}</p>
 			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
 				{title}
 			</h1>
@@ -59,7 +59,7 @@ const details =
 		</div>
 
 		{details && (
-			<pre class="text-tone-soft overflow-x-auto border-l border-foreground/18 pl-4 text-sm leading-7">{details}</pre>
+			<pre class="text-tone-soft border-foreground/18 overflow-x-auto border-l pl-4 text-sm leading-7">{details}</pre>
 		)}
 	</section>
 </SiteLayout>

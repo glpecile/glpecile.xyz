@@ -32,7 +32,7 @@ const recentPostUrls = posts
 			<ol class="space-y-5" data-reveal>
 				{posts.map((post, index) => (
 					<li class="space-y-1">
-						<p class="text-tone-faint text-xs uppercase tracking-[0.28em]">
+						<p class="text-tone-faint text-xs tracking-[0.28em] uppercase">
 							{formatProjectDate(post.data.updatedDate ?? post.data.pubDate)}
 						</p>
 						<p class="text-base leading-8 sm:text-lg">

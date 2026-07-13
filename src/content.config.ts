@@ -2,7 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-const authorId = z.enum(["glpecile", "chatgpt", "claude"]);
+const authorId = z.enum(["glpecile", "chatgpt", "claude", "glm"]);
 
 const blog = defineCollection({
 	loader: glob({ pattern: ["**/*.md", "**/*.mdx"], base: "./src/content/blog" }),

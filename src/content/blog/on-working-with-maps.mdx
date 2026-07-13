@@ -1,0 +1,616 @@
+---
+title: on working with maps
+description: Notes from shipping map features — flyTo transitions, geolocation, search, GeoJSON shapes, theming, and a grand finale that combines them all. Built on react-map-gl with live demos you can poke at.
+pubDate: 2026-07-13
+authors: [glpecile, glm, claude]
+---
+
+import { FlyToDemo } from "@/components/map/fly-to-demo";
+import { LocateDemo } from "@/components/map/locate-demo";
+import { SearchDemo } from "@/components/map/search-demo";
+import { CircleDemo } from "@/components/map/circle-demo";
+import { GrandFinaleDemo } from "@/components/map/grand-finale-demo";
+
+Maps are hard.
+
+Not in the way people think — not the projection math, not the tile pipeline,
+not the geodesic distance calculations. Those are solved problems with good
+libraries. The hard part is that a map is a dozen small decisions stacked on
+top of each other, and each one is easy to get wrong in isolation and
+impossible to debug in combination. How long should the camera take to fly
+somewhere? Do you ask for geolocation on mount or wait for a tap? What happens
+when the user pans away from the circle you just drew? Do search results
+re-open after you pick one? (They do. You'll see.)
+
+But here's the thing: this is true of every hard problem in engineering. Break
+it down. Solve the small problem. Move on. The map is not a monolith — it's a
+camera, a set of sources, a handful of event handlers, and a design system.
+This post walks through each one, in order, with live demos you can poke at.
+
+We'll use [`react-map-gl`](https://github.com/visgl/react-map-gl) — vis.gl's
+React wrapper around `mapbox-gl` — because that's the library I use in
+production, and because everything you'll see below is live. Pan it. Zoom it.
+Search it. Break it.
+
+## The map is not the territory. Except it kind of is.
+
+Let's start with the smallest possible thing that works:
+
+```tsx
+import Map from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+const initialViewState = {
+  longitude: -58.38,
+  latitude: -34.6,
+  zoom: 11,
+};
+
+function MapBlock() {
+  return (
+    <Map
+      mapboxAccessToken={import.meta.env.PUBLIC_MAPBOX_TOKEN}
+      initialViewState={initialViewState}
+      mapStyle="mapbox://styles/mapbox/light-v11"
+      style={{ width: "100%", height: 380 }}
+    />
+  );
+}
+```
+
+There's one decision hiding in this snippet that took me an embarrassing amount
+of time to internalize: **the token is in the bundle.**
+
+If you're coming from the backend, your instinct will be to hide it. Don't.
+The token *has* to be public — `react-map-gl` runs entirely in the browser, and
+the bundle ships to whoever loads the page. The only lever that actually
+matters is scoping the token to your domains and a sensible rate limit in the
+Mapbox dashboard. Everything else is theater.
+
+The second thing is the difference between *controlled* and *uncontrolled*. If
+you've ever touched a `<input>` in React, you already know this dance. An
+**uncontrolled** map is one where you seed an `initialViewState` and let the
+user drive from there. A **controlled** map is one where you hold `viewState`
+in your own state, pass it down, and react to `onMove`.
+
+Most production maps are uncontrolled. You only reach for controlled when
+something *else* on the page needs to have an opinion about the camera — which,
+conveniently, is exactly the next three sections.
+
+## flyTo, or: the camera is the product
+
+Here's a question for you. When a user clicks an item on a list, what should
+the map do?
+
+Option A: instantly re-center.
+Option B: glide.
+
+*A* is what you get for free. *B* is what makes it feel like a product.
+
+The difference isn't taste. A hard cut reads as a bug. A smooth arc reads as
+intent. And the only knob you're really turning is `flyTo`:
+
+```tsx
+import Map, { Marker, type MapRef } from "react-map-gl/mapbox";
+import { useRef, useState } from "react";
+
+const places = [
+  { id: "petra", name: "Petra", longitude: 35.44, latitude: 30.33 },
+  // …
+];
+
+const flyToPlace = (place) => {
+  setActiveId(place.id);
+  mapRef.current?.flyTo({
+    center: [place.longitude, place.latitude],
+    zoom: 6,
+    duration: 1400,
+    curve: 1.4,
+    essential: true,
+  });
+};
+```
+
+It looks like five lines. It's actually three decisions stacked on top of each
+other.
+
+**`duration`** is how long the animation takes, in milliseconds. I used to ship
+`4000` and feel smug about it. Then I watched a real user walk up to a demo,
+click, and say *"okay, I get it, stop flying."* One to two seconds is the
+actual sweet spot. Long enough that you can *see* the geography change. Short
+enough that nobody waits for it.
+
+**`curve`** is the shape of the arc. The camera doesn't fly straight — it zooms
+out, scoots sideways, and zooms back in. `curve: 1` is a straight line. `1.4`
+to `1.6` feels like an airplane without lingering. Anything higher and you've
+made a screensaver.
+
+**`essential: true`** is the one nobody tells you about. The browser quietly
+throttles animations in background tabs. If you ever notice a `flyTo` "dying"
+midway when you alt-tab away, *this* is why. Mark it essential and the browser
+keeps it alive.
+
+Try it. Pick a place. Watch the camera decide to be elsewhere:
+
+<FlyToDemo client:only="react" />
+
+It's worth saying out loud what just happened. The map *responded* to a click
+that wasn't on the map. The list and the map don't know about each other — the
+list sets state, the camera follows. That's the whole pattern. Everything else
+in this post is a variation on it.
+
+## Locate, and the art of not being weird
+
+Geolocation is the one map feature where the failure mode is mostly social.
+
+The technical part is trivial: the browser knows where you are, you ask the
+browser, the browser asks the user. The hard part is *when*. Trigger it the
+moment the page loads and you've just popped a permission prompt into a
+stranger's face. Bury it in a settings menu and no one will ever find it.
+
+`react-map-gl` ships a `GeolocateControl` that handles the lifecycle for you —
+a little crosshair button the user taps, the permission prompt, the watched
+position, the GPS marker. You drop it in as a child of `<Map>`:
+
+```tsx
+import Map, { GeolocateControl } from "react-map-gl/mapbox";
+
+<Map
+  mapboxAccessToken={import.meta.env.PUBLIC_MAPBOX_TOKEN}
+  initialViewState={{ longitude: -58.38, latitude: -34.6, zoom: 11 }}
+  mapStyle="mapbox://styles/mapbox/light-v11"
+  style={{ width: "100%", height: 380 }}
+>
+  <GeolocateControl
+    positionOptions={{ enableHighAccuracy: true }}
+    trackUserLocation
+  />
+</Map>
+```
+
+By default, this control is just a button. It waits. That's the entire point
+— *the user opts in.* The trap I want you to avoid is `.trigger()`. There's a
+method on the underlying control that lets you fire it programmatically, and
+you'll be tempted to call it on mount so the map "just works". Don't. That's
+the *weird*. Let the crosshair sit there; the user will reach for it when they
+want to be found:
+
+<LocateDemo client:only="react" />
+
+`trackUserLocation` keeps the marker pinned to the user as they move. That's
+the right default *once they've opted in*. Before that, it's surveillance
+coded as a feature.
+
+## Search, or: coordinates are not the interesting part
+
+Search on a map looks like one feature. It's two.
+
+The first is: turn "tokyo" into a coordinate. That's a fetch to the Mapbox
+Geocoding API:
+
+```tsx
+const searchPlaces = async (query: string) => {
+  const endpoint = new URL(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
+  );
+  endpoint.searchParams.set("access_token", import.meta.env.PUBLIC_MAPBOX_TOKEN);
+  endpoint.searchParams.set("autocomplete", "true");
+  endpoint.searchParams.set("limit", "5");
+
+  const response = await fetch(endpoint);
+  return (await response.json()).features;
+};
+```
+
+The second is: once they pick a result, fly the camera there. And — here's the
+part that took me too long to see — *that's the same `flyTo` from earlier.*
+
+```tsx
+const selectFeature = (feature: GeocodeFeature) => {
+  mapRef.current?.flyTo({
+    center: feature.center,
+    zoom: 12,
+    duration: 1200,
+    curve: 1.4,
+    essential: true,
+  });
+};
+```
+
+The camera API doesn't care *why* you're moving. A click from a list. A tap on
+a search result. A `geolocate` event. They all reduce to the same call. This is
+the part of the post where I'd encourage you to slow down, because once you
+see it, you can't unsee it: **the entire interaction surface of a map is just
+"what should the camera do, and when."**
+
+The pattern that actually feels good is: debounce the input by ~250ms, render a
+short list while typing, and only commit to a camera move on *explicit*
+selection. Flying on every keystroke is nauseating — not just because of the
+camera thrash, but because of the network races. A fast typist on a slow
+connection will out-type their own results, and you'll start flying to places
+they didn't mean:
+
+<SearchDemo client:only="react" />
+
+## Drawing shapes: GeoJSON circles and the radius problem
+
+Here's something that sounds trivial until you try it: draw a circle on a map.
+
+Not a marker. Not a polygon you hardcoded. A real circle — the user picks a
+radius, the shape grows and shrinks. You'd think this is one line. It's not.
+
+The problem is that the Earth is not flat. (I know, I know.) A circle on a
+globe isn't a circle in screen space — it's a geodesic curve, and if you just
+plot `x = r * cos(θ), y = r * sin(θ)` you get an oval that stretches the further
+you get from the equator. The fix is to compute the circle in geodesic space
+and hand the resulting polygon to mapbox-gl as a GeoJSON source:
+
+```tsx
+const EARTH_RADIUS_KM = 6371;
+
+function circlePolygon(lng, lat, radiusKm) {
+  const coords = [];
+  const steps = 64;
+
+  for (let i = 0; i <= steps; i++) {
+    const bearing = (i / steps) * 2 * Math.PI;
+    const dByR = radiusKm / EARTH_RADIUS_KM;
+    const latRad = (lat * Math.PI) / 180;
+    const lngRad = (lng * Math.PI) / 180;
+
+    const destLat = Math.asin(
+      Math.sin(latRad) * Math.cos(dByR) +
+      Math.cos(latRad) * Math.sin(dByR) * Math.cos(bearing),
+    );
+    const destLng = lngRad + Math.atan2(
+      Math.sin(bearing) * Math.sin(dByR) * Math.cos(latRad),
+      Math.cos(dByR) - Math.sin(latRad) * Math.sin(destLat),
+    );
+
+    coords.push([
+      ((destLng * 180) / Math.PI + 540) % 360 - 180,
+      (destLat * 180) / Math.PI,
+    ]);
+  }
+
+  return {
+    type: "Feature",
+    geometry: { type: "Polygon", coordinates: [coords] },
+  };
+}
+```
+
+That's the haversine formula applied 64 times around a center point. Hand the
+result to a `<Source type="geojson">` with a fill layer and a line layer, and
+you have a circle:
+
+```tsx
+import Map, { Source, Layer } from "react-map-gl/mapbox";
+
+<Map /* … */>
+  <Source id="circle" type="geojson" data={circlePolygon(lng, lat, radiusKm)}>
+    <Layer
+      id="circle-fill"
+      type="fill"
+      paint={{ "fill-color": "#3b82f6", "fill-opacity": 0.12 }}
+    />
+    <Layer
+      id="circle-line"
+      type="line"
+      paint={{ "line-color": "#3b82f6", "line-width": 1.5 }}
+    />
+  </Source>
+</Map>
+```
+
+Now the interesting part: the slider. You hold `radiusKm` in state, recompute
+the GeoJSON on every change, and the circle redraws. The trick is to
+`useMemo` the polygon so you're only recalculating when the radius actually
+changes:
+
+```tsx
+const [radius, setRadius] = useState(5);
+
+const data = useMemo(
+  () => circlePolygon(lng, lat, radius),
+  [lng, lat, radius],
+);
+```
+
+The slider just calls `setRadius`. The circle recomputes. The map re-renders.
+No camera fighting, no auto-zoom — the user controls the viewport. If they pan
+away from the circle, that's their call.
+
+One gotcha worth calling out: **Mapbox paint properties are WebGL, not CSS.**
+`"fill-color": "hsl(var(--link))"` looks like it should work — it doesn't.
+WebGL can't read CSS custom properties. You have to pass an actual color
+value, and switch it yourself when the theme changes:
+
+```tsx
+const FILL_COLOR = {
+  dark: "hsl(172 39% 65%)",
+  light: "hsl(192 60% 44%)",
+};
+
+const theme = useSiteTheme();
+
+<Layer
+  type="fill"
+  paint={{
+    "fill-color": FILL_COLOR[theme],
+    "fill-opacity": 0.15,
+  }}
+/>
+```
+
+Drag the slider. The circle breathes:
+
+<CircleDemo client:only="react" />
+
+This is the pattern I keep coming back to: React holds the state, GeoJSON is
+the shape, and the map just renders it. You're not animating the circle —
+you're recomputing it. The map doesn't know about the slider. It doesn't need
+to.
+
+## Make it your own: map themes and custom markers
+
+Everything so far has been functional. Let's talk about the part where the map
+stops looking like every other map on the internet.
+
+The `mapStyle` prop is where your visual identity lives. Mapbox ships a handful
+of defaults — `light-v11`, `dark-v11`, `streets-v12`, `satellite-v9` — and
+they're fine. But "fine" is what makes your map indistinguishable from a
+tutorial. The move is to either craft a custom style in the
+[Mapbox Studio](https://www.mapbox.com/studio) editor, or — if you're working
+within an existing design system — switch styles at runtime based on the user's
+theme preference.
+
+### Theme-aware styles with `useSyncExternalStore`
+
+Every demo on this page watches the site's `data-theme` attribute and swaps
+between `light-v11` and `dark-v11`. Toggle the site theme right now — the maps
+follow. That sounds like a `useEffect` + `MutationObserver` job, but it's
+exactly the use case `useSyncExternalStore` was built for:
+
+```tsx
+import { useSyncExternalStore } from "react";
+
+type Theme = "light" | "dark";
+
+function readTheme(): Theme {
+  if (typeof document === "undefined") return "light";
+  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+}
+
+function subscribe(callback: () => void) {
+  const observer = new MutationObserver(callback);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  return () => observer.disconnect();
+}
+
+export function useSiteTheme(): Theme {
+  return useSyncExternalStore(subscribe, readTheme, () => "light");
+}
+```
+
+No effects. No stale closures. No serializer/deserializer mismatch between SSR
+and hydration. `subscribe` connects the MutationObserver; `readTheme` is the
+snapshot the component sees. React handles the rest.
+
+Then use it directly in the map's `mapStyle`:
+
+```tsx
+const theme = useSiteTheme();
+
+<Map
+  mapStyle={
+    theme === "dark"
+      ? "mapbox://styles/mapbox/dark-v11"
+      : "mapbox://styles/mapbox/light-v11"
+  }
+  // …
+/>
+```
+
+### Custom markers with `currentColor`
+
+The default `Marker` component drops a mapbox teardrop pin. It's recognizable,
+which is another way of saying it's generic. But `Marker` accepts any React
+node as a child — you can render an SVG, an emoji, a styled `div`, anything.
+Here's a pin drawn from scratch with two paths and a circle:
+
+```tsx
+function PinMarker() {
+  return (
+    <svg width="22" height="30" viewBox="0 0 22 30" fill="none">
+      <path
+        d="M11 0C5.4 0 1 4.4 1 10c0 7 10 20 10 20s10-13 10-20c0-5.6-4.4-10-10-10z"
+        fill="currentColor"
+        opacity={0.18}
+      />
+      <path
+        d="M11 1.5c-4.7 0-8.5 3.8-8.5 8.5 0 5.8 8.5 17 8.5 17s8.5-11.2 8.5-17c0-4.7-3.8-8.5-8.5-8.5z"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        fill="none"
+      />
+      <circle cx="11" cy="10" r="3" fill="currentColor" />
+    </svg>
+  );
+}
+
+<Marker longitude={lng} latitude={lat} anchor="bottom">
+  <span className="text-[hsl(var(--link))]">
+    <PinMarker />
+  </span>
+</Marker>
+```
+
+`currentColor` means it inherits whatever text color you wrap it in. Toggle the
+theme and the pin recolors automatically — the marker doesn't know about the
+theme, it just reads the CSS cascade.
+
+### Layer colors: WebGL is not CSS
+
+Here's a trap I fell into: I tried to use CSS custom properties in GeoJSON
+layer paint:
+
+```tsx
+// ❌ Doesn't work — WebGL can't read CSS custom properties
+<Layer
+  type="fill"
+  paint={{ "fill-color": "hsl(var(--link))" }}
+/>
+```
+
+It compiles. It doesn't render. The paint object is handed to mapbox-gl's
+WebGL renderer, which has no access to the DOM's CSS cascade. You need
+literal color values, switched yourself when the theme changes:
+
+```tsx
+// ✅ Works — real color values, swapped per theme
+const COLORS = {
+  dark: "hsl(172 39% 65%)",
+  light: "hsl(192 60% 44%)",
+};
+
+const theme = useSiteTheme();
+
+<Layer
+  type="fill"
+  paint={{ "fill-color": COLORS[theme], "fill-opacity": 0.15 }}
+/>
+```
+
+Toggle the site theme and both the map style *and* the circle fill change in
+lockstep — but only because *you* wired it, not because CSS cascaded into
+WebGL.
+
+### Data-driven paint expressions
+
+The real power move is *data-driven* paint — layer properties that change
+based on feature data or zoom level. You can make the circle fill get more
+opaque as you zoom in, or change color based on a property:
+
+```tsx
+<Layer
+  type="fill"
+  paint={{
+    "fill-color": COLORS[theme],
+    "fill-opacity": [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      8, 0.08,   // zoom 8: faint
+      12, 0.20,  // zoom 12: stronger
+    ],
+  }}
+/>
+```
+
+That's a mapbox [expression](https://docs.mapbox.com/style-spec/reference/expressions/)
+— the first argument is the expression type (`"interpolate"`), then the
+interpolation method, then the input (`["zoom"]`), then stop pairs. At zoom
+8 the fill is barely visible. At zoom 12 it's solid enough to read. The user
+zooms; the map reacts. No React state, no event handlers, just a paint
+expression.
+
+Or switch the fill color based on a feature property — useful when you have
+classed data:
+
+```tsx
+<Layer
+  type="fill"
+  paint={{
+    "fill-color": [
+      "match",
+      ["get", "category"],
+      "park", "#2d6a4f",
+      "water", "#48cae4",
+      "#6c757d",  // fallback
+    ],
+  }}
+/>
+```
+
+`["get", "category"]` reads the `category` property from each GeoJSON
+feature. `match` maps values to colors. The fallback handles anything
+unmatched.
+
+The point is this: the map is not a foreign object embedded in your page. It's
+a citizen of your design system — theme-aware, color-consistent, and capable
+of expressing dynamic visual logic through paint expressions alone.
+
+## Closing thoughts: putting it all together
+
+Search a place. Drag the radius. Hit the crosshair.
+
+<GrandFinaleDemo client:only="react" />
+
+Every pattern from this post — `flyTo`, geolocation, GeoJSON shapes, theme-aware
+colors — lives in that one map. Same camera. Same React state. Different things
+setting it. That's what "maps are hard" actually looks like once you break it
+down: a handful of small problems, each with a clear answer, composed into
+something that feels like one thing.
+
+A few notes for the road:
+
+**`flyTo` without `essential: true` will throttle in background tabs.** If
+you've ever shipped a demo and had someone say "it stops when I switch tabs",
+this is why.
+
+**Import the stylesheet.** `import "mapbox-gl/dist/mapbox-gl.css"` at the entry
+of your island. Without it, markers and controls render unstyled — and
+"unstyled" here is more visible than you're imagining.
+
+**Search results will re-open after selection if you're not careful.** The
+naive pattern is to set the input to the selected place name — but that
+triggers your debounce, which fetches new results, which re-opens the
+dropdown. Use a ref to suppress the next search cycle. It's one line, but it's
+the difference between "that feels broken" and "that feels right."
+
+**WebGL can't read CSS custom properties.** Use literal color values and swap
+them yourself when the theme changes. `hsl(var(--link))` in a `paint` object
+silently renders nothing.
+
+**The map is a dozen small problems. Solve them one at a time.**
+
+---
+
+## Bonus: React Native — same problems, different libraries
+
+Everything above is about the web. But if you're building a mobile app — and
+at some point, you will be — the mental models transfer. The camera is still
+the camera. The token is still public. The user still needs to opt in to
+geolocation. You're still breaking the same dozen problems into the same
+small pieces — just with different libraries.
+
+The libraries are different. Here's the stack I'd reach for today:
+
+**[`@rnmapbox/maps`](https://github.com/rnmapbox/maps)** is the React Native
+port of mapbox-gl. It's the closest thing to a "just use this" answer — same
+API concepts, same style URLs, same GeoJSON sources and layers. If you've read
+this far, you already know how to use it. The one gotcha is that it bridges
+into native, so you'll spend an afternoon linking native modules and cursing
+at Xcode. That's the tax.
+
+**[`react-native-better-clustering`](https://github.com/gmi-software/react-native-better-clustering)** solves the problem I deliberately didn't cover above:
+what happens when you have *thousands* of points. On the web, mapbox-gl has
+built-in clustering via a `cluster: true` GeoJSON source. On React Native,
+that path is slower and jankier than it should be. This library does the
+supercluster math on the JS side and hands clean results to the native map.
+It's the one I'd reach for the moment point counts cross four digits.
+
+**[`react-native-nitro-map`](https://github.com/alisherrahimov/react-native-nitro-map)** is the one I'm watching. It's built on
+[Nitro Modules](https://github.com/margelo/nitro) — Margelo's JSI-based native
+module system — which means it bypasses the React Native bridge entirely.
+That's the kind of architectural shift that makes camera animations,
+clustering, and gesture handling actually feel native instead of "good enough."
+It's not stable yet, but the performance numbers are the direction mobile maps
+have been heading for years.
+
+The point is this: the libraries change. The patterns don't. `flyTo` is still
+`flyTo`. Geolocation still needs consent. And the camera is still the product.
