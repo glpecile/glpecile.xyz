@@ -5,7 +5,11 @@ import {
 	type MapRef,
 	Marker,
 } from "react-map-gl/mapbox";
-import { MapFrame, MapTokenGate } from "@/components/map/map-frame";
+import {
+	labelMapCanvas,
+	MapFrame,
+	MapTokenGate,
+} from "@/components/map/map-frame";
 import { useSiteTheme } from "@/components/map/use-site-theme";
 import { mapboxToken } from "@/lib/mapbox";
 
@@ -40,6 +44,7 @@ export function LocateDemo() {
 					}
 					interactiveLayerIds={[]}
 					attributionControl={false}
+					onLoad={(event) => labelMapCanvas(event.target, "Geolocation")}
 					style={{ width: "100%", height: 380 }}
 				>
 					<GeolocateControl

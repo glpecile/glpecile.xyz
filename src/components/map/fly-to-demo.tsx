@@ -1,6 +1,10 @@
 import * as React from "react";
 import { default as MapGL, type MapRef, Marker } from "react-map-gl/mapbox";
-import { MapFrame, MapTokenGate } from "@/components/map/map-frame";
+import {
+	labelMapCanvas,
+	MapFrame,
+	MapTokenGate,
+} from "@/components/map/map-frame";
 import { useSiteTheme } from "@/components/map/use-site-theme";
 import { mapboxToken } from "@/lib/mapbox";
 
@@ -102,6 +106,7 @@ export function FlyToDemo() {
 					}
 					interactiveLayerIds={[]}
 					attributionControl={false}
+					onLoad={(event) => labelMapCanvas(event.target, "Seven wonders of the world")}
 					style={{ width: "100%", height: 380 }}
 				>
 					{places.map((place) => (
@@ -125,12 +130,12 @@ export function FlyToDemo() {
 						</Marker>
 					))}
 				</MapGL>
-				<ul className="border-border divide-y divide-[hsl(var(--tone-faint)/0.18)] border-t font-mono text-xs">
+				<ul className="border-border m-0 list-none divide-y divide-[hsl(var(--tone-faint)/0.18)] border-t p-0 font-mono text-xs">
 					{places.map((place) => {
 						const isActive = activeId === place.id;
 
 						return (
-							<li key={place.id}>
+							<li key={place.id} className="mt-0">
 								<button
 									type="button"
 									onClick={() => flyToPlace(place)}

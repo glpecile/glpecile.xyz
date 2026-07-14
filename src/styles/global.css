@@ -628,6 +628,13 @@
 	outline-offset: -2px;
 }
 
+/* Make the keyboard-focused map canvas visible — mapbox's built-in keyboard
+   handler (arrow keys pan, +/- zoom) only works once the canvas has focus. */
+.map-frame .mapboxgl-canvas:focus-visible {
+	outline: 2px solid hsl(var(--link));
+	outline-offset: -2px;
+}
+
 :root[data-theme="dark"] .map-frame .mapboxgl-ctrl-icon {
 	filter: invert(1);
 }

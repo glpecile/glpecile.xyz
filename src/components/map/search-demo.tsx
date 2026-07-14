@@ -1,6 +1,10 @@
 import * as React from "react";
 import { default as MapGL, type MapRef, Marker } from "react-map-gl/mapbox";
-import { MapFrame, MapTokenGate } from "@/components/map/map-frame";
+import {
+	labelMapCanvas,
+	MapFrame,
+	MapTokenGate,
+} from "@/components/map/map-frame";
 import { useSiteTheme } from "@/components/map/use-site-theme";
 import { mapboxToken } from "@/lib/mapbox";
 
@@ -117,9 +121,9 @@ export function SearchDemo() {
 						/>
 					</div>
 					{results.length > 0 ? (
-						<ul className="border-border bg-background absolute inset-x-0 top-full z-10 border-y">
+						<ul className="border-border bg-background absolute inset-x-0 top-full z-10 m-0 list-none border-y p-0">
 							{results.map((feature) => (
-								<li key={feature.id}>
+								<li key={feature.id} className="mt-0">
 									<button
 										type="button"
 										onClick={() => selectFeature(feature)}
@@ -143,6 +147,7 @@ export function SearchDemo() {
 					}
 					interactiveLayerIds={[]}
 					attributionControl={false}
+					onLoad={(event) => labelMapCanvas(event.target, "Geocoding search")}
 					style={{ width: "100%", height: 380 }}
 				>
 					{selected ? (

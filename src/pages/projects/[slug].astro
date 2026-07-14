@@ -64,16 +64,25 @@ const postPath = `/projects/${post.id}`;
 				{post.data.title}
 			</h1>
 			<PostAuthors authorIds={post.data.authors} data-reveal />
-			<button
-				type="button"
-				class="blog-share-button text-tone-soft text-sm"
-				data-post-share
-				data-reveal
-				aria-label={`Copy link to project: ${post.data.title}`}
-				title={`Copy link to project: ${post.data.title}`}
-			>
-				<span class="blog-share-button-label">[share]</span>
-			</button>
+			<div class="flex items-center gap-3 text-sm" data-reveal>
+				<button
+					type="button"
+					class="blog-share-button text-tone-soft text-sm"
+					data-post-share
+					aria-label={`Copy link to project: ${post.data.title}`}
+					title={`Copy link to project: ${post.data.title}`}
+				>
+					<span class="blog-share-button-label">[share]</span>
+				</button>
+				<a
+					href={`${postPath}/index.html.md`}
+					class="terminal-link text-tone-soft"
+					aria-label={`View this project as markdown: ${post.data.title}`}
+					title="View this project as markdown"
+				>
+					[markdown]
+				</a>
+			</div>
 			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base" data-reveal>
 				{post.data.description}
 			</p>

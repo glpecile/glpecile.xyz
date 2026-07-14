@@ -317,19 +317,31 @@ const data = useMemo(
 );
 ```
 
-The slider just calls `setRadius`. The circle recomputes. The map re-renders.
-No camera fighting, no auto-zoom — the user controls the viewport. If they pan
-away from the circle, that's their call.
+(If you're on the [React Compiler](https://react.dev/learn/react-compiler),
+skip the `useMemo` — the compiler memoizes this for you.)
+
+The slider calls `setRadius`, and the camera eases back over the circle at a
+zoom computed from the radius — so the shape always fits the frame, even if
+you panned halfway across the province first. Drag to the max and the map
+pulls back until the whole circle is visible.
+
+One more detail that's easy to miss: the slider is **logarithmic**, not
+linear. Radii live on a multiplicative scale — the jump from 1 km to 2 km
+matters as much as the jump from 20 km to 40 km — and a linear slider spends
+half its travel on the boring top end.
 
 One gotcha worth calling out: **Mapbox paint properties are WebGL, not CSS.**
 `"fill-color": "hsl(var(--link))"` looks like it should work — it doesn't.
 WebGL can't read CSS custom properties. You have to pass an actual color
-value, and switch it yourself when the theme changes:
+value, and switch it yourself when the theme changes. And one more trap
+inside the trap: mapbox's color parser only understands the *legacy*
+comma-separated HSL syntax. Modern space-separated HSL —
+`hsl(172 39% 65%)` — fails validation silently and the layer never renders:
 
 ```tsx
 const FILL_COLOR = {
-  dark: "hsl(172 39% 65%)",
-  light: "hsl(192 60% 44%)",
+  dark: "hsl(172, 39%, 65%)",
+  light: "hsl(192, 60%, 44%)",
 };
 
 const theme = useSiteTheme();
@@ -558,23 +570,23 @@ something that feels like one thing.
 
 A few notes for the road:
 
-**`flyTo` without `essential: true` will throttle in background tabs.** If
-you've ever shipped a demo and had someone say "it stops when I switch tabs",
-this is why.
-
-**Import the stylesheet.** `import "mapbox-gl/dist/mapbox-gl.css"` at the entry
-of your island. Without it, markers and controls render unstyled — and
-"unstyled" here is more visible than you're imagining.
-
-**Search results will re-open after selection if you're not careful.** The
-naive pattern is to set the input to the selected place name — but that
-triggers your debounce, which fetches new results, which re-opens the
-dropdown. Use a ref to suppress the next search cycle. It's one line, but it's
-the difference between "that feels broken" and "that feels right."
-
-**WebGL can't read CSS custom properties.** Use literal color values and swap
-them yourself when the theme changes. `hsl(var(--link))` in a `paint` object
-silently renders nothing.
+- **`flyTo` without `essential: true` will throttle in background tabs.** If
+  you've ever shipped a demo and had someone say "it stops when I switch
+  tabs", this is why.
+- **Import the stylesheet.** `import "mapbox-gl/dist/mapbox-gl.css"` at the
+  entry of your island. Without it, markers and controls render unstyled —
+  and "unstyled" here is more visible than you're imagining. This one is so
+  easy to miss that even react-map-gl's own geocoder example shipped without
+  its stylesheet —
+  [I sent the fix](https://github.com/visgl/react-map-gl/pull/2521).
+- **Search results will re-open after selection if you're not careful.** The
+  naive pattern is to set the input to the selected place name — but that
+  triggers your debounce, which fetches new results, which re-opens the
+  dropdown. Use a ref to suppress the next search cycle. It's one line, but
+  it's the difference between "that feels broken" and "that feels right."
+- **WebGL can't read CSS custom properties.** Use literal color values and
+  swap them yourself when the theme changes. `hsl(var(--link))` in a `paint`
+  object silently renders nothing.
 
 **The map is a dozen small problems. Solve them one at a time.**
 

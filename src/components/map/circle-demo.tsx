@@ -7,7 +7,11 @@ import {
 	Marker,
 	Source,
 } from "react-map-gl/mapbox";
-import { MapFrame, MapTokenGate } from "@/components/map/map-frame";
+import {
+	labelMapCanvas,
+	MapFrame,
+	MapTokenGate,
+} from "@/components/map/map-frame";
 import { useSiteTheme } from "@/components/map/use-site-theme";
 import { mapboxToken } from "@/lib/mapbox";
 
@@ -67,17 +71,55 @@ export const FILL_COLOR = {
 	light: "hsl(192, 60%, 44%)",
 } as const;
 
+export const RADIUS_MIN_KM = 1;
+export const RADIUS_MAX_KM = 50;
+
+/**
+ * Log-scale mapping between slider position (0-100) and radius in km.
+ * Radii live on a multiplicative scale — 1→2 km matters as much as
+ * 20→40 km — so a linear slider wastes half its travel on the top end.
+ */
+export function radiusFromSlider(position: number): number {
+	const radius =
+		RADIUS_MIN_KM * (RADIUS_MAX_KM / RADIUS_MIN_KM) ** (position / 100);
+	return radius >= 10 ? Math.round(radius) : Math.round(radius * 10) / 10;
+}
+
+export function sliderFromRadius(radius: number): number {
+	return Math.round(
+		(100 * Math.log(radius / RADIUS_MIN_KM)) /
+			Math.log(RADIUS_MAX_KM / RADIUS_MIN_KM),
+	);
+}
+
+const EARTH_CIRCUMFERENCE_M = 40_075_016.686;
+
+/**
+ * Zoom level at which a circle of radiusKm fits inside the demo viewport,
+ * derived from mapbox's meters-per-pixel at a given latitude
+ * (circumference · cos(lat) / (512 · 2^zoom)).
+ */
+export function zoomForRadius(radiusKm: number, lat: number): number {
+	const viewportPx = 300;
+	const metersPerPixel = (radiusKm * 2 * 1000) / viewportPx;
+	return Math.log2(
+		(EARTH_CIRCUMFERENCE_M * Math.cos((lat * Math.PI) / 180)) /
+			(512 * metersPerPixel),
+	);
+}
+
 const DEFAULT_CENTER = { longitude: -58.38, latitude: -34.6 };
+const INITIAL_RADIUS_KM = 5;
 
 const initialViewState = {
 	...DEFAULT_CENTER,
-	zoom: 10,
+	zoom: zoomForRadius(INITIAL_RADIUS_KM, DEFAULT_CENTER.latitude),
 };
 
 export function CircleDemo() {
 	const theme = useSiteTheme();
 	const mapRef = React.useRef<MapRef>(null);
-	const [radius, setRadius] = React.useState(5);
+	const [radius, setRadius] = React.useState(INITIAL_RADIUS_KM);
 	const [mapReady, setMapReady] = React.useState(false);
 	const [center] = React.useState(DEFAULT_CENTER);
 
@@ -98,10 +140,16 @@ export function CircleDemo() {
 		source?.setData(data);
 	}, [data, mapReady]);
 
-	const handleRadiusChange = (value: number) => {
+	// Re-center on the circle while zooming so the shape always fits the
+	// frame, even if the user panned away before touching the slider.
+	const handleSliderChange = (position: number) => {
+		const value = radiusFromSlider(position);
 		setRadius(value);
-		const zoom = value > 20 ? 8.5 : value > 10 ? 9.5 : 10.5;
-		mapRef.current?.easeTo({ zoom, duration: 400 });
+		mapRef.current?.easeTo({
+			center: [center.longitude, center.latitude],
+			zoom: zoomForRadius(value, center.latitude),
+			duration: 400,
+		});
 	};
 
 	return (
@@ -119,7 +167,10 @@ export function CircleDemo() {
 						}
 						interactiveLayerIds={[]}
 						attributionControl={false}
-						onLoad={() => setMapReady(true)}
+						onLoad={(event) => {
+							labelMapCanvas(event.target, "GeoJSON circle over Buenos Aires");
+							setMapReady(true);
+						}}
 						style={{ width: "100%", height: 360, borderRadius: 4 }}
 					>
 						<Source id="circle" type="geojson" data={data}>
@@ -161,12 +212,12 @@ export function CircleDemo() {
 					<input
 						id="circle-radius"
 						type="range"
-						min={1}
-						max={50}
+						min={0}
+						max={100}
 						step={1}
-						value={radius}
+						value={sliderFromRadius(radius)}
 						onChange={(event) =>
-							handleRadiusChange(
+							handleSliderChange(
 								Number(event.currentTarget.value),
 							)
 						}

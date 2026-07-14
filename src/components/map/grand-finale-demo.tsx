@@ -8,8 +8,18 @@ import {
 	Marker,
 	Source,
 } from "react-map-gl/mapbox";
-import { circlePolygon, FILL_COLOR } from "@/components/map/circle-demo";
-import { MapFrame, MapTokenGate } from "@/components/map/map-frame";
+import {
+	circlePolygon,
+	FILL_COLOR,
+	radiusFromSlider,
+	sliderFromRadius,
+	zoomForRadius,
+} from "@/components/map/circle-demo";
+import {
+	labelMapCanvas,
+	MapFrame,
+	MapTokenGate,
+} from "@/components/map/map-frame";
 import {
 	type GeocodeFeature,
 	searchPlaces,
@@ -109,7 +119,7 @@ export function GrandFinaleDemo() {
 		});
 		mapRef.current?.flyTo({
 			center: feature.center,
-			zoom: 11,
+			zoom: zoomForRadius(radius, feature.center[1]),
 			duration: 1200,
 			curve: 1.4,
 			essential: true,
@@ -140,9 +150,9 @@ export function GrandFinaleDemo() {
 						/>
 					</div>
 					{showResults && results.length > 0 ? (
-						<ul className="border-border bg-background absolute inset-x-0 top-full z-10 border-y">
+						<ul className="border-border bg-background absolute inset-x-0 top-full z-10 m-0 list-none border-y p-0">
 							{results.map((feature) => (
-								<li key={feature.id}>
+								<li key={feature.id} className="mt-0">
 									<button
 										type="button"
 										onClick={() => selectFeature(feature)}
@@ -169,7 +179,13 @@ export function GrandFinaleDemo() {
 						}
 						interactiveLayerIds={[]}
 						attributionControl={false}
-						onLoad={() => setMapReady(true)}
+						onLoad={(event) => {
+							labelMapCanvas(
+								event.target,
+								"Search, radius, and geolocation combined",
+							);
+							setMapReady(true);
+						}}
 						style={{ width: "100%", height: 360, borderRadius: 4 }}
 					>
 						<Source
@@ -234,7 +250,7 @@ export function GrandFinaleDemo() {
 								setSearchedLabel("your location");
 								mapRef.current?.flyTo({
 									center: [pos.longitude, pos.latitude],
-									zoom: 11,
+									zoom: zoomForRadius(radius, pos.latitude),
 									duration: 1200,
 									curve: 1.4,
 									essential: true,
@@ -253,16 +269,20 @@ export function GrandFinaleDemo() {
 						<input
 							id="finale-radius"
 							type="range"
-							min={1}
-							max={50}
+							min={0}
+							max={100}
 							step={1}
-							value={radius}
+							value={sliderFromRadius(radius)}
 							onChange={(event) => {
-								const value = Number(event.currentTarget.value);
+								const value = radiusFromSlider(
+									Number(event.currentTarget.value),
+								);
 								setRadius(value);
-								const zoom =
-									value > 20 ? 8.5 : value > 10 ? 9.5 : 10.5;
-								mapRef.current?.easeTo({ zoom, duration: 400 });
+								mapRef.current?.easeTo({
+									center: [center.longitude, center.latitude],
+									zoom: zoomForRadius(value, center.latitude),
+									duration: 400,
+								});
 							}}
 							className="h-1.5 min-w-24 flex-1 cursor-pointer appearance-none rounded-full bg-[hsl(var(--tone-faint)/0.3)] accent-[hsl(var(--link))]"
 						/>
