@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { getBlurPlaceholder } from "@/lib/blur";
 import type { LetterboxdFilm } from "@/lib/letterboxd";
 
 export interface Props {
@@ -8,6 +9,22 @@ export interface Props {
 }
 
 const { films, layout = "grid" } = Astro.props;
+
+const blurs = new Map(
+	await Promise.all(
+		films
+			.filter((film) => film.image)
+			.map(
+				async (film) =>
+					[film.image, await getBlurPlaceholder(film.image)] as const,
+			),
+	),
+);
+
+const blurStyle = (image: string) => {
+	const blur = blurs.get(image);
+	return blur ? `background-image:url(${blur})` : undefined;
+};
 
 const formatDate = (dateStr: string | null) => {
 	if (!dateStr) return "";
@@ -81,7 +98,8 @@ const groupFilmsByMonth = (filmList: LetterboxdFilm[]) => {
 											width={80}
 											height={120}
 											loading="lazy"
-											class="bg-muted aspect-[2/3] w-16 object-cover sm:w-20"
+											class="bg-muted aspect-[2/3] w-16 bg-cover bg-center object-cover sm:w-20"
+											style={blurStyle(film.image)}
 										/>
 									</a>
 								)}
@@ -154,7 +172,8 @@ const groupFilmsByMonth = (filmList: LetterboxdFilm[]) => {
 							width={300}
 							height={450}
 							loading="lazy"
-							class="bg-muted aspect-[2/3] w-full object-cover"
+							class="bg-muted aspect-[2/3] w-full bg-cover bg-center object-cover"
+							style={blurStyle(film.image)}
 						/>
 					) : (
 						<div class="bg-muted aspect-[2/3] w-full p-3">
