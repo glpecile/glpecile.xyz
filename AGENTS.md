@@ -23,6 +23,7 @@ Project-specific guidance for working in this repo.
 - When adding or changing first-class routes, keep machine-readable surfaces in sync: `sitemap.xml`, `/llms.txt`, relevant `index.html.md` mirrors, and `SiteLayout` alternate metadata.
 - Do not edit generated output under `dist/` or `.astro/`; make source changes under `src/` or `config/`.
 - Use Astro's `<Image>` component from `astro:assets` instead of native `<img>` tags. Configure remote image domains in `astro.config.mjs` under `image.remotePatterns`.
+- When deploying to Cloudflare, set `imageService: 'passthrough'` on the Cloudflare adapter unless a Cloudflare Images binding is configured; otherwise remote `<Image>` assets will 404 at `/_image`.
 
 ## Markdown Mirrors
 

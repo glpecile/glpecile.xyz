@@ -32,6 +32,8 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 	},
 
-	adapter: cloudflare(),
+	// Passthrough image service: remote images are proxied directly
+	// without requiring a Cloudflare Images binding.
+	adapter: cloudflare({ imageService: "passthrough" }),
 	integrations: [mdx(), react()],
 });
