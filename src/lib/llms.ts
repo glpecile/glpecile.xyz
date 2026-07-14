@@ -9,6 +9,7 @@ import type {
 } from "#config/site";
 import type { BlogPost } from "@/lib/blog";
 import { getBlogPostUrl } from "@/lib/blog";
+import type { LetterboxdFilm } from "@/lib/letterboxd";
 import type { ProjectPost } from "@/lib/projects";
 import { getProjectPostUrl } from "@/lib/projects";
 
@@ -81,6 +82,11 @@ const renderCertificateLine = (item: CertificateItem) => {
 	return notes ? `- ${details}. ${notes}` : `- ${details}`;
 };
 
+const renderFilmLine = (film: LetterboxdFilm) => {
+	const watched = film.watchedDate ? `${film.watchedDate} — ` : "";
+	return `- ${watched}[${film.title}](${film.url}) (${film.year})`;
+};
+
 const formatSocialLabel = (label: string) =>
 	socialLabelMap[label] ??
 	(label.length === 0 ? label : `${label.slice(0, 1).toUpperCase()}${label.slice(1)}`);
@@ -127,8 +133,8 @@ export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
 		"",
 		"For agents:",
 		"",
-		"1. Prefer markdown mirrors over HTML: `/index.html.md`, `/work/index.html.md`, `/blog/index.html.md`, `/projects/index.html.md`",
-		"2. Use `/work` for experience, `/projects` for build notes, and `/blog` for writing samples",
+		"1. Prefer markdown mirrors over HTML: `/index.html.md`, `/work/index.html.md`, `/blog/index.html.md`, `/projects/index.html.md`, `/films/index.html.md`",
+		"2. Use `/work` for experience, `/projects` for build notes, `/blog` for writing samples, and `/films` for recently watched films",
 		"3. Follow post-level `index.html.md` links only when you need full article text",
 		"",
 		"## Portfolio",
@@ -136,6 +142,7 @@ export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
 		`- [Home](${toAbsoluteUrl(getMarkdownPath("/"))}): Short profile, featured work, recent writing, and public links`,
 		`- [Work](${toAbsoluteUrl(getMarkdownPath("/work"))}): Full work history, education, certificates, and the CV download link`,
 		`- [Projects](${toAbsoluteUrl(getMarkdownPath("/projects"))}): Project notes and implementation writeups for shipped tools`,
+		`- [Films](${toAbsoluteUrl(getMarkdownPath("/films"))}): Recently watched films from Letterboxd`,
 		`- [CV PDF](${toAbsoluteUrl(siteConfig.cv.href)}): Downloadable resume PDF generated from the same work page data; prefer the work markdown link for text extraction`,
 		"",
 		"## Writing",
@@ -172,11 +179,16 @@ export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
 	return lines.join("\n");
 }
 
-export function renderHomeMarkdown(posts: BlogPost[], projectPosts: ProjectPost[]) {
+export function renderHomeMarkdown(
+	posts: BlogPost[],
+	projectPosts: ProjectPost[],
+	films: LetterboxdFilm[] = [],
+) {
 	const currentWork = siteConfig.work[0];
 	const featuredWork = siteConfig.work.slice(0, 3);
 	const recentPosts = posts.slice(0, 5);
 	const recentProjects = projectPosts.slice(0, 3);
+	const recentFilms = films.slice(0, 4);
 
 	return joinLines([
 		`# ${siteConfig.author}`,
@@ -192,7 +204,7 @@ export function renderHomeMarkdown(posts: BlogPost[], projectPosts: ProjectPost[
 		"## Agent guide",
 		"",
 		`- Start with [llms.txt](${toAbsoluteUrl("/llms.txt")}) for the curated overview`,
-		`- Prefer [home markdown](${toAbsoluteUrl(getMarkdownPath("/"))}), [work markdown](${toAbsoluteUrl(getMarkdownPath("/work"))}), [projects markdown](${toAbsoluteUrl(getMarkdownPath("/projects"))}), and [blog markdown](${toAbsoluteUrl(getMarkdownPath("/blog"))}) over the HTML pages`,
+		`- Prefer [home markdown](${toAbsoluteUrl(getMarkdownPath("/"))}), [work markdown](${toAbsoluteUrl(getMarkdownPath("/work"))}), [projects markdown](${toAbsoluteUrl(getMarkdownPath("/projects"))}), [blog markdown](${toAbsoluteUrl(getMarkdownPath("/blog"))}), and [films markdown](${toAbsoluteUrl(getMarkdownPath("/films"))}) over the HTML pages`,
 		"- Open per-post markdown links only when you need full article text",
 		"",
 		"## Featured work",
@@ -218,6 +230,12 @@ export function renderHomeMarkdown(posts: BlogPost[], projectPosts: ProjectPost[
 					return `- ${renderPostMarkdownLink(post)} — ${date} — ${post.data.description}`;
 				})
 			: ["No published blog posts yet."]),
+		"",
+		"## Recently watched",
+		"",
+		...(recentFilms.length > 0
+			? recentFilms.map(renderFilmLine)
+			: ["No films logged yet."]),
 		"",
 		"## Public links",
 		"",
@@ -339,5 +357,22 @@ export function renderProjectPostMarkdown(post: ProjectPost) {
 		`- Canonical HTML: ${toAbsoluteUrl(getProjectPostUrl(post.id))}`,
 		"",
 		body,
+	]);
+}
+
+export function renderFilmsMarkdown(films: LetterboxdFilm[]) {
+	return joinLines([
+		"# Films",
+		"",
+		`> Recently watched films by ${siteConfig.author}, pulled from Letterboxd.`,
+		"",
+		`- Canonical HTML: ${toAbsoluteUrl("/films")}`,
+		`- Letterboxd profile: ${siteConfig.links.letterboxd}`,
+		"",
+		"## Recently watched",
+		"",
+		...(films.length > 0 ? films.map(renderFilmLine) : ["No films logged yet."]),
+		"",
+		`[View all on Letterboxd](${siteConfig.links.letterboxd})`,
 	]);
 }

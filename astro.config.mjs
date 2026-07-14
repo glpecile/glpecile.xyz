@@ -9,6 +9,15 @@ import react from "@astrojs/react";
 export default defineConfig({
 	site: "https://glpecile.xyz",
 
+	image: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "a.ltrbxd.com",
+			},
+		],
+	},
+
 	markdown: {
 		shikiConfig: {
 			defaultColor: false,

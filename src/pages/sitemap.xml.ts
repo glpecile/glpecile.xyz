@@ -19,6 +19,7 @@ export async function GET() {
 		{ loc: `${siteConfig.siteUrl}/blog`, lastmod: latestPostDate },
 		{ loc: `${siteConfig.siteUrl}/projects`, lastmod: latestProjectDate },
 		{ loc: `${siteConfig.siteUrl}/work`, lastmod: today },
+		{ loc: `${siteConfig.siteUrl}/films`, lastmod: today },
 		{ loc: `${siteConfig.siteUrl}${siteConfig.cv.href}`, lastmod: today },
 		...projectPosts.map((post) => ({
 			loc: `${siteConfig.siteUrl}${getProjectPostUrl(post.id)}`,

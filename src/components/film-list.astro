@@ -1,0 +1,174 @@
+---
+import { Image } from "astro:assets";
+import type { LetterboxdFilm } from "@/lib/letterboxd";
+
+export interface Props {
+	films: LetterboxdFilm[];
+	layout?: "grid" | "timeline";
+}
+
+const { films, layout = "grid" } = Astro.props;
+
+const formatDate = (dateStr: string | null) => {
+	if (!dateStr) return "";
+	const date = new Date(dateStr);
+	return date.toLocaleDateString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
+};
+
+const getMonthKey = (dateStr: string | null) => {
+	if (!dateStr) return "unknown";
+	const date = new Date(dateStr);
+	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+};
+
+const getMonthLabel = (dateStr: string | null) => {
+	if (!dateStr) return "";
+	const date = new Date(dateStr);
+	return date.toLocaleDateString("en-US", {
+		month: "long",
+		year: "numeric",
+	});
+};
+
+const groupFilmsByMonth = (filmList: LetterboxdFilm[]) => {
+	const groups: { month: string; label: string; films: LetterboxdFilm[] }[] = [];
+	let currentKey = "";
+
+	for (const film of filmList) {
+		const key = getMonthKey(film.watchedDate);
+		if (key !== currentKey) {
+			currentKey = key;
+			groups.push({
+				month: key,
+				label: getMonthLabel(film.watchedDate),
+				films: [film],
+			});
+		} else {
+			groups[groups.length - 1].films.push(film);
+		}
+	}
+
+	return groups;
+};
+---
+
+{layout === "timeline" ? (
+	<ol class="space-y-8">
+		{groupFilmsByMonth(films).map((group) => (
+			<li class="space-y-4">
+				<h3 class="bg-background text-tone-mid sticky top-0 z-10 -mx-6 px-6 py-2 text-sm tracking-wider uppercase">
+					{group.label}
+				</h3>
+				<ol class="border-border relative border-l pl-6">
+					{group.films.map((film) => (
+						<li class="mb-6 last:mb-0">
+							<div class="bg-foreground absolute -left-1.5 h-3 w-3 rounded-full" />
+							<div class="flex gap-4">
+								{film.image && (
+									<a
+										href={film.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="block shrink-0"
+									>
+										<Image
+											src={film.image}
+											alt={`Poster for ${film.title} (${film.year}).`}
+											width={80}
+											height={120}
+											loading="lazy"
+											class="bg-muted aspect-[2/3] w-16 object-cover sm:w-20"
+										/>
+									</a>
+								)}
+								<div class="flex-1">
+									{film.watchedDate && (
+										<time class="text-tone-faint text-sm">{formatDate(film.watchedDate)}</time>
+									)}
+									<p class="mt-1 text-base leading-8 sm:text-lg">
+										<a
+											href={film.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="terminal-link"
+										>
+											{film.title}
+										</a>
+										<span class="text-tone-faint">, {film.year}</span>
+										{
+											film.liked && (
+												<span
+													class="text-link ml-2 inline-block text-xl leading-none"
+													role="img"
+													aria-label="Liked"
+												>
+													&hearts;
+												</span>
+											)
+										}
+									</p>
+									{
+										film.tags.length > 0 && (
+											<ul class="text-tone-faint mt-1 flex flex-wrap gap-x-3 text-sm">
+												{film.tags.map((tag) => (
+													<li>
+														<a
+															href={tag.url}
+															target="_blank"
+															rel="noopener noreferrer"
+															class="hover:text-foreground focus-visible:text-foreground hover:underline focus-visible:underline"
+														>
+															#{tag.name}
+														</a>
+													</li>
+												))}
+											</ul>
+										)
+									}
+								</div>
+							</div>
+						</li>
+					))}
+				</ol>
+			</li>
+		))}
+	</ol>
+) : (
+	<ol class="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4">
+		{films.map((film) => (
+			<li>
+				<a
+					href={film.url}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="group block"
+				>
+					{film.image ? (
+						<Image
+							src={film.image}
+							alt={`Poster for ${film.title} (${film.year}).`}
+							width={300}
+							height={450}
+							loading="lazy"
+							class="bg-muted aspect-[2/3] w-full object-cover"
+						/>
+					) : (
+						<div class="bg-muted aspect-[2/3] w-full p-3">
+							<p class="text-tone-mid text-sm leading-relaxed">{film.title}</p>
+						</div>
+					)}
+					<p class="mt-2 text-sm leading-snug">
+						<span class="text-foreground group-hover:underline group-focus-visible:underline">
+							{film.title}
+						</span>
+						<span class="text-tone-faint">, {film.year}</span>
+					</p>
+				</a>
+			</li>
+		))}
+	</ol>
+)}

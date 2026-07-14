@@ -1,16 +1,11 @@
 import type { APIRoute } from "astro";
 
-import { getBlogPosts } from "@/lib/blog";
 import { getLetterboxdFilms } from "@/lib/letterboxd";
-import { getProjectPosts } from "@/lib/projects";
-import { markdownContentType, renderHomeMarkdown } from "@/lib/llms";
+import { markdownContentType, renderFilmsMarkdown } from "@/lib/llms";
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
-	const posts = await getBlogPosts();
-	const projectPosts = await getProjectPosts();
-
 	let films: Awaited<ReturnType<typeof getLetterboxdFilms>> = [];
 	try {
 		films = await getLetterboxdFilms("Glp");
@@ -18,7 +13,7 @@ export const GET: APIRoute = async () => {
 		// Fail silently: render empty state.
 	}
 
-	return new Response(renderHomeMarkdown(posts, projectPosts, films), {
+	return new Response(renderFilmsMarkdown(films), {
 		headers: {
 			"Content-Type": markdownContentType,
 		},

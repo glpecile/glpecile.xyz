@@ -1,0 +1,62 @@
+---
+import FilmList from "@/components/film-list.astro";
+import PageIntro from "@/components/page-intro.astro";
+import SiteLayout from "@/layouts/site-layout.astro";
+import { getLetterboxdFilms } from "@/lib/letterboxd";
+
+import { siteConfig } from "#config/site";
+
+let films: Awaited<ReturnType<typeof getLetterboxdFilms>> = [];
+try {
+	films = await getLetterboxdFilms("Glp", { includeTags: true });
+} catch {
+	// Fail silently: the section will render an empty state.
+}
+---
+
+<SiteLayout
+	title="Films"
+	description="Recently watched films, pulled from Letterboxd."
+	path="/films"
+	previewPath="/films/preview"
+>
+	<section class="space-y-6">
+		<PageIntro
+			label="films"
+			title="Recently watched."
+			description="A feed of films I've logged on Letterboxd."
+		/>
+
+		<p class="text-sm sm:text-base">
+			<a
+				class="terminal-link"
+				href={siteConfig.links.letterboxd}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				view all on letterboxd →
+			</a>
+		</p>
+	</section>
+
+	<section class="space-y-4" data-reveal>
+		{films.length === 0 ? (
+			<p class="text-tone-soft text-sm">no films yet.</p>
+		) : (
+			<FilmList films={films} layout="timeline" />
+		)}
+	</section>
+
+	<section class="space-y-3" data-reveal>
+		<p class="text-sm sm:text-base">
+			<a
+				class="terminal-link"
+				href={siteConfig.links.letterboxd}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				view all on letterboxd →
+			</a>
+		</p>
+	</section>
+</SiteLayout>

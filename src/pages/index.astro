@@ -1,15 +1,17 @@
 ---
+import FilmList from "@/components/film-list.astro";
 import MoreLink from "@/components/more-link.astro";
 import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
+import { getLetterboxdFilms } from "@/lib/letterboxd";
 import { getProjectPostUrl, getProjectPosts } from "@/lib/projects";
 
 import { siteConfig } from "#config/site";
 import type { WorkExperience } from "#config/site";
 
-const socialLinks = Object.entries(siteConfig.links);
+const socialLinks = Object.entries(siteConfig.links).filter(([label]) => label !== "letterboxd");
 const posts = await getBlogPosts();
 const projectPosts = await getProjectPosts();
 const latestPosts = posts.slice(0, 3);
@@ -17,6 +19,14 @@ const latestProjects = projectPosts.slice(0, 3);
 const work: readonly WorkExperience[] = siteConfig.work;
 const featuredWork = work.slice(0, 3);
 const hasMoreWork = work.length > featuredWork.length;
+
+let latestFilms: Awaited<ReturnType<typeof getLetterboxdFilms>> = [];
+try {
+	latestFilms = await getLetterboxdFilms("Glp", { limit: 4 });
+} catch {
+	// Fail silently: the section will render an empty state.
+}
+
 const navShortcutCopy = siteConfig.shortcuts.nav
 	.map(
 		(item) =>
@@ -120,6 +130,30 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 			))}
 		</ol>
 		{hasMoreWork && <MoreLink href="/work" />}
+	</section>
+
+	<section class="space-y-4" data-reveal>
+		<SectionLabel label="films" />
+		<p class="text-tone-soft text-sm sm:text-base">
+			Latest watches. Follow along on{" "}
+			<a
+				class="terminal-link"
+				href={siteConfig.links.letterboxd}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Letterboxd
+			</a>
+			{" "}for the rest.
+		</p>
+
+		{latestFilms.length === 0 ? (
+			<p class="text-tone-soft text-sm">no films yet.</p>
+		) : (
+			<FilmList films={latestFilms} />
+		)}
+
+		<MoreLink href="/films" />
 	</section>
 
 	<section class="space-y-3" data-reveal>

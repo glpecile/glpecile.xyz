@@ -22,6 +22,16 @@ Project-specific guidance for working in this repo.
 - Use kebab-case for component, layout, and route-related filenames. Avoid PascalCase filenames like `SiteLayout.astro` or `SectionLabel.astro`.
 - When adding or changing first-class routes, keep machine-readable surfaces in sync: `sitemap.xml`, `/llms.txt`, relevant `index.html.md` mirrors, and `SiteLayout` alternate metadata.
 - Do not edit generated output under `dist/` or `.astro/`; make source changes under `src/` or `config/`.
+- Use Astro's `<Image>` component from `astro:assets` instead of native `<img>` tags. Configure remote image domains in `astro.config.mjs` under `image.remotePatterns`.
+
+## Markdown Mirrors
+
+Every first-class route should have a corresponding `index.html.md.ts` endpoint that renders a plain-text markdown version of the page. This serves agents, RSS readers, and accessibility tools.
+
+- **Visual-heavy pages** (like `/films` with poster grids or timelines) should render as structured lists in markdown. Focus on the data, not the presentation.
+- **Interactive pages** should describe their purpose and link to the HTML version for the full experience.
+- Keep markdown mirrors in `src/lib/llms.ts` as `renderXxxMarkdown()` functions for consistency.
+- The markdown should be self-contained: include enough context that an agent or reader understands the page without needing to visit the HTML.
 
 ## Style
 
