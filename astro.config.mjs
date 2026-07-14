@@ -32,8 +32,9 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 	},
 
-	// Passthrough image service: remote images are proxied directly
-	// without requiring a Cloudflare Images binding.
-	adapter: cloudflare({ imageService: "passthrough" }),
+	// Compile-time image service: remote images are downloaded and
+	// optimized at build time into static /_astro assets. The site is
+	// fully prerendered, so there is no runtime /_image endpoint.
+	adapter: cloudflare({ imageService: "compile" }),
 	integrations: [mdx(), react()],
 });
