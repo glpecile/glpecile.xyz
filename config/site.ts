@@ -171,7 +171,8 @@ export const siteConfig = {
 			url: "https://explorer.alignedlayer.com",
 			highlights: [
 				"Designed and built the user-facing block explorer for zero-knowledge proofs in the Aligned verification layer — turning dense, real-time on-chain proof and batch data into a clear, legible interface.",
-				"Owned the product from concept to production across the user-facing interface, protocol API integration, and the backend services / data pipelines that index and aggregate on-chain data.",
+				"Owned the explorer frontend from concept to production, working mostly in Elixir (Phoenix) against protocol APIs.",
+				"Built initial versions of Aligned's Next.js landing sites and an unreleased token bridge from Starknet to Ethereum and zkSync.",
 			],
 		},
 		{
@@ -181,8 +182,8 @@ export const siteConfig = {
 			place: "Remote",
 			url: "https://constellationnetwork.io",
 			highlights: [
-				"Designed and built an anonymous chat app authenticated with a web wallet — wallet-based sign-in was novel at the time — owning the product UI end to end.",
-				"Developed production React/TypeScript interfaces for a web3 distributed-ledger network, delivering features against evolving protocol APIs.",
+				"Designed and built Courtyard, an anonymous chat app authenticated with the Constellation web wallet — wallet-based sign-in was novel at the time — owning the product UI end to end.",
+				"Built the app with Next.js, TypeScript, and Zustand, shipping complex chat features such as a draggable picture-in-picture view and a queue system.",
 			],
 		},
 		{
@@ -224,6 +225,15 @@ export const siteConfig = {
 				"Designed and built this site as a hand-crafted component system — consistent type, color, and motion tokens driving every page from a single config.",
 				"Engineered a custom CV generator that renders a typeset PDF programmatically (pdf-lib) from the same content source as the live site.",
 				"Sweated the details: reveal/stagger animations, keyboard shortcuts, dark/light theming, and an /llms.txt export for agents.",
+			],
+		},
+		{
+			name: "shinobu",
+			stack: "React Native / Expo / TypeScript",
+			url: "https://github.com/glpecile/shinobu",
+			highlights: [
+				"Building a DB-less, cross-platform media tracker (iOS / Android / web) — log a movie, episode, or manga chapter once and it fans out to every connected tracking service (Trakt, AniList, Letterboxd), with the same providers aggregated back into one feed.",
+				"Modern Expo stack — expo-router, React 19 with the React Compiler, TanStack Query, Effect, Reanimated, and Tailwind-based styling — from a single TypeScript codebase.",
 			],
 		},
 		{
