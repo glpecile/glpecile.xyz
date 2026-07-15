@@ -147,6 +147,8 @@ export const siteConfig = {
 			url: "https://poap.xyz",
 			highlights: [
 				"Build and own reusable React/TypeScript components and shared UI patterns for POAP — the web3 protocol for issuing digital collectibles (NFTs) — keeping the interface consistent and high-quality at scale.",
+				"Ship features for POAP Home, POAP's React Native mobile app, across iOS and Android — sharing TypeScript patterns and design language with the web surfaces.",
+				"Prototyped an unreleased location-based game in Expo / React Native with real-world Mapbox maps integration, and distilled the map-engineering patterns into a blog post (glpecile.xyz/blog/on-working-with-maps).",
 				"Ship polished, high-traffic collectible (NFT) interfaces end to end — from UI implementation through code review and release — improving reliability, performance, and product feel.",
 			],
 		},
@@ -272,12 +274,12 @@ export const siteConfig = {
 		{
 			category: "Frontend & UI",
 			items: [
+				"React Native / Expo",
 				"React",
-				"Next.js",
 				"TypeScript",
+				"Next.js",
 				"CSS",
 				"Tailwind CSS",
-				"React Native / Expo",
 				"Astro",
 				"Responsive & accessible UI",
 			],
@@ -302,6 +304,7 @@ export const siteConfig = {
 		{
 			category: "AI / ML",
 			items: [
+				"AI-assisted development (Claude Code, agent-ready /llms.txt)",
 				"Machine learning (PyTorch)",
 				"Privacy-preserving ML (FHE, Concrete ML)",
 				"LLM application patterns",
