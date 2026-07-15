@@ -7,6 +7,7 @@ import geistMonoBoldDataUrl from "@fontsource/geist-mono/files/geist-mono-latin-
 import geistMonoRegularDataUrl from "@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff?inline";
 
 import { cvDownloadName } from "@/lib/cv";
+import { flattenInlineLinks } from "@/lib/inline-links";
 import { siteConfig } from "#config/site";
 import type {
 	CertificateItem,
@@ -355,7 +356,7 @@ function buildEntryBlock(ctx: Ctx, entry: CvEntry): Block {
 	const bulletTextX = x0 + layout.entryIndent + dashWidth + layout.detailBulletGap;
 	const bulletTextWidth = rightEdge - bulletTextX;
 	const bulletLineGroups = (entry.bullets ?? []).map((bullet) =>
-		wrapText(ctx.regular, bullet, layout.detailSize, bulletTextWidth),
+		wrapText(ctx.regular, flattenInlineLinks(bullet), layout.detailSize, bulletTextWidth),
 	);
 	const bulletsHeight = bulletLineGroups.reduce(
 		(total, lines) => total + layout.entryGap + lines.length * lineBox(layout.detailSize, layout.detailLineHeight),

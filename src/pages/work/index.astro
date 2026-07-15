@@ -3,6 +3,7 @@ import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { cvDownloadName } from "@/lib/cv";
+import { parseInlineLinks } from "@/lib/inline-links";
 
 import { siteConfig } from "#config/site";
 import type {
@@ -91,7 +92,15 @@ const cvFileName = cvDownloadName();
 								{job.highlights.map((highlight) => (
 									<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
 										<span class="text-tone-faint">- </span>
-										{highlight}
+										{parseInlineLinks(highlight).map((segment) =>
+											segment.url ? (
+												<a class="terminal-link" href={segment.url}>
+													{segment.text}
+												</a>
+											) : (
+												segment.text
+											),
+										)}
 									</li>
 								))}
 							</ul>
@@ -142,7 +151,15 @@ const cvFileName = cvDownloadName();
 							{project.highlights.map((highlight) => (
 								<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
 									<span class="text-tone-faint">- </span>
-									{highlight}
+									{parseInlineLinks(highlight).map((segment) =>
+										segment.url ? (
+											<a class="terminal-link" href={segment.url}>
+												{segment.text}
+											</a>
+										) : (
+											segment.text
+										),
+									)}
 								</li>
 							))}
 						</ul>
