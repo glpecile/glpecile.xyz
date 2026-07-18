@@ -1,30 +1,20 @@
 import { siteConfig } from "#config/site";
 import { getBlogPosts } from "@/lib/blog";
-import { getProjectPostUrl, getProjectPosts } from "@/lib/projects";
 
 const formatSitemapDate = (date: Date) => date.toISOString().split("T")[0];
 
 export async function GET() {
 	const posts = await getBlogPosts();
-	const projectPosts = await getProjectPosts();
 	const today = formatSitemapDate(new Date());
 	const latestPostDate = posts[0]
 		? formatSitemapDate(posts[0].data.updatedDate ?? posts[0].data.pubDate)
 		: today;
-	const latestProjectDate = projectPosts[0]
-		? formatSitemapDate(projectPosts[0].data.updatedDate ?? projectPosts[0].data.pubDate)
-		: today;
 	const urls = [
 		{ loc: `${siteConfig.siteUrl}/`, lastmod: today },
 		{ loc: `${siteConfig.siteUrl}/blog`, lastmod: latestPostDate },
-		{ loc: `${siteConfig.siteUrl}/projects`, lastmod: latestProjectDate },
 		{ loc: `${siteConfig.siteUrl}/work`, lastmod: today },
 		{ loc: `${siteConfig.siteUrl}/films`, lastmod: today },
 		{ loc: `${siteConfig.siteUrl}${siteConfig.cv.href}`, lastmod: today },
-		...projectPosts.map((post) => ({
-			loc: `${siteConfig.siteUrl}${getProjectPostUrl(post.id)}`,
-			lastmod: formatSitemapDate(post.data.updatedDate ?? post.data.pubDate),
-		})),
 		...posts.map((post) => ({
 			loc: `${siteConfig.siteUrl}/blog/${post.id}`,
 			lastmod: formatSitemapDate(post.data.updatedDate ?? post.data.pubDate),

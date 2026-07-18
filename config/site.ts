@@ -82,11 +82,6 @@ const nav = [
 		shortcut: "b",
 	},
 	{
-		title: "Projects",
-		href: "/projects",
-		shortcut: "p",
-	},
-	{
 		title: "Work",
 		href: "/work",
 		shortcut: "w",
@@ -122,9 +117,6 @@ export const siteConfig = {
 		nav,
 		theme,
 		blog: {
-			latestPostCount: 9,
-		},
-		projects: {
 			latestPostCount: 9,
 		},
 	},

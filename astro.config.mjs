@@ -9,6 +9,12 @@ import react from "@astrojs/react";
 export default defineConfig({
 	site: "https://glpecile.xyz",
 
+	// The projects collection was merged into the blog; keep old URLs alive.
+	redirects: {
+		"/projects": "/blog",
+		"/projects/[slug]": "/blog/[slug]",
+	},
+
 	image: {
 		remotePatterns: [
 			{
