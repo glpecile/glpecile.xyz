@@ -6,7 +6,7 @@ import { getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 const feedPath = "/blog/rss.xml";
 const blogPath = "/blog";
 const feedTitle = `${siteConfig.shortName} / blog`;
-const feedDescription = "Thoughts, experiments, and tiny posts.";
+const feedDescription = "Thoughts, experiments, and project writeups.";
 
 const escapeXml = (value: string) =>
 	value
