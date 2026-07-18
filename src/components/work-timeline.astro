@@ -5,19 +5,27 @@ import { parseInlineLinks } from "@/lib/inline-links";
 export interface Props {
 	work: readonly WorkExperience[];
 	detail?: "summary" | "highlights";
+	/** End the rail with a terminator dash. Disable for truncated lists that link to more. */
+	capped?: boolean;
 }
 
-const { work, detail = "summary" } = Astro.props;
+const { work, detail = "summary", capped = true } = Astro.props;
 ---
 
-<ol class="border-border relative border-l border-dotted pl-6">
+<ol
+	class:list={[
+		"border-border relative border-l-2 border-dotted pl-6",
+		capped &&
+			"after:bg-border after:absolute after:bottom-0 after:-left-1.5 after:h-0.5 after:w-2.5",
+	]}
+>
 	{work.map((job, index) => (
 		<li class="mb-8 last:mb-0">
-			<span class="absolute -left-1.5 mt-1 flex h-3 w-3">
+			<span class="absolute -left-1.5 mt-1.5 flex h-2.5 w-2.5">
 				{index === 0 && (
 					<span class="bg-foreground absolute inline-flex h-full w-full animate-ping opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
 				)}
-				<span class="bg-foreground relative inline-flex h-3 w-3" />
+				<span class="bg-foreground relative inline-flex h-2.5 w-2.5" />
 			</span>
 			<time class="text-tone-faint text-sm">{job.period}</time>
 			<p class="mt-1 text-base leading-8 sm:text-lg">

@@ -69,7 +69,7 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 
 	<section class="space-y-4" data-reveal>
 		<SectionLabel label="work" />
-		<WorkTimeline work={featuredWork} />
+		<WorkTimeline work={featuredWork} capped={false} />
 		{hasMoreWork && <MoreLink href="/work" />}
 	</section>
 
