@@ -258,7 +258,7 @@ export function renderBlogIndexMarkdown(posts: BlogPost[]) {
 	return joinLines([
 		"# Blog",
 		"",
-		`> Published writing by ${siteConfig.author}.`,
+		`> Notes, builds, and rabbit holes by ${siteConfig.author} — from tiny thoughts to full project writeups.`,
 		"",
 		`- Canonical HTML: ${toAbsoluteUrl("/blog")}`,
 		"",
