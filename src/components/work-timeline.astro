@@ -10,14 +10,14 @@ export interface Props {
 const { work, detail = "summary" } = Astro.props;
 ---
 
-<ol class="border-border relative border-l pl-6">
+<ol class="border-border relative border-l border-dotted pl-6">
 	{work.map((job, index) => (
 		<li class="mb-8 last:mb-0">
 			<span class="absolute -left-1.5 mt-1 flex h-3 w-3">
 				{index === 0 && (
-					<span class="bg-foreground absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
+					<span class="bg-foreground absolute inline-flex h-full w-full animate-ping opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
 				)}
-				<span class="bg-foreground relative inline-flex h-3 w-3 rounded-full" />
+				<span class="bg-foreground relative inline-flex h-3 w-3" />
 			</span>
 			<time class="text-tone-faint text-sm">{job.period}</time>
 			<p class="mt-1 text-base leading-8 sm:text-lg">
