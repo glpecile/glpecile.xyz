@@ -13,7 +13,7 @@ const { work, detail = "summary" } = Astro.props;
 <ol class="border-border relative border-l pl-6">
 	{work.map((job, index) => (
 		<li class="mb-8 last:mb-0">
-			<span class="absolute -left-1.5 flex h-3 w-3">
+			<span class="absolute -left-1.5 mt-1 flex h-3 w-3">
 				{index === 0 && (
 					<span class="bg-foreground absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
 				)}
