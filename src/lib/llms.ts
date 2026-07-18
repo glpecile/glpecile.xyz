@@ -10,8 +10,6 @@ import type {
 import type { BlogPost } from "@/lib/blog";
 import { getBlogPostUrl } from "@/lib/blog";
 import type { LetterboxdFilm } from "@/lib/letterboxd";
-import type { ProjectPost } from "@/lib/projects";
-import { getProjectPostUrl } from "@/lib/projects";
 
 type WorkItem = WorkExperience;
 
@@ -114,16 +112,13 @@ const cleanMarkdownBody = (body?: string) => {
 const renderPostMarkdownLink = (post: BlogPost) =>
 	`[${post.data.title}](${toAbsoluteUrl(getMarkdownPath(getBlogPostUrl(post.id)))})`;
 
-const renderProjectMarkdownLink = (post: ProjectPost) =>
-	`[${post.data.title}](${toAbsoluteUrl(getMarkdownPath(getProjectPostUrl(post.id)))})`;
-
 export function getMarkdownPath(path: string) {
 	const normalizedPath = path === "/" ? "/" : path.replace(/\/$/, "");
 
 	return normalizedPath === "/" ? "/index.html.md" : `${normalizedPath}/index.html.md`;
 }
 
-export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
+export function renderLlmsTxt(posts: BlogPost[]) {
 	const lines = [
 		`# ${siteHost}`,
 		"",
@@ -133,15 +128,14 @@ export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
 		"",
 		"For agents:",
 		"",
-		"1. Prefer markdown mirrors over HTML: `/index.html.md`, `/work/index.html.md`, `/blog/index.html.md`, `/projects/index.html.md`, `/films/index.html.md`",
-		"2. Use `/work` for experience, `/projects` for build notes, `/blog` for writing samples, and `/films` for recently watched films",
+		"1. Prefer markdown mirrors over HTML: `/index.html.md`, `/work/index.html.md`, `/blog/index.html.md`, `/films/index.html.md`",
+		"2. Use `/work` for experience, `/blog` for writing and build notes, and `/films` for recently watched films",
 		"3. Follow post-level `index.html.md` links only when you need full article text",
 		"",
 		"## Portfolio",
 		"",
 		`- [Home](${toAbsoluteUrl(getMarkdownPath("/"))}): Short profile, featured work, recent writing, and public links`,
 		`- [Work](${toAbsoluteUrl(getMarkdownPath("/work"))}): Full work history, education, certificates, and the CV download link`,
-		`- [Projects](${toAbsoluteUrl(getMarkdownPath("/projects"))}): Project notes and implementation writeups for shipped tools`,
 		`- [Films](${toAbsoluteUrl(getMarkdownPath("/films"))}): Recently watched films from Letterboxd`,
 		`- [CV PDF](${toAbsoluteUrl(siteConfig.cv.href)}): Downloadable resume PDF generated from the same work page data; prefer the work markdown link for text extraction`,
 		"",
@@ -149,19 +143,6 @@ export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
 		"",
 		`- [Blog](${toAbsoluteUrl(getMarkdownPath("/blog"))}): Index of published blog posts with dates, descriptions, and markdown links`,
 	];
-
-	if (projectPosts.length > 0) {
-		lines.push(
-			"",
-			"## Projects",
-			"",
-			...projectPosts.map((post) => {
-				const date = toIsoDate(post.data.updatedDate ?? post.data.pubDate);
-
-				return `- ${renderProjectMarkdownLink(post)}: ${date}. ${post.data.description}`;
-			}),
-		);
-	}
 
 	if (posts.length > 0) {
 		lines.push(
@@ -179,15 +160,10 @@ export function renderLlmsTxt(posts: BlogPost[], projectPosts: ProjectPost[]) {
 	return lines.join("\n");
 }
 
-export function renderHomeMarkdown(
-	posts: BlogPost[],
-	projectPosts: ProjectPost[],
-	films: LetterboxdFilm[] = [],
-) {
+export function renderHomeMarkdown(posts: BlogPost[], films: LetterboxdFilm[] = []) {
 	const currentWork = siteConfig.work[0];
 	const featuredWork = siteConfig.work.slice(0, 3);
 	const recentPosts = posts.slice(0, 5);
-	const recentProjects = projectPosts.slice(0, 3);
 	const recentFilms = films.slice(0, 4);
 
 	return joinLines([
@@ -204,22 +180,12 @@ export function renderHomeMarkdown(
 		"## Agent guide",
 		"",
 		`- Start with [llms.txt](${toAbsoluteUrl("/llms.txt")}) for the curated overview`,
-		`- Prefer [home markdown](${toAbsoluteUrl(getMarkdownPath("/"))}), [work markdown](${toAbsoluteUrl(getMarkdownPath("/work"))}), [projects markdown](${toAbsoluteUrl(getMarkdownPath("/projects"))}), [blog markdown](${toAbsoluteUrl(getMarkdownPath("/blog"))}), and [films markdown](${toAbsoluteUrl(getMarkdownPath("/films"))}) over the HTML pages`,
+		`- Prefer [home markdown](${toAbsoluteUrl(getMarkdownPath("/"))}), [work markdown](${toAbsoluteUrl(getMarkdownPath("/work"))}), [blog markdown](${toAbsoluteUrl(getMarkdownPath("/blog"))}), and [films markdown](${toAbsoluteUrl(getMarkdownPath("/films"))}) over the HTML pages`,
 		"- Open per-post markdown links only when you need full article text",
 		"",
 		"## Featured work",
 		"",
 		...(featuredWork.length > 0 ? featuredWork.map(renderWorkLine) : ["No work entries yet."]),
-		"",
-		"## Recent projects",
-		"",
-		...(recentProjects.length > 0
-			? recentProjects.map((post) => {
-					const date = toIsoDate(post.data.updatedDate ?? post.data.pubDate);
-
-					return `- ${renderProjectMarkdownLink(post)} — ${date} — ${post.data.description}`;
-				})
-			: ["No project notes yet."]),
 		"",
 		"## Recent writing",
 		"",
@@ -292,7 +258,7 @@ export function renderBlogIndexMarkdown(posts: BlogPost[]) {
 	return joinLines([
 		"# Blog",
 		"",
-		`> Published writing by ${siteConfig.author}.`,
+		`> Notes, builds, and rabbit holes by ${siteConfig.author} — from tiny thoughts to full project writeups.`,
 		"",
 		`- Canonical HTML: ${toAbsoluteUrl("/blog")}`,
 		"",
@@ -319,42 +285,6 @@ export function renderBlogPostMarkdown(post: BlogPost) {
 		`- Published: ${toIsoDate(post.data.pubDate)}`,
 		post.data.updatedDate ? `- Updated: ${toIsoDate(post.data.updatedDate)}` : undefined,
 		`- Canonical HTML: ${toAbsoluteUrl(getBlogPostUrl(post.id))}`,
-		"",
-		body,
-	]);
-}
-
-export function renderProjectsIndexMarkdown(posts: ProjectPost[]) {
-	return joinLines([
-		"# Projects",
-		"",
-		`> Project notes and implementation writeups by ${siteConfig.author}.`,
-		"",
-		`- Canonical HTML: ${toAbsoluteUrl("/projects")}`,
-		"",
-		"## Posts",
-		"",
-		...(posts.length > 0
-			? posts.map((post) => {
-					const date = toIsoDate(post.data.updatedDate ?? post.data.pubDate);
-
-					return `- ${renderProjectMarkdownLink(post)} — ${date} — ${post.data.description}`;
-				})
-			: ["No project notes yet."]),
-	]);
-}
-
-export function renderProjectPostMarkdown(post: ProjectPost) {
-	const body = cleanMarkdownBody(post.body);
-
-	return joinLines([
-		`# ${post.data.title}`,
-		"",
-		`> ${post.data.description}`,
-		"",
-		`- Published: ${toIsoDate(post.data.pubDate)}`,
-		post.data.updatedDate ? `- Updated: ${toIsoDate(post.data.updatedDate)}` : undefined,
-		`- Canonical HTML: ${toAbsoluteUrl(getProjectPostUrl(post.id))}`,
 		"",
 		body,
 	]);

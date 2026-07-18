@@ -30,9 +30,17 @@ const themeItems = siteConfig.shortcuts.theme;
 					data-theme-option={item.theme}
 					data-theme-shortcut={item.shortcut}
 					aria-keyshortcuts={item.shortcut}
-					class="terminal-link text-tone-soft cursor-pointer px-1"
+					aria-label={`${item.theme} theme`}
+					class="text-tone-soft group inline-flex cursor-pointer items-center gap-1.5 px-1 focus-visible:outline-none"
 				>
-					[{item.shortcut}]
+					<span
+						data-theme-label
+						class="group-hover:underline group-focus-visible:underline"
+					>[{item.shortcut}]</span>
+					<span
+						aria-hidden="true"
+						class="inline-flex items-center justify-center text-lg leading-none"
+					>{item.icon}</span>
 				</button>
 			))}
 		</span>
@@ -66,12 +74,16 @@ const themeItems = siteConfig.shortcuts.theme;
 					}
 
 					const isActive = button.dataset.themeOption === theme;
+					const label = button.querySelector("[data-theme-label]");
 
 					button.dataset.active = isActive ? "true" : "false";
 					button.setAttribute("aria-pressed", isActive ? "true" : "false");
 					button.classList.toggle("text-foreground", isActive);
-					button.classList.toggle("underline", isActive);
 					button.classList.toggle("text-tone-soft", !isActive);
+
+					if (label instanceof HTMLElement) {
+						label.classList.toggle("underline", isActive);
+					}
 				});
 			};
 

@@ -7,7 +7,7 @@ export const prerender = true;
 export const GET: APIRoute = async ({ url }) => {
 	const png = await renderPreview(
 		"glpecile",
-		"Thoughts, experiments, and tiny posts.",
+		"Thoughts, experiments, and project writeups.",
 		url.toString(),
 		"dark",
 	);

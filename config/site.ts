@@ -68,6 +68,7 @@ type NavItem = {
 type ThemeItem = {
 	theme: "auto" | "light" | "dark";
 	shortcut: string;
+	icon: string;
 };
 
 const nav = [
@@ -82,11 +83,6 @@ const nav = [
 		shortcut: "b",
 	},
 	{
-		title: "Projects",
-		href: "/projects",
-		shortcut: "p",
-	},
-	{
 		title: "Work",
 		href: "/work",
 		shortcut: "w",
@@ -97,14 +93,17 @@ const theme = [
 	{
 		theme: "auto",
 		shortcut: "a",
+		icon: "◐",
 	},
 	{
 		theme: "light",
 		shortcut: "l",
+		icon: "☼",
 	},
 	{
 		theme: "dark",
 		shortcut: "d",
+		icon: "☾",
 	},
 ] satisfies ThemeItem[];
 
@@ -122,9 +121,6 @@ export const siteConfig = {
 		nav,
 		theme,
 		blog: {
-			latestPostCount: 9,
-		},
-		projects: {
 			latestPostCount: 9,
 		},
 	},

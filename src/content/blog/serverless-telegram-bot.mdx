@@ -1,0 +1,234 @@
+---
+title: "building serverless telegram notification bots"
+description: Every IMAX showing of The Odyssey was sold out, so instead of refreshing the booking page I built a bot — and accidentally learned how to make one that can survive its own hosting platform.
+pubDate: 2026-07-18
+authors: [glpecile, claude]
+---
+
+import MermaidDiagram from "../../components/mermaid-diagram.astro";
+
+*The Odyssey* is playing in IMAX right now, and I haven't seen it.
+
+Not for lack of trying. Christopher Nolan shot the thing for IMAX, everyone knows he shot it for IMAX, and so every IMAX showing within reach of me sold out roughly at the speed of light. The theater adds new showtimes when it adds them — no announcement, no schedule, no mercy. One day there's nothing. The next day there's a Tuesday 22:30 slot that's already half gone.
+
+So I did what any reasonable person does: I started checking the booking page. Then checking it again. Then checking it at weird hours, because *what if they add showtimes at night?*
+
+Somewhere around the fifteenth refresh, the programmer brain finally kicked in. I was polling. Manually. With my eyes. I had become a cron job with anxiety.
+
+The fix was obvious: build the cron job, and let it have the anxiety instead. A Telegram bot that watches the schedule and messages me — *me*, personally, doing nothing — when a new IMAX date appears.
+
+That's the origin story. The rest of this post is about what the bot turned into, because it turns out "notify me when the thing changes" is one of the most reusable shapes in software, and building it *well* on a serverless platform has a few lessons in it that I want to write down before I forget them.
+
+## What a notification bot actually is
+
+Strip away the movie tickets and here's the skeleton:
+
+1. Users tell the bot what they care about, through chat.
+2. A scheduled job watches an upstream source.
+3. New items get diffed against what each user has *already been told about*.
+4. Alerts go out — once, to the right people, and never again for the same thing.
+
+That last clause is doing a lot of work. We'll get to it.
+
+I had two hard constraints, and they shaped everything:
+
+1. **$0 hosting.** This is a bot for me and a few friends who also want to see *The Odyssey*. It should cost nothing, forever.
+2. **No platform lock-in.** The domain logic should not care where it runs.
+
+The second one sounds like architecture-astronaut talk. It's not. Free tiers change. Betas gate access. Platforms deprecate things on a Tuesday. If your logic imports a platform SDK, every one of those events is a rewrite. I wanted every one of them to be a shrug.
+
+Spoiler: this constraint got tested *much* sooner than I expected.
+
+## A core that doesn't know where it runs
+
+Here's the whole design in one sentence: all the actual logic lives in a `lib/` directory as factories that take their dependencies as arguments, and each hosting platform gets a thin adapter directory whose only job is to construct those dependencies and hand them over.
+
+The Telegram API client? Injected. The storage layer? Injected. Even `fetch` is injected. Nothing in `lib/` imports a platform SDK. Nothing in `lib/` even knows platforms *exist*.
+
+<MermaidDiagram
+	caption="Dependencies point inward: adapters know the core, the core knows nothing."
+	code={`flowchart TB
+    subgraph core ["Domain core — lib/"]
+        GW["gateway.ts<br/>cross-cutting update policy"]
+        RT["router<br/>commands + conversation flows"]
+        AL["alerts + baseline logic"]
+        ST["WatchlistStore<br/>(interface)"]
+        GW --> RT
+        RT --> AL
+        RT --> ST
+        AL --> ST
+    end
+
+    subgraph target1 ["Target A — Telegram Serverless"]
+        H["handlers/<br/>update entrypoints"]
+        DB["db-store.ts<br/>platform database"]
+    end
+
+    subgraph target2 ["Target B — Cloudflare Workers"]
+        W["worker.ts<br/>webhook + cron entry"]
+        APP["app.ts<br/>composition root"]
+        TG["telegram.ts<br/>Bot API client"]
+        D1["d1-store.ts<br/>D1 (SQLite)"]
+        W --> APP
+    end
+
+    H -- "injects deps" --> GW
+    APP -- "injects deps" --> GW
+    DB -. "implements" .-> ST
+    D1 -. "implements" .-> ST
+    APP --> TG
+    APP --> D1`}
+/>
+
+Two rules keep this honest:
+
+**The import boundaries are real, not aspirational.** Adapter directories never import each other, and the core never imports an adapter. If `lib/` compiles with both adapters deleted, the boundary exists. If it doesn't, you have a diagram, not an architecture.
+
+**Cross-cutting policy lives in exactly one place.** There's a shared *gateway* that owns everything that must be true no matter where the bot runs: the DM-only guard, the error boundaries, update filtering. Every entrypoint on every platform goes through it. This is the piece that stops two deploy targets from slowly drifting into two different bots.
+
+And the payoff is that each adapter is almost embarrassingly small. Composition is the *only* thing it does:
+
+```ts
+// Target A: handlers/message.ts          // Target B: cf/worker.ts
+const { router } = createApp();           const app = createWorkerApp(env);
+const gateway = createGateway({ api, router });
+await gateway.handleMessage(msg);         await app.gateway.handleMessage(update.message);
+```
+
+## What this looks like on disk
+
+I find architecture posts frustrating when they stay abstract, so here's the actual tree. The whole design is visible in it — the core, one directory per deploy target, and nothing shared between targets except the core itself:
+
+```txt
+.
+├── lib/                    # domain core — zero platform imports
+│   ├── app.ts              #   factory: builds the router from injected deps
+│   ├── gateway.ts          #   cross-cutting policy: guards, error boundaries
+│   ├── commands.ts         #   command + conversation routing
+│   ├── check.ts            #   scan source, diff vs baselines, build alerts
+│   ├── watchlist.ts        #   WatchlistStore interface + subscription rules
+│   ├── source.ts           #   upstream schedule client (injected fetch)
+│   └── parse.ts            #   input parsing: queries, IDs, links
+├── handlers/               # Target A: Telegram Serverless adapter
+│   ├── message.ts          #   update entrypoints — compose deps,
+│   └── callback_query.ts   #   call the gateway, nothing else
+├── cf/                     # Target B: Cloudflare Workers adapter
+│   ├── worker.ts           #   webhook + cron entrypoint
+│   ├── app.ts              #   composition root
+│   ├── telegram.ts         #   minimal Bot API client
+│   ├── d1-store.ts         #   WatchlistStore on D1
+│   ├── migrations/         #   SQL mirror of schema.ts
+│   ├── cloudflare.d.ts     #   hand-written ambient runtime types
+│   └── set-webhook.ts      #   one-shot setup: setWebhook + setMyCommands
+├── schema.ts               # table definitions, shared by both stores
+└── tests/                  # domain tests against in-memory fakes
+```
+
+My favorite side effect of this layout: code review gets a rule so blunt it doesn't need judgment. Any pull request that adds a platform import under `lib/`, or an import between `handlers/` and `cf/`, is wrong *by construction*. You don't debate it. You point at the tree.
+
+## Following a message through the system
+
+Let's trace what happens when someone tells the bot to track a film.
+
+Telegram delivers updates to a webhook. Before anything interesting happens, the adapter has exactly two transport-level jobs: check that the request *actually came from Telegram*, and deserialize the update. Everything after that is core code that has no idea Cloudflare exists.
+
+<MermaidDiagram
+	caption="A command round-trip. Everything between the gateway and the store is host-agnostic."
+	code={`sequenceDiagram
+    autonumber
+    participant U as User
+    participant T as Telegram
+    participant A as Adapter (webhook)
+    participant G as Gateway
+    participant R as Router
+    participant S as Store
+
+    U->>T: /track <query>
+    T->>A: POST /webhook (update)
+    A->>A: verify secret token
+    A->>G: handleMessage(message)
+    G->>G: DM-only guard,<br/>error boundary
+    G->>R: dispatch command
+    R->>S: upsert subscription
+    S-->>R: ok
+    R-->>A: reply payload
+    A->>T: sendMessage
+    T->>U: confirmation`}
+/>
+
+The router handles slash commands *and* conversational flows — you can just message the bot a movie title, get back a list of matches, and tap one. Because the store and the API client are both injected, this exact router runs unmodified against a platform-managed database on one host, SQLite-over-HTTP on another, and in-memory fakes in the tests.
+
+That last one is the quiet superpower. The tests don't mock Telegram. They don't mock the database driver. They hand the core a fake store and a fake API client and assert on *behavior*. The tests were written once and survived a full platform migration without changing.
+
+## The part that actually sends notifications
+
+Okay. This is the piece that will — hopefully — get me my *Odyssey* tickets, so let's give it its due.
+
+The notification half is a scheduled job that runs the same injected core. And the single most important design decision in the whole bot lives here: **per-user, per-subscription baselines**.
+
+The bot records the latest state each user has already been alerted about. When the scan finds new showtimes, it compares them against *your* baseline — not a global one, not a config file, yours. And after it alerts you, it advances your baseline *in the same flow*.
+
+<MermaidDiagram
+	caption="Baseline advancement is what makes alerts idempotent — no manual state, no repeats."
+	code={`flowchart LR
+    C(["cron trigger<br/>*/15 * * * *"]) --> F["fetch upstream source"]
+    F --> D{"new items vs<br/>user's baseline?"}
+    D -- "no" --> Z(["done"])
+    D -- "yes" --> N["send alert<br/>to subscriber"]
+    N --> B["advance baseline<br/>for that user + subscription"]
+    B --> Z`}
+/>
+
+Why am I making such a big deal out of this? Because it's the part naive notification bots get wrong, and the failure mode is *awful*. If the "what have I already announced" state lives anywhere that needs manual updating, then every missed update means the bot spams you with the same alert until you fix it. A notification bot that cries wolf trains you to ignore it, and then it's worse than no bot at all.
+
+Owning the baseline in the store — keyed by user and subscription, advanced automatically — makes the whole pipeline idempotent. Re-running a scan is *always* safe. Nothing to babysit.
+
+One wrinkle worth knowing before you pick a platform: not every serverless host gives you a real scheduler. Update-driven platforms only run your code when a message arrives, so there your scan has to piggyback on interactions — a *soft schedule*. Hosts with cron triggers get the real `*/15 * * * *`. Here's the nice part: because the scan is core code with injected dependencies, both scheduling modes call the same function. The trigger is just another adapter detail.
+
+## One interface, two databases
+
+Storage is where dual-target setups usually rot. Two databases, two sets of semantics, and six months later a bug that only reproduces on one of them.
+
+The countermeasure is boring on purpose: a single store interface in the core, with its contracts pinned down precisely enough to test. The two that matter most here:
+
+- Upserting an existing subscription **preserves its baseline**. Re-tracking a film must never reset your alert state — otherwise `/track` twice means duplicate alerts, and we just talked about how that story ends.
+- Every read is scoped by user. There is no cross-user query surface to misuse.
+
+Both implementations are then deliberately dull. On Cloudflare that meant raw D1 prepared statements — no ORM — and a hand-written migration file that mirrors the schema module. (Yes, that means changing them together. They're two views of one truth, and the discipline is cheaper than the dependency.)
+
+Two small tricks kept the second target at *zero* new runtime dependencies:
+
+- **Hand-written ambient types** for the Workers runtime — a tiny `.d.ts` with just the bindings the bot uses — instead of `@cloudflare/workers-types`, which fights with `bun-types` globals when they share a tsconfig.
+- **wrangler's esbuild resolves tsconfig `paths`**, so the core's bare `lib/*` imports needed no rewriting for the new host.
+
+## Two things you'll hit no matter what
+
+Neither of these is architecture. Both cost me real time, and both are cheaper on day one.
+
+**Telegram never infers your command menu.** You know that autocomplete menu when you type `/`? It's built *exclusively* from an explicit `setMyCommands` API call. Your bot can answer every command perfectly and the menu will still be empty. The fix that stuck: register the menu in the same one-shot script that sets the webhook, so it re-asserts itself on every deploy and your command surface lives in code instead of in a half-remembered BotFather conversation.
+
+```ts
+// set-webhook.ts — one script, re-runnable, idempotent
+await api.setWebhook({ url, secret_token });
+await api.setMyCommands({ commands });
+```
+
+**Verify the webhook secret.** Your webhook is a public URL, and anyone can POST JSON at it. The `secret_token` you pass to `setWebhook` comes back on every real delivery as the `X-Telegram-Bot-Api-Secret-Token` header. Reject anything without it at the adapter edge, before a single byte reaches the core.
+
+## The plot twist that justified everything
+
+Remember the "no platform lock-in" constraint I said would get tested sooner than expected?
+
+The bot was originally built for [Telegram Serverless](https://core.telegram.org/bots/serverless) — Telegram's own hosting, where your handlers run on their infrastructure with a built-in database, for free. For a Telegram bot with a $0 constraint, it's the obvious first choice: the platform that delivers the messages also runs the code.
+
+The code was done. The tests passed. And then the enable switch in BotFather turned out to be part of a gradual rollout that simply… hadn't reached my account. No error, no waitlist position, no timeline. A finished bot with nowhere to run.
+
+That could have been a rewrite and a lost weekend. Instead it was an afternoon: one new adapter directory targeting Cloudflare Workers, a D1 implementation of the same store interface, and *zero changes to the core*. Better still, the replacement host has real cron triggers, so the bot actually got an upgrade out of its own eviction — a true every-15-minutes scan instead of a soft schedule.
+
+And the Telegram Serverless adapter? Still in the repo, fully working, waiting. When the rollout reaches my account, switching over — or running both — costs nothing. That's the whole point: targets are additions, never migrations.
+
+Dependency injection usually gets sold as a testing story. Nobody tells you it's a *shipping* story. The platform failed in a way I could never have predicted — not an API change, not pricing, but a settings toggle that didn't render for my account — and the boundary I'd drawn for hygiene turned out to be the escape hatch.
+
+The bot runs today, for free, checking every fifteen minutes. When the theater quietly adds an IMAX showing of *The Odyssey*, my phone buzzes before the seats are gone.
+
+I don't refresh the booking page anymore. That's the bot's job now — and unlike me, it doesn't get anxious about it.

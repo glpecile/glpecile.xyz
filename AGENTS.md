@@ -17,6 +17,7 @@ Project-specific guidance for working in this repo.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
 - Prefer shorter, clearer `.md` and `.mdx` filenames for content slugs. Avoid overly long post filenames when a concise slug like `srt-cli.mdx` would stay clear.
+- Keep content `title` frontmatter fully lowercase (terminal aesthetic), e.g. `building serverless telegram notification bots`, not `Building Serverless Telegram Notification Bots`.
 - Never use `any`. Prefer concrete types, `unknown`, or small typed helpers instead.
 - Prefer `async`/`await` over `.then()` chains.
 - Use kebab-case for component, layout, and route-related filenames. Avoid PascalCase filenames like `SiteLayout.astro` or `SectionLabel.astro`.

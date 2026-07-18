@@ -2,6 +2,7 @@
 import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
+import WorkTimeline from "@/components/work-timeline.astro";
 import { cvDownloadName } from "@/lib/cv";
 import { parseInlineLinks } from "@/lib/inline-links";
 
@@ -62,58 +63,7 @@ const cvFileName = cvDownloadName();
 		{work.length === 0 ? (
 			<p class="text-tone-soft text-sm">no work yet.</p>
 		) : (
-			<ol class="space-y-5">
-				{work.map((job) => (
-					<li class="space-y-1">
-						<p class="text-base leading-8 sm:text-lg">
-							<span class="text-foreground">{job.role}</span>
-							<span class="text-tone-faint"> @ </span>
-							{job.url ? (
-								<a
-									class="terminal-link"
-									href={job.url}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{job.company}
-								</a>
-							) : (
-								<span class="text-tone-strong">{job.company}</span>
-							)}
-						</p>
-						<p class="text-tone-soft text-sm leading-7 sm:text-base">
-							{job.period}
-						</p>
-						<p class="text-tone-soft text-sm leading-7 sm:text-base">
-							{job.place}
-						</p>
-						{job.highlights ? (
-							<ul class="space-y-1 pt-1">
-								{job.highlights.map((highlight) => (
-									<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
-										<span class="text-tone-faint">- </span>
-										{parseInlineLinks(highlight).map((segment) =>
-											segment.url ? (
-												<a class="terminal-link" href={segment.url}>
-													{segment.text}
-												</a>
-											) : (
-												segment.text
-											),
-										)}
-									</li>
-								))}
-							</ul>
-						) : (
-							job.summary && (
-								<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
-									{job.summary}
-								</p>
-							)
-						)}
-					</li>
-				))}
-			</ol>
+			<WorkTimeline work={work} detail="highlights" />
 		)}
 	</section>
 
