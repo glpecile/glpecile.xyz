@@ -68,6 +68,7 @@ type NavItem = {
 type ThemeItem = {
 	theme: "auto" | "light" | "dark";
 	shortcut: string;
+	icon: string;
 };
 
 const nav = [
@@ -92,14 +93,17 @@ const theme = [
 	{
 		theme: "auto",
 		shortcut: "a",
+		icon: "◐",
 	},
 	{
 		theme: "light",
 		shortcut: "l",
+		icon: "☼",
 	},
 	{
 		theme: "dark",
 		shortcut: "d",
+		icon: "☾",
 	},
 ] satisfies ThemeItem[];
 
