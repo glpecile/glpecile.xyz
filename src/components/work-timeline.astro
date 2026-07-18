@@ -1,0 +1,66 @@
+---
+import type { WorkExperience } from "#config/site";
+import { parseInlineLinks } from "@/lib/inline-links";
+
+export interface Props {
+	work: readonly WorkExperience[];
+	detail?: "summary" | "highlights";
+}
+
+const { work, detail = "summary" } = Astro.props;
+---
+
+<ol class="border-border relative border-l pl-6">
+	{work.map((job, index) => (
+		<li class="mb-8 last:mb-0">
+			<span class="absolute -left-1.5 flex h-3 w-3">
+				{index === 0 && (
+					<span class="bg-foreground absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
+				)}
+				<span class="bg-foreground relative inline-flex h-3 w-3 rounded-full" />
+			</span>
+			<time class="text-tone-faint text-sm">{job.period}</time>
+			<p class="mt-1 text-base leading-8 sm:text-lg">
+				<span class="text-foreground">{job.role}</span>
+				<span class="text-tone-faint"> @ </span>
+				{job.url ? (
+					<a
+						class="terminal-link"
+						href={job.url}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{job.company}
+					</a>
+				) : (
+					<span class="text-tone-strong">{job.company}</span>
+				)}
+			</p>
+			<p class="text-tone-soft text-sm leading-7 sm:text-base">{job.place}</p>
+			{detail === "highlights" && job.highlights ? (
+				<ul class="space-y-1 pt-1">
+					{job.highlights.map((highlight) => (
+						<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
+							<span class="text-tone-faint">- </span>
+							{parseInlineLinks(highlight).map((segment) =>
+								segment.url ? (
+									<a class="terminal-link" href={segment.url}>
+										{segment.text}
+									</a>
+								) : (
+									segment.text
+								),
+							)}
+						</li>
+					))}
+				</ul>
+			) : (
+				(job.summary ?? job.highlights?.[0]) && (
+					<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+						{job.summary ?? job.highlights?.[0]}
+					</p>
+				)
+			)}
+		</li>
+	))}
+</ol>
