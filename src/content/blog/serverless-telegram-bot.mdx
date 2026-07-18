@@ -1,5 +1,5 @@
 ---
-title: "Building serverless Telegram notification bots"
+title: "building serverless telegram notification bots"
 description: Every IMAX showing of The Odyssey was sold out, so instead of refreshing the booking page I built a bot — and accidentally learned how to make one that can survive its own hosting platform.
 pubDate: 2026-07-18
 authors: [glpecile, claude]
@@ -162,7 +162,7 @@ That last one is the quiet superpower. The tests don't mock Telegram. They don't
 
 ## The part that actually sends notifications
 
-Okay. This is the piece that got me my *Odyssey* tickets, so let's give it its due.
+Okay. This is the piece that will — hopefully — get me my *Odyssey* tickets, so let's give it its due.
 
 The notification half is a scheduled job that runs the same injected core. And the single most important design decision in the whole bot lives here: **per-user, per-subscription baselines**.
 
@@ -201,9 +201,9 @@ Two small tricks kept the second target at *zero* new runtime dependencies:
 - **Hand-written ambient types** for the Workers runtime — a tiny `.d.ts` with just the bindings the bot uses — instead of `@cloudflare/workers-types`, which fights with `bun-types` globals when they share a tsconfig.
 - **wrangler's esbuild resolves tsconfig `paths`**, so the core's bare `lib/*` imports needed no rewriting for the new host.
 
-## Three things you'll hit no matter what
+## Two things you'll hit no matter what
 
-None of these are architecture. All of them cost me real time, and all of them are cheaper on day one.
+Neither of these is architecture. Both cost me real time, and both are cheaper on day one.
 
 **Telegram never infers your command menu.** You know that autocomplete menu when you type `/`? It's built *exclusively* from an explicit `setMyCommands` API call. Your bot can answer every command perfectly and the menu will still be empty. The fix that stuck: register the menu in the same one-shot script that sets the webhook, so it re-asserts itself on every deploy and your command surface lives in code instead of in a half-remembered BotFather conversation.
 
@@ -215,8 +215,6 @@ await api.setMyCommands({ commands });
 
 **Verify the webhook secret.** Your webhook is a public URL, and anyone can POST JSON at it. The `secret_token` you pass to `setWebhook` comes back on every real delivery as the `X-Telegram-Bot-Api-Secret-Token` header. Reject anything without it at the adapter edge, before a single byte reaches the core.
 
-**Your shell history is not a secrets manager.** Bun auto-loads `.env`, `.env.local`, and `.env.[NODE_ENV]` for `bun run` — no dotenv package, no code changes. Real values go in a gitignored `.env.local`, placeholders in a committed `.env.template`, and the setup command collapses from `TOKEN=... URL=... SECRET=... bun run webhook` to `bun run webhook`. (Deploy-side secrets still belong in the platform's secret store.)
-
 ## The plot twist that justified everything
 
 Remember the "no platform lock-in" constraint I said would get tested sooner than expected?
@@ -225,7 +223,7 @@ The bot was originally built for [Telegram Serverless](https://core.telegram.org
 
 The code was done. The tests passed. And then the enable switch in BotFather turned out to be part of a gradual rollout that simply… hadn't reached my account. No error, no waitlist position, no timeline. A finished bot with nowhere to run.
 
-Under the old me, that's a rewrite and a lost weekend. Under this architecture, it was an afternoon: one new adapter directory targeting Cloudflare Workers, a D1 implementation of the same store interface, and *zero changes to the core*. Better still, the replacement host has real cron triggers, so the bot actually got an upgrade out of its own eviction — a true every-15-minutes scan instead of a soft schedule.
+That could have been a rewrite and a lost weekend. Instead it was an afternoon: one new adapter directory targeting Cloudflare Workers, a D1 implementation of the same store interface, and *zero changes to the core*. Better still, the replacement host has real cron triggers, so the bot actually got an upgrade out of its own eviction — a true every-15-minutes scan instead of a soft schedule.
 
 And the Telegram Serverless adapter? Still in the repo, fully working, waiting. When the rollout reaches my account, switching over — or running both — costs nothing. That's the whole point: targets are additions, never migrations.
 
