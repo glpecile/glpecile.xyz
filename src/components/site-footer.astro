@@ -39,8 +39,13 @@ const themeItems = siteConfig.shortcuts.theme;
 					>[{item.shortcut}]</span>
 					<span
 						aria-hidden="true"
-						class="inline-flex items-center justify-center text-lg leading-none"
-					>{item.icon}</span>
+						class:list={[
+							"inline-block h-[0.7em] w-[0.7em] rounded-full border border-current",
+							item.theme === "auto" &&
+								"bg-[linear-gradient(90deg,currentColor_50%,transparent_50%)]",
+							item.theme === "dark" && "bg-current",
+						]}
+					></span>
 				</button>
 			))}
 		</span>

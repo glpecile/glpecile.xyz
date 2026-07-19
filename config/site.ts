@@ -68,7 +68,6 @@ type NavItem = {
 type ThemeItem = {
 	theme: "auto" | "light" | "dark";
 	shortcut: string;
-	icon: string;
 };
 
 const nav = [
@@ -93,17 +92,14 @@ const theme = [
 	{
 		theme: "auto",
 		shortcut: "a",
-		icon: "◐",
 	},
 	{
 		theme: "light",
 		shortcut: "l",
-		icon: "☼",
 	},
 	{
 		theme: "dark",
 		shortcut: "d",
-		icon: "☾",
 	},
 ] satisfies ThemeItem[];
 
@@ -112,6 +108,20 @@ export const siteConfig = {
 	name: "glpecile's personal site",
 	shortName: "glpecile",
 	description: "Frontend engineer focused on design systems and high-craft product UI.",
+	keywords: [
+		"gian luca pecile",
+		"glpecile",
+		"frontend engineer",
+		"software engineer",
+		"design systems",
+		"react",
+		"react native",
+		"typescript",
+		"astro",
+		"product ui",
+		"web3",
+		"buenos aires",
+	],
 	emoji: "🧙",
 	backgroundColor: "#eff1f5",
 	themeColor: "#eff1f5",
