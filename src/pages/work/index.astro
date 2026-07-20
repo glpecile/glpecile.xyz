@@ -40,6 +40,8 @@ const cvFileName = cvDownloadName();
 			label="work"
 			title="Past work experience."
 			description="+ projects, skills, education & certificates."
+			prompt="history"
+			cwd="~/work"
 		/>
 
 		<div class="space-y-2" data-reveal>
@@ -67,8 +69,13 @@ const cvFileName = cvDownloadName();
 		)}
 	</section>
 
-	<section class="space-y-4" data-reveal>
-		<SectionLabel label="projects" />
+	<section data-reveal>
+		<div class="border-border relative border px-5 py-6 sm:px-6">
+			<SectionLabel
+				label="projects"
+				rule={false}
+				class="bg-background absolute -top-[0.55em] left-3 px-2 leading-none"
+			/>
 
 		{projects.length === 0 ? (
 			<p class="text-tone-soft text-sm">no projects yet.</p>
@@ -117,6 +124,7 @@ const cvFileName = cvDownloadName();
 				))}
 			</ol>
 		)}
+		</div>
 	</section>
 
 	<section class="space-y-4" data-reveal>

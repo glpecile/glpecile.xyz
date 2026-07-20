@@ -536,7 +536,27 @@
 		margin: 2rem 0;
 	}
 
+	/* Blinking block cursor for the home hero. Static under reduced motion. */
+	.tui-cursor {
+		animation: tui-cursor-blink 1.1s step-end infinite;
+	}
+
+	@keyframes tui-cursor-blink {
+		0%,
+		100% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
+		.tui-cursor {
+			animation: none;
+		}
+
 		.blog-back-link-icon,
 		.blog-prose .blog-heading-status {
 			transition: none;
@@ -637,4 +657,55 @@
 
 :root[data-theme="dark"] .map-frame .mapboxgl-ctrl-icon {
 	filter: invert(1);
+}
+
+/*
+	TUI row selection: reverse-video highlight with a `>` gutter cursor, like
+	a focused row in a terminal menu. Rows opt in with [data-tui-row]; the
+	layout script moves [data-tui-selected] with j/k and opens with enter.
+	Unlayered on purpose — like the map-frame overrides above — so the
+	inversion flattens Tailwind's tone/link color utilities on descendants.
+*/
+[data-tui-row] {
+	position: relative;
+}
+
+[data-tui-row][data-tui-selected],
+[data-tui-row]:focus-within {
+	background: hsl(var(--foreground));
+	color: hsl(var(--background));
+}
+
+[data-tui-row][data-tui-selected] :is(a, p, span, time, div),
+[data-tui-row]:focus-within :is(a, p, span, time, div) {
+	color: inherit;
+}
+
+[data-tui-row][data-tui-selected]::before,
+[data-tui-row]:focus-within::before {
+	color: hsl(var(--foreground));
+	content: ">";
+	position: absolute;
+	left: -1.6ch;
+	top: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	[data-tui-row]:hover {
+		background: hsl(var(--foreground));
+		color: hsl(var(--background));
+		cursor: pointer;
+	}
+
+	[data-tui-row]:hover :is(a, p, span, time, div) {
+		color: inherit;
+	}
+
+	[data-tui-row]:hover::before {
+		color: hsl(var(--foreground));
+		content: ">";
+		position: absolute;
+		left: -1.6ch;
+		top: 0;
+	}
 }

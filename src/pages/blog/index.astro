@@ -11,6 +11,7 @@ const latestPostRange = `1-${latestPostCount}`;
 const recentPostUrls = posts
 	.slice(0, latestPostCount)
 	.map((post) => getBlogPostUrl(post.id));
+const introExtra = `use <span class="text-tone-mid">[${latestPostRange}]</span> for the latest posts · <span class="text-tone-mid">[j]/[k]</span> to move · <span class="text-tone-mid">[enter]</span> to open.<span class="mt-2 block">or subscribe via the <a class="terminal-link" href="/blog/rss.xml">rss feed</a>.</span>`;
 ---
 
 <SiteLayout
@@ -24,6 +25,9 @@ const recentPostUrls = posts
 			label="blog"
 			title="Notes, builds, and rabbit holes."
 			description="From tiny thoughts to full project writeups. Every post is just an mdx file — the latest nine get a keyboard shortcut."
+			extra={posts.length > 0 ? introExtra : undefined}
+			prompt="ls *.mdx"
+			cwd="~/blog"
 		/>
 
 		{posts.length === 0 ? (
@@ -31,12 +35,15 @@ const recentPostUrls = posts
 		) : (
 			<ol class="space-y-5" data-reveal>
 				{posts.map((post, index) => (
-					<li class="space-y-1">
+					<li data-tui-row class="group space-y-1">
 						<p class="text-tone-faint text-xs tracking-[0.28em] uppercase">
 							{formatDate(post.data.updatedDate ?? post.data.pubDate)}
 						</p>
 						<p class="text-base leading-8 sm:text-lg">
-							<a class="terminal-link" href={getBlogPostUrl(post.id)}>
+							<a
+								class="terminal-link group-hover:underline"
+								href={getBlogPostUrl(post.id)}
+							>
 								{post.data.title}
 							</a>
 							{index < latestPostCount && (
@@ -51,16 +58,6 @@ const recentPostUrls = posts
 			</ol>
 		)}
 
-		{posts.length > 0 && (
-			<div class="text-tone-soft space-y-1 text-sm" data-reveal>
-				<p>
-					use <span class="text-tone-mid">[{latestPostRange}]</span> for the latest posts.
-				</p>
-				<p>
-					or subscribe via the <a class="terminal-link" href="/blog/rss.xml">rss feed</a>.
-				</p>
-			</div>
-		)}
 	</section>
 
 	<script

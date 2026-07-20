@@ -34,7 +34,7 @@ const navShortcutCopy = siteConfig.shortcuts.nav
 			`<span class="text-tone-mid">[${item.shortcut}] ${item.title.toLowerCase()}</span>`,
 	)
 	.join('<span class="text-tone-faint"> / </span>');
-const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">are you an agent? start with <a class="terminal-link" href="/llms.txt">/llms.txt</a>.</span>`;
+const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">move with <span class="text-tone-mid">[j]/[k]</span>, open with <span class="text-tone-mid">[enter]</span>.</span><span class="mt-2 block">are you an agent? start with <a class="terminal-link" href="/llms.txt">/llms.txt</a>.</span>`;
 ---
 
 <SiteLayout>
@@ -43,6 +43,8 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		title="Software / Frontend Engineer."
 		description="I don't build everything. I just build what I build."
 		extra={introExtra}
+		prompt="whoami"
+		cursor
 	/>
 
 	<section class="space-y-4" data-reveal>
@@ -53,12 +55,15 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 		) : (
 			<ol class="space-y-4">
 				{latestPosts.map((post) => (
-					<li class="grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-5">
+					<li data-tui-row class="group grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-5">
 						<p class="text-tone-faint text-sm leading-7 sm:text-base">
 							{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
 						</p>
 						<p class="text-base leading-8 sm:text-lg">
-							<a class="terminal-link" href={getBlogPostUrl(post.id)}>
+							<a
+								class="terminal-link group-hover:underline"
+								href={getBlogPostUrl(post.id)}
+							>
 								{post.data.title}
 							</a>
 						</p>
@@ -99,15 +104,17 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 	<section class="space-y-3" data-reveal>
 		<SectionLabel label="socials" />
 		<ul class="space-y-2 text-sm sm:text-base">
-			{socialLinks.map(([label, href]) => (
-				<li>
+			{socialLinks.map(([label, href], index) => (
+				<li data-tui-row class="group">
 					<a
 						href={href}
 						target="_blank"
 						rel="noopener noreferrer"
-					class="terminal-link inline-flex items-center gap-3"
+					class="terminal-link inline-flex items-center gap-2 group-hover:underline"
 				>
-						<span class="text-tone-faint">-</span>
+						<span class="text-tone-faint" aria-hidden="true">
+							{index === socialLinks.length - 1 ? "└──" : "├──"}
+						</span>
 						<span class="capitalize">{label}</span>
 					</a>
 				</li>
