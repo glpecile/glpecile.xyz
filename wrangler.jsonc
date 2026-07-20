@@ -13,5 +13,11 @@
   "assets": {
     "binding": "ASSETS",
     "directory": "dist"
-  }
+  },
+  // Astro sessions: the Cloudflare adapter auto-enables KV-backed sessions for
+  // SSR routes (e.g. /api/films.json) and binds `SESSION`. Pin the existing
+  // namespace so wrangler uses it instead of trying to re-provision on deploy.
+  "kv_namespaces": [
+    { "binding": "SESSION", "id": "4df5b82cb1544ae99cc67b1c49beda14" }
+  ]
 }
