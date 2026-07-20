@@ -1,5 +1,7 @@
 import { Buffer } from "node:buffer";
 
+import type { LetterboxdFilm } from "@/lib/letterboxd";
+
 // Smallest resized poster variant Letterboxd's CDN serves; other
 // arbitrary sizes are rejected with a 403.
 const TINY_POSTER_SIZE = "0-35-0-52";
@@ -48,3 +50,20 @@ export const getBlurPlaceholder = (url: string): Promise<string | null> => {
 	}
 	return placeholder;
 };
+
+export type FilmWithBlur = LetterboxdFilm & { blur?: string | null };
+
+/**
+ * Attaches an inline blur placeholder to each film so the client island can
+ * paint the exact same poster (same src, same soft preview) the build-time
+ * render produced. Keeps hydration flash-free without an image-processing step.
+ */
+export const withBlurPlaceholders = async (
+	films: LetterboxdFilm[],
+): Promise<FilmWithBlur[]> =>
+	Promise.all(
+		films.map(async (film) => ({
+			...film,
+			blur: film.image ? await getBlurPlaceholder(film.image) : null,
+		})),
+	);

@@ -1,11 +1,12 @@
 ---
-import FilmList from "@/components/film-list.astro";
+import FilmListLoader from "@/components/film-list";
 import MoreLink from "@/components/more-link.astro";
 import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import WorkTimeline from "@/components/work-timeline.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
+import { withBlurPlaceholders } from "@/lib/blur";
 import { getLetterboxdFilms } from "@/lib/letterboxd";
 
 import { siteConfig } from "#config/site";
@@ -18,9 +19,11 @@ const work: readonly WorkExperience[] = siteConfig.work;
 const featuredWork = work.slice(0, 3);
 const hasMoreWork = work.length > featuredWork.length;
 
-let latestFilms: Awaited<ReturnType<typeof getLetterboxdFilms>> = [];
+let latestFilms: Awaited<ReturnType<typeof withBlurPlaceholders>> = [];
 try {
-	latestFilms = await getLetterboxdFilms("Glp", { limit: 4 });
+	latestFilms = await withBlurPlaceholders(
+		await getLetterboxdFilms("Glp", { limit: 4 }),
+	);
 } catch {
 	// Fail silently: the section will render an empty state.
 }
@@ -88,11 +91,7 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">ar
 			{" "}for the rest.
 		</p>
 
-		{latestFilms.length === 0 ? (
-			<p class="text-tone-soft text-sm">no films yet.</p>
-		) : (
-			<FilmList films={latestFilms} />
-		)}
+		<FilmListLoader client:load limit={4} layout="grid" films={latestFilms} />
 
 		<MoreLink href="/films" />
 	</section>

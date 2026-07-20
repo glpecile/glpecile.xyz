@@ -18,6 +18,21 @@ type GetLetterboxdFilmsOptions = {
 	limit?: number;
 };
 
+type CfFetchInit = RequestInit & {
+	cf?: { cacheTtl?: number; cacheEverything?: boolean };
+};
+
+const EDGE_CACHE_TTL = 3600;
+
+const edgeFetch = (url: string, init: CfFetchInit = {}) => {
+	const merged: CfFetchInit = {
+		...init,
+		cf: { cacheTtl: EDGE_CACHE_TTL, cacheEverything: true, ...init.cf },
+	};
+
+	return fetch(url, merged);
+};
+
 const decodeHtmlEntities = (text: string): string =>
 	text
 		.replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
@@ -40,7 +55,7 @@ const extractCdata = (xml: string, tag: string): string | null => {
 
 const getEntryTags = async (url: string): Promise<LetterboxdTag[]> => {
 	try {
-		const response = await fetch(url);
+		const response = await edgeFetch(url);
 		if (!response.ok) return [];
 
 		const html = await response.text();
@@ -63,7 +78,7 @@ export async function getLetterboxdFilms(
 	{ includeTags = false, limit }: GetLetterboxdFilmsOptions = {},
 ): Promise<LetterboxdFilm[]> {
 	const rssUrl = `https://letterboxd.com/${username}/rss/`;
-	const response = await fetch(rssUrl, {
+	const response = await edgeFetch(rssUrl, {
 		headers: {
 			Accept: "application/rss+xml, application/xml, text/xml",
 		},

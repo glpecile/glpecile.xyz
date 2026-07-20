@@ -1,14 +1,17 @@
 ---
-import FilmList from "@/components/film-list.astro";
+import FilmListLoader from "@/components/film-list";
 import PageIntro from "@/components/page-intro.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
+import { withBlurPlaceholders } from "@/lib/blur";
 import { getLetterboxdFilms } from "@/lib/letterboxd";
 
 import { siteConfig } from "#config/site";
 
-let films: Awaited<ReturnType<typeof getLetterboxdFilms>> = [];
+let films: Awaited<ReturnType<typeof withBlurPlaceholders>> = [];
 try {
-	films = await getLetterboxdFilms("Glp", { includeTags: true });
+	films = await withBlurPlaceholders(
+		await getLetterboxdFilms("Glp", { includeTags: true }),
+	);
 } catch {
 	// Fail silently: the section will render an empty state.
 }
@@ -40,11 +43,7 @@ try {
 	</section>
 
 	<section class="space-y-4" data-reveal>
-		{films.length === 0 ? (
-			<p class="text-tone-soft text-sm">no films yet.</p>
-		) : (
-			<FilmList films={films} layout="timeline" />
-		)}
+		<FilmListLoader client:load layout="timeline" tags films={films} />
 	</section>
 
 	<section class="space-y-3" data-reveal>
