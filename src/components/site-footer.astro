@@ -1,15 +1,23 @@
 ---
 import { siteConfig } from "#config/site";
 
+export interface Props {
+	currentPath: string;
+}
+
+const { currentPath } = Astro.props;
 const themeItems = siteConfig.shortcuts.theme;
+
+// Render the current path like a shell cwd: `~` at home, `~/blog` elsewhere.
+const termPath =
+	currentPath === "/" ? "~" : `~${currentPath.replace(/\/+$/, "")}`;
 ---
 
-<footer class="text-tone-soft pt-12 text-sm">
-	<p class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-		<span class="inline-flex items-center gap-2">
-			<svg viewBox="0 0 16 16" aria-hidden="true" class="text-tone-mid h-4 w-4 fill-current">
-				<path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
-			</svg>
+<footer class="text-tone-soft bg-background sticky bottom-0 z-10 -mx-6 mt-12 text-sm sm:-mx-8">
+	<div class="border-border mx-6 border-t sm:mx-8">
+		<p class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2">
+		<span class="inline-flex items-center gap-4">
+			<span class="text-tone-faint">{termPath}</span>
 			<a
 				class="terminal-link text-tone-mid"
 				href={`${siteConfig.links.github}/glpecile.xyz`}
@@ -49,7 +57,8 @@ const themeItems = siteConfig.shortcuts.theme;
 				</button>
 			))}
 		</span>
-	</p>
+		</p>
+	</div>
 </footer>
 
 <script is:inline>

@@ -1,10 +1,16 @@
 ---
 export interface Props {
 	label: string;
+	/** Append a hairline rule that fills the remaining width, like a TUI panel separator. */
+	rule?: boolean;
+	class?: string;
 	[key: string]: unknown;
 }
 
-const { label, ...rest } = Astro.props;
+const { label, rule = true, class: className, ...rest } = Astro.props;
 ---
 
-<p class="section-label" {...rest}>* {label}</p>
+<p class:list={["section-label", rule && "flex items-center gap-3", className]} {...rest}>
+	<span class="shrink-0">* {label}</span>
+	{rule && <span aria-hidden="true" class="bg-border h-px flex-1"></span>}
+</p>
