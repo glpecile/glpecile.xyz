@@ -18,10 +18,18 @@ type Layout = "grid" | "timeline";
 
 type FilmsResponse = { films: LetterboxdFilm[] };
 
+// `watchedDate` is date-only (`YYYY-MM-DD`). `new Date(str)` parses that as
+// UTC midnight, which shifts the rendered day in negative-UTC timezones and
+// breaks SSR/client hydration when the two disagree. Parse as a local
+// calendar date so both sides always render the same day.
+const parseLocalDate = (dateStr: string) => {
+	const [year = 0, month = 1, day = 1] = dateStr.split("-").map(Number);
+	return new Date(year, month - 1, day);
+};
+
 const formatDate = (dateStr: string | null) => {
 	if (!dateStr) return "";
-	const date = new Date(dateStr);
-	return date.toLocaleDateString("en-US", {
+	return parseLocalDate(dateStr).toLocaleDateString("en-US", {
 		month: "short",
 		day: "numeric",
 		year: "numeric",
@@ -30,14 +38,13 @@ const formatDate = (dateStr: string | null) => {
 
 const getMonthKey = (dateStr: string | null) => {
 	if (!dateStr) return "unknown";
-	const date = new Date(dateStr);
+	const date = parseLocalDate(dateStr);
 	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 };
 
 const getMonthLabel = (dateStr: string | null) => {
 	if (!dateStr) return "";
-	const date = new Date(dateStr);
-	return date.toLocaleDateString("en-US", {
+	return parseLocalDate(dateStr).toLocaleDateString("en-US", {
 		month: "long",
 		year: "numeric",
 	});
@@ -68,6 +75,8 @@ const groupFilmsByMonth = <T extends LetterboxdFilm>(filmList: T[]) => {
 // by the same inline blur. Matching the `src` lets the browser reuse the loaded
 // image when the island hydrates, so there is no reload flash. (The runtime
 // `/_image` optimizer 404s on this prerendered site, so raw URLs are required.)
+// The 1px frame makes each poster read like a TUI pane; the grid brightens it
+// on hover like a focused one.
 const Poster = ({
 	film,
 	className,
@@ -82,7 +91,7 @@ const Poster = ({
 		height={450}
 		loading="lazy"
 		style={film.blur ? { backgroundImage: `url(${film.blur})` } : undefined}
-		className={`bg-muted aspect-[2/3] bg-cover bg-center object-cover ${className}`}
+		className={`bg-muted border-border aspect-[2/3] border bg-cover bg-center object-cover ${className}`}
 	/>
 );
 
@@ -96,13 +105,16 @@ const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 					rel="noopener noreferrer"
 					className="group block"
 				>
-					{film.image ? (
-						<Poster film={film} className="w-full" />
-					) : (
-						<div className="bg-muted aspect-[2/3] w-full p-3">
-							<p className="text-tone-mid text-sm leading-relaxed">{film.title}</p>
-						</div>
-					)}
+				{film.image ? (
+					<Poster
+						film={film}
+						className="group-hover:border-tone-mid w-full transition-colors duration-150 motion-reduce:transition-none"
+					/>
+				) : (
+					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full border p-3 transition-colors duration-150 motion-reduce:transition-none">
+						<p className="text-tone-mid text-sm leading-relaxed">{film.title}</p>
+					</div>
+				)}
 					<p className="mt-2 text-sm leading-snug">
 						<span className="text-foreground group-hover:underline group-focus-visible:underline">
 							{film.title}
