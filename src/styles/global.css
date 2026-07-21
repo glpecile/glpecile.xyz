@@ -660,11 +660,11 @@
 }
 
 /*
-	TUI row selection: reverse-video highlight with a `>` gutter cursor, like
-	a focused row in a terminal menu. Rows opt in with [data-tui-row]; the
-	layout script moves [data-tui-selected] with j/k and opens with enter.
-	Unlayered on purpose — like the map-frame overrides above — so the
-	inversion flattens Tailwind's tone/link color utilities on descendants.
+	TUI row selection: subtle surface highlight with a `>` gutter cursor,
+	opencode-TUI style — no reverse video, descendant tone/link colors are
+	preserved so the row just steps one shade up from the page background.
+	Rows opt in with [data-tui-row]; the layout script moves
+	[data-tui-selected] with j/k and opens with enter.
 */
 [data-tui-row] {
 	position: relative;
@@ -672,13 +672,7 @@
 
 [data-tui-row][data-tui-selected],
 [data-tui-row]:focus-within {
-	background: hsl(var(--foreground));
-	color: hsl(var(--background));
-}
-
-[data-tui-row][data-tui-selected] :is(a, p, span, time, div),
-[data-tui-row]:focus-within :is(a, p, span, time, div) {
-	color: inherit;
+	background: hsl(var(--muted));
 }
 
 [data-tui-row][data-tui-selected]::before,
@@ -692,13 +686,8 @@
 
 @media (hover: hover) and (pointer: fine) {
 	[data-tui-row]:hover {
-		background: hsl(var(--foreground));
-		color: hsl(var(--background));
+		background: hsl(var(--muted));
 		cursor: pointer;
-	}
-
-	[data-tui-row]:hover :is(a, p, span, time, div) {
-		color: inherit;
 	}
 
 	[data-tui-row]:hover::before {
