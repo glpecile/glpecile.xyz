@@ -10,11 +10,9 @@ export interface Props {
 	prompt?: string;
 	/** Working directory shown in the prompt, e.g. `~/blog`. Defaults to `~`. */
 	cwd?: string;
-	/** Append a blinking block cursor to the title, like a shell awaiting input. */
-	cursor?: boolean;
 }
 
-const { label, title, description, extra, prompt, cwd = "~", cursor = false } = Astro.props;
+const { label, title, description, extra, prompt, cwd = "~" } = Astro.props;
 ---
 
 <section class="space-y-4">
@@ -29,9 +27,7 @@ const { label, title, description, extra, prompt, cwd = "~", cursor = false } = 
 		class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl"
 		data-reveal
 	>
-		{title}{cursor && (
-			<span aria-hidden="true" class="tui-cursor">▊</span>
-		)}
+		{title}
 	</h1>
 	{description && (
 		<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base" data-reveal>

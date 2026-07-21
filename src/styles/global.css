@@ -536,27 +536,7 @@
 		margin: 2rem 0;
 	}
 
-	/* Blinking block cursor for the home hero. Static under reduced motion. */
-	.tui-cursor {
-		animation: tui-cursor-blink 1.1s step-end infinite;
-	}
-
-	@keyframes tui-cursor-blink {
-		0%,
-		100% {
-			opacity: 1;
-		}
-
-		50% {
-			opacity: 0;
-		}
-	}
-
 	@media (prefers-reduced-motion: reduce) {
-		.tui-cursor {
-			animation: none;
-		}
-
 		.blog-back-link-icon,
 		.blog-prose .blog-heading-status {
 			transition: none;
