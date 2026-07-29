@@ -3,8 +3,8 @@ import { PDFDocument, PDFName, PDFString, rgb } from "pdf-lib";
 import type { PDFFont, PDFPage } from "pdf-lib";
 import type { APIRoute } from "astro";
 
-import geistMonoBoldDataUrl from "@fontsource/geist-mono/files/geist-mono-latin-700-normal.woff?inline";
-import geistMonoRegularDataUrl from "@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff?inline";
+import jetBrainsMonoBoldDataUrl from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff?inline";
+import jetBrainsMonoRegularDataUrl from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff?inline";
 
 import { cvDownloadName } from "@/lib/cv";
 import { flattenInlineLinks } from "@/lib/inline-links";
@@ -458,10 +458,17 @@ function buildInlineGridBlock(ctx: Ctx, rows: CvInlineRow[]): Block {
 	const valueLineGroups = rows.map((row) =>
 		wrapText(ctx.regular, row.value, layout.entryMetaSize, valueWidth),
 	);
+	// Labels wrap too, so a long category never bleeds into the value column.
+	const labelLineGroups = rows.map((row) =>
+		wrapText(ctx.bold, row.label, layout.entryMetaSize, layout.inlineLabelWidth),
+	);
+
+	const cellLines = (index: number) =>
+		Math.max(labelLineGroups[index]?.length ?? 0, valueLineGroups[index]?.length ?? 0);
 
 	const pairHeight = (index: number) => {
-		const leftLines = valueLineGroups[index]?.length ?? 1;
-		const rightLines = valueLineGroups[index + 1]?.length ?? 0;
+		const leftLines = cellLines(index) || 1;
+		const rightLines = index + 1 < rows.length ? cellLines(index + 1) : 0;
 		return Math.max(leftLines, rightLines) * lineBox(layout.entryMetaSize, layout.entryMetaLineHeight) + layout.inlineRowGap;
 	};
 
@@ -474,19 +481,27 @@ function buildInlineGridBlock(ctx: Ctx, rows: CvInlineRow[]): Block {
 		let y = top;
 
 		for (let index = 0; index < rows.length; index += 2) {
-			const drawCell = (row: CvInlineRow | undefined, lines: string[] | undefined, cellX: number) => {
+			const drawCell = (
+				row: CvInlineRow | undefined,
+				lines: string[] | undefined,
+				labelLines: string[] | undefined,
+				cellX: number,
+			) => {
 				if (!row) {
 					return;
 				}
 
-				const labelBaseline = y - layout.entryMetaSize * layout.baselineFactor;
-				page.drawText(row.label, {
-					x: cellX,
-					y: labelBaseline,
-					size: layout.entryMetaSize,
-					font: ctx.bold,
-					color: colors.foreground,
-				});
+				let labelY = y;
+				for (const line of labelLines ?? [row.label]) {
+					page.drawText(line, {
+						x: cellX,
+						y: labelY - layout.entryMetaSize * layout.baselineFactor,
+						size: layout.entryMetaSize,
+						font: ctx.bold,
+						color: colors.foreground,
+					});
+					labelY -= lineBox(layout.entryMetaSize, layout.entryMetaLineHeight);
+				}
 
 				let lineY = y;
 				for (const line of lines ?? [row.value]) {
@@ -501,8 +516,8 @@ function buildInlineGridBlock(ctx: Ctx, rows: CvInlineRow[]): Block {
 				}
 			};
 
-			drawCell(rows[index], valueLineGroups[index], x0);
-			drawCell(rows[index + 1], valueLineGroups[index + 1], x0 + cellWidth);
+			drawCell(rows[index], valueLineGroups[index], labelLineGroups[index], x0);
+			drawCell(rows[index + 1], valueLineGroups[index + 1], labelLineGroups[index + 1], x0 + cellWidth);
 
 			y -= pairHeight(index);
 		}
@@ -583,8 +598,8 @@ export const GET: APIRoute = async () => {
 
 	const ctx: Ctx = {
 		pdf,
-		regular: await pdf.embedFont(decodeDataUrl(geistMonoRegularDataUrl), { subset: true }),
-		bold: await pdf.embedFont(decodeDataUrl(geistMonoBoldDataUrl), { subset: true }),
+		regular: await pdf.embedFont(decodeDataUrl(jetBrainsMonoRegularDataUrl), { subset: true }),
+		bold: await pdf.embedFont(decodeDataUrl(jetBrainsMonoBoldDataUrl), { subset: true }),
 	};
 
 	const pages = paginate(buildBlocks(ctx));
