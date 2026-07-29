@@ -1,4 +1,6 @@
 ---
+import jetBrainsMonoRegularUrl from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url";
+
 import meAvatar from "@/assets/me-avatar.webp?inline";
 import SiteFooter from "@/components/site-footer.astro";
 import SiteNav from "@/components/site-nav.astro";
@@ -117,11 +119,12 @@ const jsonLd = {
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 		<link rel="apple-touch-icon" href="/apple-icon.png" />
 		<link rel="manifest" href="/manifest.webmanifest" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 		<link
-			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap"
-			rel="stylesheet"
+			rel="preload"
+			href={jetBrainsMonoRegularUrl}
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
 		/>
 		<script is:inline>
 			(() => {
