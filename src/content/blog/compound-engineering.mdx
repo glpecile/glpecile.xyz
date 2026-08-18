@@ -1,0 +1,247 @@
+---
+title: "shinobu: a media tracking harness built on compound engineering"
+description: Shinobu logs what you watch to every tracker you use, all at once. When its main provider put third-party apps behind a paywall, swapping it out took a weekend — because everything the project had learned was already written down.
+pubDate: 2026-08-13
+draft: false
+authors: [glpecile, claude]
+---
+
+import { Image } from "astro:assets";
+import { DemoFrame } from "@/components/compound/demo-frame";
+import { SolutionsExplorer } from "@/components/compound/solutions-explorer";
+import { FanOutDemo } from "@/components/compound/fan-out-demo";
+import { RugpullTimeline } from "@/components/compound/rugpull-timeline";
+import webHome from "@/assets/images/shinobu/web-home.webp";
+import androidHome from "@/assets/images/shinobu/android-home.webp";
+import androidTrackers from "@/assets/images/shinobu/android-trackers.webp";
+
+Media tracking is fragmented. If you watch movies, series, *and* anime,
+your history is probably split across several services:
+[Letterboxd](https://letterboxd.com) for films,
+[Serializd](https://www.serializd.com), [Trakt](https://trakt.tv), or
+[Simkl](https://simkl.com) for TV, [AniList](https://anilist.co) for
+anime. Each has its own
+community and its own strengths, and none of them covers everything. So you
+either commit to one service and lose the others, or you keep several and
+log everything more than once. I was doing the second one, and it's exactly
+as tedious as it sounds.
+
+[Shinobu](https://github.com/glpecile/shinobu) is my answer: a harness
+over the trackers rather than yet another tracker. It's a single Expo
+codebase that runs on the web, iOS, and Android — I use it daily on my
+Android phone and in the browser, at
+[shinobu.glpecile.xyz](https://shinobu.glpecile.xyz/) — and hopefully
+coming soon to TestFlight.
+
+<DemoFrame label="shinobu.glpecile.xyz · the web app, signed out">
+	<Image
+		src={webHome}
+		alt="Shinobu's landing screen: 'One log. Every tracker.' surrounded by the provider logos, with a Connect your trackers button"
+		class="m-0 block w-full"
+		loading="eager"
+	/>
+</DemoFrame>
+
+Day to day it looks like any tracker: an **Up Next** feed with the next
+unwatched episode of each show you follow (an episode only appears once it
+has actually aired in your timezone), a **calendar** of upcoming releases,
+and a **diary** of everything you've logged. The difference is where the
+data lives. Shinobu has no account system, no backend, and no database —
+every one of those screens is aggregated live from the trackers you've
+connected, and every log is written back out to them.
+
+Connecting is per-provider and opt-in. You link any subset of Simkl,
+Trakt, AniList, Letterboxd, and Serializd through each provider's own
+login, and the provider's token *is* the session — there's nothing else to
+sign into:
+
+<DemoFrame label="shinobu on Android · the home feed, and the connected trackers">
+	<div className="flex gap-4 p-4">
+		<Image
+			src={androidHome}
+			alt="Shinobu's home feed on Android: a Continue Watching row with the next episode of each show, and a This Week strip with two releases airing tomorrow, stamped with their local air times"
+			class="m-0 block min-w-0 flex-1"
+			loading="lazy"
+		/>
+		<Image
+			src={androidTrackers}
+			alt="Shinobu's Manage Trackers screen on Android: AniList, Letterboxd, Serializd, and Simkl connected under their own accounts, with Trakt listed as not connected"
+			class="m-0 block min-w-0 flex-1"
+			loading="lazy"
+		/>
+	</div>
+</DemoFrame>
+
+When you log something, Shinobu writes it to every connected provider that
+handles that kind of media, and the routing isn't one-to-one, because the
+providers aren't symmetric.
+Letterboxd only does film, Serializd only does TV, AniList lives entirely
+in anime and manga. Try it:
+
+<FanOutDemo client:only="react" />
+
+Two details of this design matter for the rest of the story. First, all of
+those routing rules live in
+[one small, tested module](https://github.com/glpecile/shinobu/blob/main/src/lib/providers/routing.ts)
+— the rest of the app just asks it where a log should go, so no screen
+anywhere has its own opinion about which tracker handles what. Second,
+failure stays visible: if
+[Letterboxd is down](https://variety.com/2026/film/news/letterboxd-down-users-locked-out-accounts-1236830887/)
+while the other four writes succeed, Shinobu tells you Letterboxd failed and hands you a link to log
+the film there yourself, instead of pretending everything worked. The whole
+design assumes any provider can be missing at any moment.
+
+That assumption was made for resilience — networks fail, tokens expire. It
+ended up mattering for a very different reason.
+
+## Compound engineering
+
+The other unusual thing about Shinobu is how it's built: most of its code
+is written by AI agents. Early on, I ran into the phrase "compound
+engineering" in a [Ben Awad video](https://www.youtube.com/watch?v=Jxq0CQk2rb0)
+and followed it to [Every's guide](https://every.to/guides/compound-engineering)
+by Kieran Klaassen. The whole idea fits in one sentence:
+
+> Each unit of engineering work should make subsequent units easier — not
+> harder.
+
+The version of this I practice is mostly about writing things down. Models
+remember a lot these days, but that memory belongs to a session, a tool, or
+a vendor. A project outlives all three: work happens across hundreds of
+sessions, in different tools, on whatever model is best this month. The
+memory that compounds is the memory that lives in the repo — versioned,
+greppable, readable by every future contributor regardless of what's
+running it.
+
+In Shinobu that memory has three parts:
+
+- [`docs/plans/`](https://github.com/glpecile/shinobu/tree/main/docs/plans)
+  — numbered blueprints, written *before* building.
+- [`docs/solutions/`](https://github.com/glpecile/shinobu/tree/main/docs/solutions)
+  — one file per solved bug or non-obvious finding.
+- [`AGENTS.md`](https://github.com/glpecile/shinobu/blob/main/AGENTS.md) —
+  the conventions file every session loads, which cites those solution
+  files as the evidence behind its rules.
+
+Two habits hold it together. Fixes get written up the same day they land,
+because by tomorrow the details are gone. And every new plan starts with a
+search through the solutions folder — even a search that finds nothing gets
+noted, so nobody has to wonder later whether anyone looked. One naming
+convention does a surprising amount of work: the title of a doc is a claim,
+not a topic. Not
+`season-mapping-notes.md`, but "ani.zip's seasons are TVDB's, and the
+trackers' usually aren't." When titles state findings, a plain text search
+returns lessons instead of homework.
+
+Here's the actual folder — eighty files as of August 10th, 2026,
+accumulated over five and a half weeks of ordinary work:
+
+<SolutionsExplorer client:only="react" />
+
+This post is about the week that folder paid for itself.
+
+## When a provider plays dirty
+
+Even with that symmetric design, Shinobu had a de facto favorite. It was
+built Trakt-first —
+[plans 0006 through 0010](https://github.com/glpecile/shinobu/tree/main/docs/plans)
+are all Trakt: OAuth, search, seasons, watch progress. Trakt was the spine that the Up Next feed, the
+calendar, and TV tracking leaned on.
+
+The first sign of trouble came in June 2026, when Trakt shipped breaking
+API changes: images removed from responses, pagination made mandatory,
+endpoints drifting from their own published docs. Annoying, but absorbable
+— the kind of thing you document and move past.
+
+Then, effective the week of July 22nd, 2026, the real change: free Trakt
+accounts were capped at **one connected community app**. Connecting a
+second app now requires VIP at $60/year — after VIP prices had already
+risen 100–300% the year before. Overnight, every third-party app built on
+Trakt's public API became something its users might have to pay Trakt to
+keep using. r/trakt filled with people
+[discovering the hard way that only one of their apps still worked](https://www.reddit.com/r/trakt/comments/1veosz1/1_app/),
+and with
+[developers whose API tokens were simply deleted](https://www.reddit.com/r/trakt/comments/1vb2gyc/api_deleted_vip_required_to_be_a_developer_now/)
+until they, too, went VIP.
+
+I want to be fair about this. Charging for an API is legitimate.
+Infrastructure costs money, and $60 a year is not an outrageous number by
+itself. If the change had been announced well ahead of time, priced at
+developers instead of end users, or grandfathered existing connections, I
+suspect most people would have grumbled and paid. Goodwill is a real
+currency, and plenty of services keep loyal, paying users through honest
+communication alone.
+
+But that's not what happened. The cap landed on users of free apps,
+retroactively, on top of a price hike and a summer of unannounced breaking
+changes. And a move like that rests on a single assumption: that you're
+hard to replace.
+
+Trakt wasn't. On July 31st, 2026 came the decision: full detachment. Simkl
+— free API, real OAuth, write parity — becomes the tracking spine. Trakt
+stays supported, but demoted to bring-your-own-everything: the app ships no
+Trakt credentials at all, and the provider activates only if a user
+registers their own Trakt API app and pastes in their own keys. No bundled
+key for the cap to hit. No dependency left to squeeze.
+
+Making the decision took one conversation. What the decision *implies* is
+replacing the primary integration of a five-provider app — reads, writes,
+watchlist, calendar, OAuth, rate-limit handling, all of it. That's the kind
+of migration that sits on a roadmap for a quarter.
+
+It shipped the next day.
+
+## Why it took a weekend
+
+[The plan for the swap](https://github.com/glpecile/shinobu/blob/main/docs/plans/0034-simkl-provider-and-trakt-detachment.md)
+— 322 lines, ten implementation units, written the same day as the decision
+— did not start from a blank page. It opens with a search through the
+solutions folder and cites what it found by name. Its retry design follows
+"the AniList lesson" — a
+[retry storm](https://github.com/glpecile/shinobu/blob/main/docs/solutions/anilist-rate-limit-retry-storm.md)
+from two and a half weeks earlier, written up the day it was fixed. Its
+live-account checks follow "the Serializd lesson" — a
+[near-miss with destructive writes](https://github.com/glpecile/shinobu/blob/main/docs/solutions/serializd-watchlist-clears-watched.md)
+documented the day before the decision. Neither had anything to do with
+Trakt or Simkl when it was written; both were sitting in the folder, one
+search away, exactly when the migration needed them. The plan also lists
+stop conditions, agreed on in advance, where whoever is executing — human
+or agent — has to stop and ask rather than guess: "if the live-account
+probe shows Simkl's status model destroys watched state, stop."
+
+Here's the whole arc as the repo recorded it. Every entry is a real file:
+
+<RugpullTimeline client:only="react" />
+
+Cap on July 22nd, 2026. Decision on July 31st. Plan written the same day.
+Shipped August 1st, 2026. The ledger is honest about what
+shipping fast looks like: four bug reports the next day, each becoming a
+doc before its fix landed. The system doesn't promise flawless — it
+promises that nothing gets learned twice.
+
+That's the compounding the name points to. The expensive part of a rewrite
+was never the typing. It was re-learning everything the codebase already
+knew, and that cost had already been paid, one markdown file at a time, by
+five weeks of ordinary work that left receipts.
+
+## The cautionary tale
+
+There are two lessons here, one for each side of an API.
+
+If you run a platform that people build on: goodwill is load-bearing. Users
+will pay a fair fee when they can see the reasoning and hear about it
+before it hits them. What they won't do is stay put when the terms change
+underneath them — and the cost of leaving keeps falling. Switching away
+from a deeply integrated dependency used to take a quarter of engineering
+time, and that inertia quietly protected a lot of bad platform behavior.
+When a codebase remembers everything it has ever learned, that protection
+thins out fast.
+
+If you build on platforms: keep receipts. Write down every rate limit,
+every quirk, every lesson, at the moment you learn it. Not because any
+single note is precious, but because the pile is what makes you portable —
+the difference between "we can't leave, the migration would kill us" and
+"it shipped the next day."
+
+The codebase remembers, so nobody — human or agent — has to learn anything
+twice.
