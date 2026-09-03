@@ -10,7 +10,9 @@
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)"
   ],
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "rangeStrategy": "bump",
   "packageRules": [
     {
@@ -27,6 +29,13 @@
       "groupName": "astro/vite/cloudflare toolchain",
       "automerge": false,
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "satori 0.33+ bundles HarfBuzz (Emscripten) whose glue reads `self.location.href` under a WorkerGlobalScope. The Cloudflare prerenderer runs in workerd, which has no `location`, so `astro build` crashes on /preview routes. Cap until satori handles workerd.",
+      "matchPackageNames": [
+        "satori"
+      ],
+      "allowedVersions": "<0.33.0"
     }
   ],
   "ignoreDeps": [

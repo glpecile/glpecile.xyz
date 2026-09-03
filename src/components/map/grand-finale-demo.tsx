@@ -60,14 +60,10 @@ export function GrandFinaleDemo() {
 	React.useEffect(() => {
 		if (skipSearchRef.current) {
 			skipSearchRef.current = false;
-			setResults([]);
-			setShowResults(false);
 			return;
 		}
 
 		if (!query.trim()) {
-			setResults([]);
-			setShowResults(false);
 			return;
 		}
 
@@ -140,8 +136,11 @@ export function GrandFinaleDemo() {
 							placeholder="search a place, then adjust the radius…"
 							value={query}
 							onChange={(event) => {
-								setQuery(event.currentTarget.value);
-								if (!event.currentTarget.value) {
+								const value = event.currentTarget.value;
+								setQuery(value);
+								if (!value.trim()) {
+									setResults([]);
+									setShowResults(false);
 									setSearchedLabel(null);
 								}
 							}}

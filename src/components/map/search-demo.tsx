@@ -63,12 +63,10 @@ export function SearchDemo() {
 	React.useEffect(() => {
 		if (skipSearchRef.current) {
 			skipSearchRef.current = false;
-			setResults([]);
 			return;
 		}
 
 		if (!query.trim()) {
-			setResults([]);
 			return;
 		}
 
@@ -113,9 +111,13 @@ export function SearchDemo() {
 							type="search"
 							placeholder="search a city, address, or venue…"
 							value={query}
-							onChange={(event) =>
-								setQuery(event.currentTarget.value)
-							}
+							onChange={(event) => {
+								const value = event.currentTarget.value;
+								setQuery(value);
+								if (!value.trim()) {
+									setResults([]);
+								}
+							}}
 							aria-label="Search a location"
 							className="text-tone-mid placeholder:text-tone-faint flex-1 bg-transparent font-mono text-sm focus:outline-none"
 						/>
