@@ -38,6 +38,13 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 	},
 
+	// Inline all CSS into each page. Firefox paints before an external
+	// stylesheet lands on a hard refresh, which showed a flash of unstyled
+	// content; with no external stylesheet there is nothing to wait for.
+	build: {
+		inlineStylesheets: "always",
+	},
+
 	// Compile-time image service: remote images are downloaded and
 	// optimized at build time into static /_astro assets. The site is
 	// fully prerendered, so there is no runtime /_image endpoint.
