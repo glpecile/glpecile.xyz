@@ -16,10 +16,13 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 	headings.length > 0 && (
 		<nav
 			aria-label="Table of contents"
-			class="fixed top-24 right-[calc(50%+30rem)] hidden w-64 space-y-5 text-sm 2xl:block"
+			class="fixed top-43 right-[calc(50%+30rem)] hidden w-64 space-y-5 text-sm 2xl:block"
 			data-post-toc
 		>
-			<p class="text-foreground invisible leading-6 font-bold" data-toc-title>
+			<p
+				class="text-foreground invisible absolute bottom-full mb-5 w-full leading-6 font-bold"
+				data-toc-title
+			>
 				{title}
 			</p>
 			<SectionLabel label="tree" rule={false} />
