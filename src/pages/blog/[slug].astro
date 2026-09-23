@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import { render, type CollectionEntry } from "astro:content";
 
+import PostToc from "@/components/post-toc.astro";
 import PostAuthors from "@/components/post-authors.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
@@ -22,7 +23,7 @@ type Props = {
 };
 
 const { post } = Astro.props as Props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const displayDate = post.data.updatedDate ?? post.data.pubDate;
 const readingTime = formatReadingTime(getReadingTimeMinutes(post.body));
 const postPath = `/blog/${post.id}`;
@@ -36,6 +37,8 @@ const postPath = `/blog/${post.id}`;
 	type="article"
 	publishedTime={post.data.pubDate.toISOString()}
 >
+	<PostToc headings={headings} />
+
 	<article class="space-y-6">
 		<a
 			href="/blog"
