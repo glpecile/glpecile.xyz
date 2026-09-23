@@ -246,6 +246,36 @@ const jsonLd = {
 						: "[]",
 				);
 				const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+				const normalize = (path) => path.replace(/\/+$/, "") || "/";
+				const isCurrentPage = (url) =>
+					url.origin === window.location.origin &&
+					normalize(url.pathname) === normalize(window.location.pathname);
+
+				// Links to the current page (nav, logo, j/k + enter) scroll to
+				// the top instead of reloading and replaying the enter cascade.
+				document.addEventListener("click", (event) => {
+					if (
+						event.defaultPrevented ||
+						event.button !== 0 ||
+						event.metaKey ||
+						event.ctrlKey ||
+						event.shiftKey ||
+						event.altKey ||
+						!(event.target instanceof Element)
+					) {
+						return;
+					}
+
+					const link = event.target.closest("a[href]");
+					if (!(link instanceof HTMLAnchorElement) || link.target || link.hash) {
+						return;
+					}
+
+					if (isCurrentPage(link)) {
+						event.preventDefault();
+						window.scrollTo({ top: 0 });
+					}
+				});
 
 				const onShortcut = (event) => {
 					if (
@@ -277,7 +307,7 @@ const jsonLd = {
 
 					event.preventDefault();
 
-					if (window.location.pathname === shortcut.href) {
+					if (isCurrentPage(new URL(shortcut.href, window.location.href))) {
 						window.scrollTo({ top: 0 });
 						return;
 					}
