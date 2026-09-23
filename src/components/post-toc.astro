@@ -73,7 +73,15 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 		const title = toc.querySelector("[data-toc-title]");
 		const heading = document.querySelector("article h1");
 
+		// Matches the rail's `2xl:block`; below it the toc is display:none, so skip
+		// the per-scroll layout reads entirely.
+		const wide = window.matchMedia("(min-width: 96rem)");
+
 		const update = () => {
+			if (!wide.matches) {
+				return;
+			}
+
 			const max = document.documentElement.scrollHeight - window.innerHeight;
 			const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 1;
 
@@ -127,6 +135,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 		window.addEventListener("scroll", update, { passive: true });
 		window.addEventListener("resize", update);
 		window.addEventListener("load", update);
+		wide.addEventListener("change", update);
 		update();
 	});
 </script>
