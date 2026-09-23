@@ -19,7 +19,9 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 			class="fixed top-24 right-[calc(50%+30rem)] hidden w-64 space-y-5 text-sm 2xl:block"
 			data-post-toc
 		>
-			<p class="text-foreground leading-6 font-bold">{title}</p>
+			<p class="text-foreground invisible leading-6 font-bold" data-toc-title>
+				{title}
+			</p>
 			<SectionLabel label="tree" rule={false} />
 			<ol class="space-y-1.5">
 				{headings.map(({ depth, slug, text }) => (
@@ -59,6 +61,8 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 		);
 		const bar = toc.querySelector("[data-toc-bar]");
 		const percent = toc.querySelector("[data-toc-percent]");
+		const title = toc.querySelector("[data-toc-title]");
+		const heading = document.querySelector("article h1");
 		const width = 20;
 
 		const update = () => {
@@ -68,6 +72,8 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 
 			bar.textContent = "█".repeat(filled) + "░".repeat(width - filled);
 			percent.textContent = `${Math.round(progress * 100)}%`;
+			// Title only once the post's own h1 has scrolled out of view.
+			title.classList.toggle("invisible", (heading?.getBoundingClientRect().bottom ?? 1) > 0);
 
 			// Active section: last heading scrolled past the top third of the viewport,
 			// or the final one at the bottom so short trailing sections still light up.
@@ -89,6 +95,9 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 
 		window.addEventListener("scroll", update, { passive: true });
 		window.addEventListener("resize", update);
-		update();
+		// This script runs before the article is parsed; wait for the full page
+		// height or the bar reads 100% on load.
+		document.addEventListener("DOMContentLoaded", update);
+		window.addEventListener("load", update);
 	})();
 </script>
