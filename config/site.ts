@@ -146,9 +146,22 @@ export const siteConfig = {
 	} satisfies ContactInfo,
 	work: [
 		{
+			role: "Senior Frontend Engineer",
+			company: "Humand",
+			period: "Sep 2026 - Present",
+			place: "Buenos Aires · Hybrid",
+			url: "https://humand.co",
+			highlights: [
+				"Build and maintain user-facing features for Humand's web applications, translating design wireframes into responsive, high-quality interfaces across devices and screen sizes.",
+				"Optimize applications for speed and scalability, and troubleshoot complex issues to improve performance and user experience.",
+				"Integrate APIs and third-party services, review code to keep quality consistent across projects, and contribute to technical documentation.",
+				"Help plan project timelines and deliverables, bringing current industry practices into the team's development process.",
+			],
+		},
+		{
 			role: "Software / Frontend Engineer",
 			company: "POAP - Proof Of Attendance Protocol",
-			period: "Jan 2025 - Present",
+			period: "Jan 2025 - Aug 2026",
 			place: "Buenos Aires · Hybrid",
 			url: "https://poap.xyz",
 			highlights: [
