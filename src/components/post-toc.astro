@@ -31,7 +31,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 						</span>
 						<a
 							href={`#${slug}`}
-							class="text-tone-soft hover:text-foreground aria-[current=location]:text-foreground truncate no-underline"
+							class="text-tone-soft hover:text-foreground aria-[current=location]:text-foreground truncate no-underline transition-colors duration-200"
 							title={text}
 						>
 							{text}
@@ -92,6 +92,22 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 				}
 			});
 		};
+
+		// Smooth-scroll to sections on click; stays instant under reduced motion.
+		links.forEach((link, index) => {
+			link.addEventListener("click", (event) => {
+				const target = targets[index];
+
+				if (!target) {
+					return;
+				}
+
+				event.preventDefault();
+				const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+				target.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+				window.history.pushState(null, "", link.getAttribute("href"));
+			});
+		});
 
 		window.addEventListener("scroll", update, { passive: true });
 		window.addEventListener("resize", update);
