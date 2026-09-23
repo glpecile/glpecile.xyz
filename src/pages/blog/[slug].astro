@@ -37,7 +37,7 @@ const postPath = `/blog/${post.id}`;
 	type="article"
 	publishedTime={post.data.pubDate.toISOString()}
 >
-	<PostToc headings={headings} />
+	<PostToc title={post.data.title} headings={headings} />
 
 	<article class="space-y-6">
 		<a
