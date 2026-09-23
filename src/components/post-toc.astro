@@ -19,12 +19,14 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 			class="fixed top-44.5 right-[calc(50%+30rem)] hidden w-64 space-y-5 text-sm 2xl:block"
 			data-post-toc
 		>
-			<p
-				class="text-foreground invisible absolute bottom-full mb-5 w-full leading-6 font-bold"
+			<a
+				href="#"
+				title="Back to top"
+				class="text-foreground invisible absolute bottom-full mb-5 block w-full translate-y-1 leading-6 font-bold no-underline opacity-0 blur-[2px] transition-[opacity,translate,filter,visibility] duration-200 ease-(--ease-reveal) data-visible:visible data-visible:translate-y-0 data-visible:opacity-100 data-visible:blur-none motion-reduce:translate-y-0 motion-reduce:blur-none"
 				data-toc-title
 			>
 				{title}
-			</p>
+			</a>
 			<SectionLabel label="tree" rule={false} />
 			<ol class="space-y-1.5">
 				{headings.map(({ depth, slug, text }) => (
@@ -62,7 +64,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 			return;
 		}
 
-		const links = Array.from(toc.querySelectorAll("a[href^='#']"));
+		const links = Array.from(toc.querySelectorAll("ol a"));
 		const targets = links.map((link) =>
 			document.getElementById(link.getAttribute("href").slice(1)),
 		);
@@ -78,7 +80,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 			bar.style.width = `${progress * 100}%`;
 			percent.textContent = `${Math.round(progress * 100)}%`;
 			// Title only once the post's own h1 has scrolled out of view.
-			title.classList.toggle("invisible", (heading?.getBoundingClientRect().bottom ?? 1) > 0);
+			title.toggleAttribute("data-visible", (heading?.getBoundingClientRect().bottom ?? 1) <= 0);
 
 			// Active section: last heading scrolled past the top third of the viewport,
 			// or the final one at the bottom so short trailing sections still light up.
@@ -98,6 +100,15 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 			});
 		};
 
+		const scrollBehavior = () =>
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+
+		title.addEventListener("click", (event) => {
+			event.preventDefault();
+			window.scrollTo({ top: 0, behavior: scrollBehavior() });
+			window.history.pushState(null, "", window.location.pathname);
+		});
+
 		// Smooth-scroll to sections on click; stays instant under reduced motion.
 		links.forEach((link, index) => {
 			link.addEventListener("click", (event) => {
@@ -108,8 +119,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 				}
 
 				event.preventDefault();
-				const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-				target.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+				target.scrollIntoView({ behavior: scrollBehavior() });
 				window.history.pushState(null, "", link.getAttribute("href"));
 			});
 		});
