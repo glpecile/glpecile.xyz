@@ -39,8 +39,10 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 					</li>
 				))}
 			</ol>
-			<p class="text-tone-soft flex gap-3 tabular-nums" aria-hidden="true">
-				<span class="whitespace-pre" data-toc-bar></span>
+			<p class="text-tone-soft flex items-center gap-3 tabular-nums" aria-hidden="true">
+				<span class="bg-border h-2 w-40 overflow-hidden">
+					<span class="bg-tone-soft block h-full w-0" data-toc-bar></span>
+				</span>
 				<span data-toc-percent>0%</span>
 			</p>
 		</nav>
@@ -63,14 +65,12 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 		const percent = toc.querySelector("[data-toc-percent]");
 		const title = toc.querySelector("[data-toc-title]");
 		const heading = document.querySelector("article h1");
-		const width = 20;
 
 		const update = () => {
 			const max = document.documentElement.scrollHeight - window.innerHeight;
 			const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 1;
-			const filled = Math.round(progress * width);
 
-			bar.textContent = "█".repeat(filled) + "░".repeat(width - filled);
+			bar.style.width = `${progress * 100}%`;
 			percent.textContent = `${Math.round(progress * 100)}%`;
 			// Title only once the post's own h1 has scrolled out of view.
 			title.classList.toggle("invisible", (heading?.getBoundingClientRect().bottom ?? 1) > 0);
