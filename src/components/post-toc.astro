@@ -16,7 +16,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 	headings.length > 0 && (
 		<nav
 			aria-label="Table of contents"
-			class="fixed top-43 right-[calc(50%+30rem)] hidden w-64 space-y-5 text-sm 2xl:block"
+			class="fixed top-44.5 right-[calc(50%+30rem)] hidden w-64 space-y-5 text-sm 2xl:block"
 			data-post-toc
 		>
 			<p
@@ -53,7 +53,9 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 }
 
 <script is:inline>
-	(() => {
+	// Runs before the article is parsed (the toc renders first), so defer all
+	// lookups until the headings and h1 exist.
+	document.addEventListener("DOMContentLoaded", () => {
 		const toc = document.querySelector("[data-post-toc]");
 
 		if (!(toc instanceof HTMLElement)) {
@@ -114,9 +116,7 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 
 		window.addEventListener("scroll", update, { passive: true });
 		window.addEventListener("resize", update);
-		// This script runs before the article is parsed; wait for the full page
-		// height or the bar reads 100% on load.
-		document.addEventListener("DOMContentLoaded", update);
 		window.addEventListener("load", update);
-	})();
+		update();
+	});
 </script>
