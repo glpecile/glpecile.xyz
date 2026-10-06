@@ -2,6 +2,16 @@
 
 Project-specific guidance for working in this repo.
 
+## Skills
+
+- Skills are vendored in `.agents/skills/`, with a Claude Code directory symlink at `.claude/skills`; OpenCode reads `.agents/skills/` directly. `skills-lock.json` tracks upstream sources. Update through `bunx skills@latest`, not by editing vendored files.
+- Use `astro` for framework work and `shadcn` for the existing component library.
+- Use `emil-design-eng` for interaction and motion decisions; use `frontend-design` for new visual directions only within the site's style rules below.
+- Use `better-accessibility` for semantics, keyboard and focus behavior; `better-typography` for text rendering; `better-layout` for responsive structure; and `better-colors` for tokens and measured contrast.
+- Use `mobile-native` for phone-specific viewport, touch and safe-area bugs. This is a scrolling personal site, not an app shell: preserve native scrolling, zoom and selectable content instead of applying its app baseline globally.
+- Use `break-ui` when asked to stress-test a component with realistic edge-case data. Keep fixtures and toggles dev-only; do not ship a test route or list it in machine-readable surfaces.
+- The site's monospace, lowercase content titles, existing tokens, square TUI panes and instant keyboard navigation take precedence over generic skill styling defaults. Fix usability failures without restyling the site.
+
 ## Gotchas
 
 - Assume the user is already running a dev server. Do not start another one unless they explicitly ask.
