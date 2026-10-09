@@ -3,10 +3,12 @@ import {
 	QueryClientProvider,
 	useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Component, Suspense, type ReactNode } from "react";
+import { Component, Suspense, useState, type ReactNode } from "react";
+import { TextMorph } from "torph/react";
 
 import type { FilmWithBlur } from "@/lib/blur";
 import type { LetterboxdFilm } from "@/lib/letterboxd";
+import { textMorphOptions } from "@/lib/text-morph";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -231,11 +233,14 @@ type Props = {
 	limit?: number;
 	tags?: boolean;
 	layout?: Layout;
+	allowLayoutSwitch?: boolean;
 };
 
 const EmptyState = () => <p className="text-tone-soft text-sm">no films yet.</p>;
 
-const FilmListContent = ({ films: initialFilms, limit, tags, layout }: Props) => {
+const FilmListContent = ({ films: initialFilms, limit, tags, layout, allowLayoutSwitch }: Props) => {
+	const [view, setView] = useState<Layout>(layout ?? "grid");
+	const [animate, setAnimate] = useState(false);
 	// Seed with the build-time films so the first paint is real content, then
 	// let react-query refresh in place. `initialDataUpdatedAt: 0` marks the
 	// seed stale so a background refetch runs on mount without ever suspending.
@@ -248,10 +253,32 @@ const FilmListContent = ({ films: initialFilms, limit, tags, layout }: Props) =>
 
 	if (films.length === 0) return <EmptyState />;
 
-	return layout === "timeline" ? (
-		<FilmTimeline films={films} withTags={!!tags} />
-	) : (
-		<FilmGrid films={films} />
+	return (
+		<div className="space-y-4">
+			{allowLayoutSwitch && (
+				<div className="text-tone-soft flex flex-wrap items-center justify-between gap-3 text-sm">
+					<span>{films.length} recent watches</span>
+					<button
+						type="button"
+						aria-label={`${view} view: switch to ${view === "grid" ? "timeline" : "grid"}`}
+						onClick={(event) => {
+							setAnimate(event.detail > 0);
+							setView(view === "grid" ? "timeline" : "grid");
+						}}
+						className="text-link min-h-6 cursor-pointer hover:underline focus-visible:underline"
+					>
+						<TextMorph {...textMorphOptions} disabled={!animate}>
+							{`[${view}]`}
+						</TextMorph>
+					</button>
+				</div>
+			)}
+			{view === "timeline" ? (
+				<FilmTimeline films={films} withTags={!!tags} />
+			) : (
+				<FilmGrid films={films} />
+			)}
+		</div>
 	);
 };
 

@@ -27,7 +27,7 @@ type AttachCopyStateOptions = {
 	button: HTMLButtonElement;
 	getCopyText(): string;
 	labels: CopyLabels;
-	setLabel(nextLabel: string): void;
+	setLabel(nextLabel: string, animate: boolean): void;
 	setState(nextState?: "success" | "error"): void;
 	onBeforeCopy?(): void;
 	resetDelay?: number;
@@ -43,9 +43,16 @@ export function attachCopyState({
 	resetDelay = 1600,
 }: AttachCopyStateOptions) {
 	let resetTimer = 0;
+	const status = document.createElement("span");
+	status.className = "sr-only";
+	status.setAttribute("role", "status");
+	button.append(status);
+	const action = button.getAttribute("aria-label") ?? labels.idle;
 
-	button.addEventListener("click", async () => {
+	button.addEventListener("click", async (event) => {
 		window.clearTimeout(resetTimer);
+		const animate = event.detail > 0;
+		status.textContent = "";
 
 		if (onBeforeCopy) {
 			onBeforeCopy();
@@ -53,15 +60,20 @@ export function attachCopyState({
 
 		try {
 			await copyText(getCopyText());
-			setLabel(labels.success);
+			setLabel(labels.success, animate);
+			status.textContent = labels.success;
+			button.setAttribute("aria-label", `${labels.success}: ${action}`);
 			setState("success");
 		} catch {
-			setLabel(labels.error);
+			setLabel(labels.error, animate);
+			status.textContent = labels.error;
+			button.setAttribute("aria-label", `${labels.error}: ${action}`);
 			setState("error");
 		}
 
 		resetTimer = window.setTimeout(() => {
-			setLabel(labels.idle);
+			setLabel(labels.idle, animate);
+			button.setAttribute("aria-label", action);
 			setState();
 		}, resetDelay);
 	});

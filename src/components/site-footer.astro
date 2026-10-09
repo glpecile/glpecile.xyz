@@ -32,6 +32,7 @@ const termPath =
 			data-theme-picker
 		>
 			<span class="text-tone-faint text-[0.72rem] tracking-[0.28em] uppercase">theme</span>
+			<span data-theme-name aria-hidden="true" class="text-tone-mid inline-block w-[5ch]">auto</span>
 			{themeItems.map((item) => (
 				<button
 					type="button"
@@ -86,6 +87,7 @@ const termPath =
 					</a>
 					<span class="inline-flex items-center gap-2" data-theme-picker>
 						<span class="text-tone-faint text-[0.72rem] tracking-[0.28em] uppercase">theme</span>
+						<span data-theme-name aria-hidden="true" class="text-tone-mid inline-block w-[5ch]">auto</span>
 						{themeItems.map((item) => (
 							<button
 								type="button"
@@ -206,9 +208,10 @@ const termPath =
 				});
 			};
 
-			const syncThemeButtons = (theme) => {
+			const syncThemeButtons = (theme, animate = false) => {
 				window.__glpecileTheme.apply(theme);
 				setThemeButtonState(theme);
+				footer.dispatchEvent(new CustomEvent("theme-change", { detail: { theme, animate } }));
 			};
 
 			const storedTheme =
@@ -241,7 +244,7 @@ const termPath =
 				}
 
 				window.__glpecileTheme.persist(theme);
-				syncThemeButtons(theme);
+				syncThemeButtons(theme, event.detail > 0);
 			});
 
 			document.addEventListener("keydown", (event) => {
@@ -276,4 +279,18 @@ const termPath =
 			});
 		}
 	})();
+</script>
+
+<script>
+	import { createTextMorph } from "@/lib/text-morph";
+
+	const footer = document.querySelector("footer");
+	const labels = Array.from(document.querySelectorAll<HTMLElement>("[data-theme-name]"), createTextMorph);
+	const initialTheme = document.documentElement.dataset.themePreference ?? "auto";
+	labels.forEach((update) => update(initialTheme, false));
+	footer?.addEventListener("theme-change", (event) => {
+		if (!(event instanceof CustomEvent)) return;
+		const { theme, animate } = event.detail as { theme: string; animate: boolean };
+		labels.forEach((update) => update(theme, animate));
+	});
 </script>

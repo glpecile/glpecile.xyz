@@ -73,7 +73,7 @@ const postPath = `/blog/${post.id}`;
 					type="button"
 					class="blog-share-button text-tone-soft text-sm"
 					data-post-share
-					aria-label={`Copy link to post: ${post.data.title}`}
+					aria-label={`share: copy link to post: ${post.data.title}`}
 					title={`Copy link to post: ${post.data.title}`}
 				>
 					<span class="blog-share-button-label">[share]</span>
@@ -96,35 +96,33 @@ const postPath = `/blog/${post.id}`;
 			<Content />
 		</div>
 
-		<script is:inline>
+		<script>
+			import { attachCopyState, type CopyLabels } from "@/lib/copy";
+			import { createTextMorph } from "@/lib/text-morph";
+
 			(() => {
 				const codeBlocks = document.querySelectorAll(".blog-prose pre.astro-code");
 				const postShareButton = document.querySelector("[data-post-share]");
 				const copyableHeadings = document.querySelectorAll(
 					".blog-prose h2[id], .blog-prose h3[id], .blog-prose h4[id], .blog-prose h5[id], .blog-prose h6[id]",
 				);
-				/** @typedef {{ idle: string; success: string; error: string }} CopyLabelSet */
-
-				/** @type {CopyLabelSet} */
-				const copyLabels = {
+				const copyLabels: CopyLabels = {
 					idle: "[copy]",
 					success: "[copied]",
 					error: "[unavailable]",
 				};
-				/** @type {CopyLabelSet} */
-				const headingLabels = {
+				const headingLabels: CopyLabels = {
 					idle: "[#]",
 					success: "[✔︎]",
 					error: "[unavailable]",
 				};
-				/** @type {CopyLabelSet} */
-				const shareLabels = {
+				const shareLabels: CopyLabels = {
 					idle: "[share]",
 					success: "[copied to clipboard]",
 					error: "[unavailable]",
 				};
 
-				const formatLanguage = (value) => {
+				const formatLanguage = (value: string | undefined) => {
 					if (typeof value !== "string" || value.length === 0 || value === "plaintext") {
 						return "text";
 					}
@@ -132,7 +130,7 @@ const postPath = `/blog/${post.id}`;
 					return value.toLowerCase();
 				};
 
-				const getCodeText = (pre) => {
+				const getCodeText = (pre: HTMLElement) => {
 					const code = pre.querySelector("code");
 
 					if (!(code instanceof HTMLElement)) {
@@ -148,63 +146,7 @@ const postPath = `/blog/${post.id}`;
 					return lines.map((line) => line.textContent ?? "").join("\n");
 				};
 
-				const copyText = async (text) => {
-					if (navigator.clipboard?.writeText) {
-						await navigator.clipboard.writeText(text);
-						return;
-					}
-
-					if (
-						typeof ClipboardItem !== "undefined" &&
-						navigator.clipboard?.write
-					) {
-						const blob = new Blob([text], { type: "text/plain" });
-						await navigator.clipboard.write([
-							new ClipboardItem({
-								"text/plain": blob,
-							}),
-						]);
-						return;
-					}
-
-					throw new Error("copy unavailable");
-				};
-
-				const attachCopyState = ({
-					button,
-					getCopyText,
-					labels,
-					setLabel,
-					setState,
-					onBeforeCopy,
-					resetDelay = 1600,
-				}) => {
-					let resetTimer = 0;
-
-					button.addEventListener("click", async () => {
-						window.clearTimeout(resetTimer);
-
-						if (onBeforeCopy) {
-							onBeforeCopy();
-						}
-
-						try {
-							await copyText(getCopyText());
-							setLabel(labels.success);
-							setState("success");
-						} catch {
-							setLabel(labels.error);
-							setState("error");
-						}
-
-						resetTimer = window.setTimeout(() => {
-							setLabel(labels.idle);
-							setState();
-						}, resetDelay);
-					});
-				};
-
-				const getHeadingPermalink = (id) => {
+				const getHeadingPermalink = (id: string) => {
 					const url = new URL(window.location.href);
 					url.hash = id;
 
@@ -214,7 +156,13 @@ const postPath = `/blog/${post.id}`;
 				const getPostPermalink = () =>
 					new URL(window.location.pathname, window.location.origin).toString();
 
-				const attachCopyButton = (button, options) => {
+				type CopyOptions = {
+					getCopyText(): string;
+					labels: CopyLabels;
+					onBeforeCopy?(): void;
+				};
+
+				const attachCopyButton = (button: Element | null, options: CopyOptions) => {
 					if (
 						!(button instanceof HTMLButtonElement) ||
 						button.dataset.copyButton === "true"
@@ -233,9 +181,7 @@ const postPath = `/blog/${post.id}`;
 						button,
 						getCopyText: options.getCopyText,
 						labels: options.labels,
-						setLabel: (nextLabel) => {
-							label.textContent = nextLabel;
-						},
+						setLabel: createTextMorph(label),
 						setState: (nextState) => {
 							if (nextState) {
 								button.dataset.copyState = nextState;
@@ -246,7 +192,7 @@ const postPath = `/blog/${post.id}`;
 					});
 				};
 
-				const enhanceCopyTarget = (heading, options) => {
+				const enhanceCopyTarget = (heading: Element, options: CopyOptions & { ariaLabel: string }) => {
 					if (!(heading instanceof HTMLElement) || heading.dataset.copyHeading === "true") {
 						return;
 					}
@@ -280,9 +226,7 @@ const postPath = `/blog/${post.id}`;
 						button,
 						getCopyText: options.getCopyText,
 						labels: options.labels,
-						setLabel: (nextLabel) => {
-							status.textContent = nextLabel;
-						},
+						setLabel: createTextMorph(status),
 						setState: (nextState) => {
 							if (nextState) {
 								heading.dataset.copyState = nextState;
@@ -333,15 +277,17 @@ const postPath = `/blog/${post.id}`;
 					button.type = "button";
 					button.className = "code-copy-button";
 					button.setAttribute("aria-label", "Copy code to clipboard");
-					button.textContent = copyLabels.idle;
+					const label = document.createElement("span");
+					label.textContent = copyLabels.idle;
+					button.append(label);
+					toolbar.append(button);
+					wrapper.append(toolbar, pre);
 
 					attachCopyState({
 						button,
 						getCopyText: () => getCodeText(pre),
 						labels: copyLabels,
-						setLabel: (nextLabel) => {
-							button.textContent = nextLabel;
-						},
+						setLabel: createTextMorph(label),
 						setState: (nextState) => {
 							if (nextState) {
 								button.dataset.copyState = nextState;
@@ -350,9 +296,6 @@ const postPath = `/blog/${post.id}`;
 							}
 						},
 					});
-
-					toolbar.append(button);
-					wrapper.append(toolbar, pre);
 				});
 			})();
 		</script>

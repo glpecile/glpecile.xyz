@@ -298,6 +298,7 @@ export function renderFilmsMarkdown(films: LetterboxdFilm[]) {
 		"",
 		`- Canonical HTML: ${toAbsoluteUrl("/films")}`,
 		`- Letterboxd profile: ${siteConfig.links.letterboxd}`,
+		"- The HTML page lets you switch between timeline and poster-grid views.",
 		"",
 		"## Recently watched",
 		"",
