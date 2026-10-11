@@ -595,6 +595,25 @@
 	}
 }
 
+/* Override Vaul's injected defaults, including instant keyboard interaction. */
+[data-mobile-drawer][data-vaul-drawer],
+[data-mobile-drawer][data-vaul-overlay] {
+	animation-duration: 250ms !important;
+	transition-duration: 250ms !important;
+}
+
+[data-mobile-drawer][data-instant="true"] {
+	animation: none !important;
+	transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-mobile-drawer] {
+		animation: none !important;
+		transition: none !important;
+	}
+}
+
 /*
 	Mapbox control buttons: override the default white/dark chrome so the
 	geolocate crosshair blends with the site's terminal aesthetic. Scoped

@@ -330,8 +330,10 @@ const jsonLd = {
 			const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 			let selectedIndex = -1;
 
-			const getRows = () =>
-				Array.from(document.querySelectorAll("[data-tui-row]"));
+			const getRows = () => {
+				const scope = document.querySelector('[data-mobile-drawer][role="dialog"][data-state="open"]') ?? document;
+				return Array.from(scope.querySelectorAll("[data-tui-row]"));
+			};
 
 			const setSelected = (index) => {
 				const rows = getRows();
@@ -386,7 +388,8 @@ const jsonLd = {
 					target instanceof HTMLElement &&
 					(editableTags.has(target.tagName) ||
 						target.isContentEditable ||
-						target instanceof HTMLAnchorElement)
+						target instanceof HTMLAnchorElement ||
+						(event.key === "Enter" && target instanceof HTMLButtonElement))
 				) {
 					return;
 				}
