@@ -1,4 +1,5 @@
 ---
+import MobileDrawer from "@/components/mobile-drawer";
 import { siteConfig } from "#config/site";
 
 export interface Props {
@@ -58,64 +59,7 @@ const termPath =
 				</button>
 			))}
 		</span>
-		<div class="group relative shrink-0 sm:hidden" data-footer-menu data-state="closed">
-			<button
-				type="button"
-				aria-label="Toggle footer menu"
-				aria-controls="mobile-footer-menu"
-				aria-expanded="false"
-				data-footer-menu-toggle
-				class="text-tone-mid hover:text-foreground focus-visible:ring-foreground/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors duration-200 ease-out focus-visible:ring-1 focus-visible:outline-none motion-reduce:transition-none"
-			>
-				<span aria-hidden="true" class="tracking-[-0.2em]">···</span>
-			</button>
-
-			<div
-				id="mobile-footer-menu"
-				aria-hidden="true"
-				data-footer-menu-panel
-				class="border-foreground/10 bg-background pointer-events-none absolute right-0 bottom-full z-10 mb-2 min-w-44 origin-bottom-right translate-y-1 border px-4 py-3 opacity-0 transition-[opacity,transform] duration-200 ease-out group-data-[state=open]:pointer-events-auto group-data-[state=open]:translate-y-0 group-data-[state=open]:opacity-100 motion-reduce:transition-none"
-			>
-				<div class="flex flex-col gap-3 text-sm">
-					<a
-						class="terminal-link text-tone-mid"
-						href={`${siteConfig.links.github}/glpecile.xyz`}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						source code
-					</a>
-					<span class="inline-flex items-center gap-2" data-theme-picker>
-						<span class="text-tone-faint text-[0.72rem] tracking-[0.28em] uppercase">theme</span>
-						<span data-theme-name aria-hidden="true" class="text-tone-mid inline-block w-[5ch]">auto</span>
-						{themeItems.map((item) => (
-							<button
-								type="button"
-								data-theme-option={item.theme}
-								data-theme-shortcut={item.shortcut}
-								aria-keyshortcuts={item.shortcut}
-								aria-label={`${item.theme} theme`}
-								class="text-tone-soft group inline-flex cursor-pointer items-center gap-1.5 px-1 focus-visible:outline-none"
-							>
-								<span
-									data-theme-label
-									class="group-hover:underline group-focus-visible:underline"
-								>[{item.shortcut}]</span>
-								<span
-									aria-hidden="true"
-									class:list={[
-										"inline-block h-[0.7em] w-[0.7em] rounded-full border border-current",
-										item.theme === "auto" &&
-											"bg-[linear-gradient(90deg,currentColor_50%,transparent_50%)]",
-										item.theme === "dark" && "bg-current",
-									]}
-								></span>
-							</button>
-						))}
-					</span>
-				</div>
-			</div>
-		</div>
+		<MobileDrawer menu="footer" client:load />
 		</div>
 	</div>
 </footer>
@@ -127,55 +71,6 @@ const termPath =
 			currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
 
 		if (footer instanceof HTMLElement) {
-			const menu = footer.querySelector("[data-footer-menu]");
-			const menuToggle = footer.querySelector("[data-footer-menu-toggle]");
-			const menuPanel = footer.querySelector("[data-footer-menu-panel]");
-
-			if (
-				menu instanceof HTMLElement &&
-				menuToggle instanceof HTMLButtonElement &&
-				menuPanel instanceof HTMLElement
-			) {
-				const setOpen = (open) => {
-					menu.dataset.state = open ? "open" : "closed";
-					menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
-					menuPanel.setAttribute("aria-hidden", open ? "false" : "true");
-					menuPanel.inert = !open;
-				};
-
-				const closeMenu = () => {
-					setOpen(false);
-				};
-
-				menuToggle.addEventListener("click", () => {
-					setOpen(menu.dataset.state !== "open");
-				});
-
-				document.addEventListener("click", (event) => {
-					if (menu.dataset.state !== "open") {
-						return;
-					}
-
-					const target = event.target;
-
-					if (target instanceof Node && !menu.contains(target)) {
-						closeMenu();
-					}
-				});
-
-				document.addEventListener("keydown", (event) => {
-					if (event.key === "Escape") {
-						closeMenu();
-					}
-				});
-
-				menuPanel.querySelectorAll("a").forEach((link) => {
-					link.addEventListener("click", closeMenu);
-				});
-
-				setOpen(false);
-			}
-
 			const themeButtons = Array.from(footer.querySelectorAll("[data-theme-option]"));
 			const themeEditableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 			const themeMap = new Map(
