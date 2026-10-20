@@ -9,6 +9,8 @@
 @theme {
 	--font-mono: "JetBrains Mono", monospace;
 	--font-sans: "JetBrains Mono", monospace;
+	--text-blog: clamp(1.125rem, 1.08rem + 0.2vw, 1.25rem);
+	--text-blog--line-height: 1.7;
 
 	--color-border: hsl(var(--border));
 	--color-input: hsl(var(--input));
@@ -247,9 +249,8 @@
 	}
 
 	.blog-prose {
+		@apply text-blog;
 		color: hsl(var(--tone-mid));
-		font-size: 1rem;
-		line-height: 2;
 	}
 
 	.blog-prose > * + * {
@@ -276,7 +277,7 @@
 	}
 
 	.blog-prose h3 {
-		font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+		font-size: 1.125em;
 		margin-top: 2rem;
 	}
 
