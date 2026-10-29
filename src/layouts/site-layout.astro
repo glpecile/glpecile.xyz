@@ -1,5 +1,6 @@
 ---
-import jetBrainsMonoRegularUrl from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url";
+import jetBrainsMonoBoldUrl from "@/assets/fonts/jetbrains-mono-700.woff2?url";
+import jetBrainsMonoRegularUrl from "@/assets/fonts/jetbrains-mono-400.woff2?url";
 
 import meAvatar from "@/assets/me-avatar.webp?inline";
 import SiteFooter from "@/components/site-footer.astro";
@@ -119,13 +120,11 @@ const jsonLd = {
 		<link rel="icon" type="image/png" href="/favicon.png" sizes="64x64" />
 		<link rel="apple-touch-icon" href="/apple-icon.png" />
 		<link rel="manifest" href="/manifest.webmanifest" />
-		<link
-			rel="preload"
-			href={jetBrainsMonoRegularUrl}
-			as="font"
-			type="font/woff2"
-			crossorigin="anonymous"
-		/>
+		{/* Subsets from scripts/subset-fonts.py; every page sets body text in
+		    400 and the site name in 700, so both are on the critical path. */}
+		{[jetBrainsMonoRegularUrl, jetBrainsMonoBoldUrl].map((href) => (
+			<link rel="preload" href={href} as="font" type="font/woff2" crossorigin="anonymous" />
+		))}
 		<script is:inline>
 			(() => {
 				const createThemeController = () => ({
