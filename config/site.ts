@@ -247,6 +247,16 @@ export const siteConfig = {
 			],
 		},
 		{
+			name: "hachikuji",
+			stack: "Rust / zsh / Nushell",
+			url: "https://github.com/glpecile/hachikuji",
+			highlights: [
+				"Built and shipped an IDE-style completion popup for zsh with no pty wrapper — ZLE draws it, so zsh stays the foreground process.",
+				"About 2 MB per shell (inshellisense: ~43 MB) — one Rust helper per shell over a shared mmap index of 1,455 Fig specs.",
+				"Published to Homebrew through my own tap (brew install glpecile/tap/hachikuji) — prebuilt macOS binaries with pinned SHA-256s, so installing needs no Rust toolchain.",
+			],
+		},
+		{
 			name: "shinobu",
 			stack: "React Native / Expo / TypeScript",
 			url: "https://github.com/glpecile/shinobu",
@@ -264,25 +274,6 @@ export const siteConfig = {
 			],
 		},
 		{
-			name: "Human-in-Picture — Privacy-Preserving CNN (Thesis)",
-			stack: "Python / PyTorch / Concrete ML (FHE)",
-			url: "https://github.com/Memento-Research/human-in-picture-concrete-ml",
-			highlights: [
-				"Engineering thesis: a CNN that detects human presence in images while running inference entirely on encrypted data via fully homomorphic encryption (FHE) — no server-side decryption.",
-				"Trained a PyTorch CNN and compiled it with Concrete ML (Zama) for homomorphic inference; benchmarked accuracy and latency across input resolutions (32–128px).",
-				"Shipped an interactive proof-of-concept web app demonstrating end-to-end private inference.",
-			],
-		},
-		{
-			name: "SIA - AI Systems",
-			stack: "Python / NumPy / AI/ML",
-			url: "https://github.com/glpecile/SIA_TPs",
-			highlights: [
-				"Implemented perceptrons, search, and optimization algorithms from scratch in Python.",
-				"Trained and evaluated neural-network and AI models across multiple problem sets.",
-			],
-		},
-		{
 			name: "srt-cli",
 			stack: "TypeScript / Bun",
 			url: "https://github.com/glpecile/srt-cli",
@@ -291,10 +282,12 @@ export const siteConfig = {
 			],
 		},
 		{
-			name: "ITBA Systems Coursework",
-			stack: "C / Java / PostgreSQL / Redis",
+			name: "ITBA Coursework",
+			stack: "Python / PyTorch / C / Java / PostgreSQL / Redis",
 			url: "https://github.com/glpecile",
 			highlights: [
+				"Thesis: a PyTorch CNN that detects people in images, compiled with Concrete ML to run inference on FHE-encrypted data, with a web demo.",
+				"Perceptrons, search and optimization algorithms written from scratch in Python.",
 				"Cryptography & steganography tooling, a multithreaded socket server in C, distributed object computing in Java, and a Postgres/Redis-backed data platform.",
 			],
 		},
@@ -324,11 +317,11 @@ export const siteConfig = {
 		},
 		{
 			category: "Languages",
-			items: ["TypeScript", "JavaScript", "Python", "Elixir", "Java", "C", "SQL"],
+			items: ["TypeScript", "JavaScript", "Python", "Rust", "Elixir", "Java", "C", "SQL"],
 		},
 		{
 			category: "Backend & Data",
-			items: ["Phoenix (Elixir)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
+			items: ["Phoenix (Elixir)", "Effect (TypeScript)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
 		},
 		{
 			category: "AI / ML",

@@ -1,0 +1,56 @@
+---
+import { createHash } from "node:crypto";
+import { render } from "pele";
+
+interface Props {
+	code: string;
+	caption?: string;
+}
+
+const { code, caption } = Astro.props;
+
+// Rendered at build time, so no diagram JS ships. JetBrains Mono is
+// monospace: every glyph, bold included, advances 0.6em.
+const { svg } = render(code, {
+	measurer: { width: (text, size) => [...text].length * size * 0.6 },
+	fontFamily: "JetBrains Mono, monospace",
+	fontFamilyMono: "JetBrains Mono, monospace",
+	// The site column: max-w-4xl (896px) less the sm:px-8 padding.
+	maxWidth: 832,
+	idPrefix: `d${createHash("sha1").update(code).digest("hex").slice(0, 8)}`,
+});
+
+// Pele emits role="graphics-document document", which assistive tech
+// and audits don't recognize. A function replacer keeps `$` in the
+// caption literal.
+const label = (caption ?? "Diagram").replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+const html = svg.replace(
+	/role="graphics-document document" aria-roledescription="[^"]*"/,
+	() => `role="img" aria-label="${label}"`,
+);
+// Phones scroll a wide diagram at full size instead of shrinking its text.
+---
+
+<figure class="diagram my-8 overflow-x-auto [&_svg]:mx-auto max-sm:[&_svg]:max-w-none!" tabindex="0">
+	<Fragment set:html={html} />
+	{
+		caption && (
+			<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">{caption}</figcaption>
+		)
+	}
+</figure>
+
+<style>
+	/* Colors follow the theme tokens, so a theme switch needs no re-render. */
+	.diagram {
+		--pele-bg: var(--color-background);
+		--pele-fg: var(--color-foreground);
+		--pele-muted: var(--color-tone-soft);
+		--pele-line: var(--color-tone-mid);
+		--pele-surface: var(--color-background);
+		--pele-surface-alt: var(--color-muted);
+		--pele-border: var(--color-border);
+		--pele-accent: var(--color-ring);
+		--pele-radius: 0;
+	}
+</style>
