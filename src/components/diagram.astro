@@ -21,10 +21,12 @@ const { svg } = render(code, {
 });
 
 // Pele emits role="graphics-document document", which assistive tech
-// and audits don't recognize.
+// and audits don't recognize. A function replacer keeps `$` in the
+// caption literal.
+const label = (caption ?? "Diagram").replaceAll("&", "&amp;").replaceAll('"', "&quot;");
 const html = svg.replace(
 	/role="graphics-document document" aria-roledescription="[^"]*"/,
-	`role="img" aria-label="${(caption ?? "Diagram").replaceAll('"', "&quot;")}"`,
+	() => `role="img" aria-label="${label}"`,
 );
 ---
 
