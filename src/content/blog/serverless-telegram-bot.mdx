@@ -170,7 +170,7 @@ The bot records the latest state each user has already been alerted about. When 
 
 <Diagram
 	caption="Baseline advancement is what makes alerts idempotent — no manual state, no repeats."
-	code={`flowchart LR
+	code={`flowchart TB
     C(["cron trigger<br/>*/15 * * * *"]) --> F["fetch upstream source"]
     F --> D{"new items vs<br/>user's baseline?"}
     D -- "no" --> Z(["done"])

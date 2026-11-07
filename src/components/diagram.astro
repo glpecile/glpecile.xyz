@@ -28,7 +28,8 @@ const html = svg.replace(
 );
 ---
 
-<figure class="diagram my-8 overflow-x-auto">
+<!-- Phones scroll a wide diagram at full size instead of shrinking its text. -->
+<figure class="diagram my-8 overflow-x-auto [&_svg]:mx-auto max-sm:[&_svg]:max-w-none!" tabindex="0">
 	<Fragment set:html={html} />
 	{
 		caption && (
@@ -49,9 +50,5 @@ const html = svg.replace(
 		--pele-border: var(--color-border);
 		--pele-accent: var(--color-ring);
 		--pele-radius: 0;
-	}
-
-	.diagram :global(svg) {
-		margin-inline: auto;
 	}
 </style>
