@@ -247,6 +247,15 @@ export const siteConfig = {
 			],
 		},
 		{
+			name: "hachikuji",
+			stack: "Rust / zsh / Nushell",
+			url: "https://github.com/glpecile/hachikuji",
+			highlights: [
+				"Built and shipped an IDE-style completion popup for zsh with no pty wrapper — ZLE draws it, so zsh stays the foreground process.",
+				"About 2 MB per shell (inshellisense: ~43 MB) — one Rust helper per shell over a shared mmap index of 1,455 Fig specs.",
+			],
+		},
+		{
 			name: "shinobu",
 			stack: "React Native / Expo / TypeScript",
 			url: "https://github.com/glpecile/shinobu",
@@ -324,7 +333,7 @@ export const siteConfig = {
 		},
 		{
 			category: "Languages",
-			items: ["TypeScript", "JavaScript", "Python", "Elixir", "Java", "C", "SQL"],
+			items: ["TypeScript", "JavaScript", "Python", "Rust", "Elixir", "Java", "C", "SQL"],
 		},
 		{
 			category: "Backend & Data",
