@@ -1,90 +1,57 @@
 ---
+import { createHash } from "node:crypto";
+import { render } from "pele";
+
 interface Props {
 	code: string;
 	caption?: string;
 }
 
 const { code, caption } = Astro.props;
+
+// Rendered at build time, so no diagram JS ships. JetBrains Mono is
+// monospace: every glyph, bold included, advances 0.6em.
+const { svg } = render(code, {
+	measurer: { width: (text, size) => [...text].length * size * 0.6 },
+	fontFamily: "JetBrains Mono, monospace",
+	fontFamilyMono: "JetBrains Mono, monospace",
+	// The site column: max-w-4xl (896px) less the sm:px-8 padding.
+	maxWidth: 832,
+	idPrefix: `d${createHash("sha1").update(code).digest("hex").slice(0, 8)}`,
+});
+
+// Pele emits role="graphics-document document", which assistive tech
+// and audits don't recognize.
+const html = svg.replace(
+	/role="graphics-document document" aria-roledescription="[^"]*"/,
+	`role="img" aria-label="${(caption ?? "Diagram").replaceAll('"', "&quot;")}"`,
+);
 ---
 
-<figure class="mermaid-diagram" data-mermaid-source={code}>
-	<pre class="mermaid-diagram-fallback">{code}</pre>
-	{caption && <figcaption>{caption}</figcaption>}
+<figure class="mermaid-diagram my-8 overflow-x-auto">
+	<Fragment set:html={html} />
+	{
+		caption && (
+			<figcaption class="mt-3 text-center text-[0.85rem] opacity-70">{caption}</figcaption>
+		)
+	}
 </figure>
 
-<script>
-	import mermaid from "mermaid";
-
-	const diagrams = Array.from(
-		document.querySelectorAll<HTMLElement>(".mermaid-diagram"),
-	);
-	let renderSeq = 0;
-
-	const renderAll = async () => {
-		const isDark = document.documentElement.dataset.theme === "dark";
-		mermaid.initialize({
-			startOnLoad: false,
-			theme: isDark ? "dark" : "neutral",
-			fontFamily: "'JetBrains Mono', monospace",
-			suppressErrorRendering: true,
-		});
-		for (const figure of diagrams) {
-			const source = figure.dataset.mermaidSource;
-			if (!source) continue;
-			const renderId = `mermaid-${renderSeq++}`;
-			try {
-				const { svg } = await mermaid.render(renderId, source);
-				const caption = figure.querySelector("figcaption");
-				figure.innerHTML = svg;
-				if (caption) figure.appendChild(caption);
-				const svgEl = figure.querySelector("svg");
-				if (svgEl) {
-					// Mermaid emits role="graphics-document document", which
-					// assistive tech and audits don't recognize.
-					svgEl.setAttribute("role", "img");
-					svgEl.removeAttribute("aria-roledescription");
-					svgEl.setAttribute(
-						"aria-label",
-						caption?.textContent?.trim() || "Diagram",
-					);
-				}
-			} catch {
-				// Leave the source-text fallback in place, and drop the
-				// scratch element mermaid appends to <body> on failure.
-				document.getElementById(renderId)?.remove();
-			}
-		}
-	};
-
-	if (diagrams.length > 0) {
-		renderAll();
-		new MutationObserver(renderAll).observe(document.documentElement, {
-			attributeFilter: ["data-theme"],
-		});
-	}
-</script>
-
 <style>
+	/* Colors follow the theme tokens, so a theme switch needs no re-render. */
 	.mermaid-diagram {
-		margin: 2rem 0;
-		overflow-x: auto;
+		--pele-bg: var(--color-background);
+		--pele-fg: var(--color-foreground);
+		--pele-muted: var(--color-tone-soft);
+		--pele-line: var(--color-tone-mid);
+		--pele-surface: var(--color-background);
+		--pele-surface-alt: var(--color-muted);
+		--pele-border: var(--color-border);
+		--pele-accent: var(--color-ring);
+		--pele-radius: 0;
 	}
 
 	.mermaid-diagram :global(svg) {
 		margin-inline: auto;
-		max-width: 100%;
-		height: auto;
-	}
-
-	.mermaid-diagram-fallback {
-		font-size: 0.8rem;
-		overflow-x: auto;
-	}
-
-	.mermaid-diagram figcaption {
-		margin-top: 0.75rem;
-		text-align: center;
-		font-size: 0.85rem;
-		opacity: 0.7;
 	}
 </style>
