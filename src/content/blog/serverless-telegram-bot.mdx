@@ -5,7 +5,7 @@ pubDate: 2026-07-18
 authors: [glpecile, claude]
 ---
 
-import MermaidDiagram from "../../components/mermaid-diagram.astro";
+import Diagram from "@/components/diagram.astro";
 
 *The Odyssey* is playing in IMAX right now, and I haven't seen it.
 
@@ -45,7 +45,7 @@ Here's the whole design in one sentence: all the actual logic lives in a `lib/` 
 
 The Telegram API client? Injected. The storage layer? Injected. Even `fetch` is injected. Nothing in `lib/` imports a platform SDK. Nothing in `lib/` even knows platforms *exist*.
 
-<MermaidDiagram
+<Diagram
 	caption="Dependencies point inward: adapters know the core, the core knows nothing."
 	code={`flowchart TB
     subgraph core ["Domain core — lib/"]
@@ -132,7 +132,7 @@ Let's trace what happens when someone tells the bot to track a film.
 
 Telegram delivers updates to a webhook. Before anything interesting happens, the adapter has exactly two transport-level jobs: check that the request *actually came from Telegram*, and deserialize the update. Everything after that is core code that has no idea Cloudflare exists.
 
-<MermaidDiagram
+<Diagram
 	caption="A command round-trip. Everything between the gateway and the store is host-agnostic."
 	code={`sequenceDiagram
     autonumber
@@ -168,7 +168,7 @@ The notification half is a scheduled job that runs the same injected core. And t
 
 The bot records the latest state each user has already been alerted about. When the scan finds new showtimes, it compares them against *your* baseline — not a global one, not a config file, yours. And after it alerts you, it advances your baseline *in the same flow*.
 
-<MermaidDiagram
+<Diagram
 	caption="Baseline advancement is what makes alerts idempotent — no manual state, no repeats."
 	code={`flowchart LR
     C(["cron trigger<br/>*/15 * * * *"]) --> F["fetch upstream source"]

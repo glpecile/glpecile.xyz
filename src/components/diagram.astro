@@ -28,7 +28,7 @@ const html = svg.replace(
 );
 ---
 
-<figure class="mermaid-diagram my-8 overflow-x-auto">
+<figure class="diagram my-8 overflow-x-auto">
 	<Fragment set:html={html} />
 	{
 		caption && (
@@ -39,7 +39,7 @@ const html = svg.replace(
 
 <style>
 	/* Colors follow the theme tokens, so a theme switch needs no re-render. */
-	.mermaid-diagram {
+	.diagram {
 		--pele-bg: var(--color-background);
 		--pele-fg: var(--color-foreground);
 		--pele-muted: var(--color-tone-soft);
@@ -51,7 +51,7 @@ const html = svg.replace(
 		--pele-radius: 0;
 	}
 
-	.mermaid-diagram :global(svg) {
+	.diagram :global(svg) {
 		margin-inline: auto;
 	}
 </style>
