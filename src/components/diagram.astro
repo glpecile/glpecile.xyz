@@ -28,9 +28,9 @@ const html = svg.replace(
 	/role="graphics-document document" aria-roledescription="[^"]*"/,
 	() => `role="img" aria-label="${label}"`,
 );
+// Phones scroll a wide diagram at full size instead of shrinking its text.
 ---
 
-<!-- Phones scroll a wide diagram at full size instead of shrinking its text. -->
 <figure class="diagram my-8 overflow-x-auto [&_svg]:mx-auto max-sm:[&_svg]:max-w-none!" tabindex="0">
 	<Fragment set:html={html} />
 	{
