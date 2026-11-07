@@ -321,7 +321,7 @@ export const siteConfig = {
 		},
 		{
 			category: "Backend & Data",
-			items: ["Phoenix (Elixir)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
+			items: ["Phoenix (Elixir)", "Effect (TypeScript)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
 		},
 		{
 			category: "AI / ML",
