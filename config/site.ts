@@ -253,6 +253,7 @@ export const siteConfig = {
 			highlights: [
 				"Built and shipped an IDE-style completion popup for zsh with no pty wrapper — ZLE draws it, so zsh stays the foreground process.",
 				"About 2 MB per shell (inshellisense: ~43 MB) — one Rust helper per shell over a shared mmap index of 1,455 Fig specs.",
+				"Published to Homebrew through my own tap (brew install glpecile/tap/hachikuji) — prebuilt macOS binaries with pinned SHA-256s, so installing needs no Rust toolchain.",
 			],
 		},
 		{
