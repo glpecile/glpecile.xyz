@@ -1,6 +1,7 @@
 ---
 import { siteConfig } from "#config/site";
 
+import Icon from "@/components/icon.astro";
 import PageIntro from "@/components/page-intro.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
@@ -11,7 +12,8 @@ const latestPostRange = `1-${latestPostCount}`;
 const recentPostUrls = posts
 	.slice(0, latestPostCount)
 	.map((post) => getBlogPostUrl(post.id));
-const introExtra = `use <span class="text-tone-mid">[${latestPostRange}]</span> for the latest posts · <span class="text-tone-mid">[j]/[k]</span> to move · <span class="text-tone-mid">[enter]</span> to open.<span class="mt-2 block">or subscribe via the <a class="terminal-link" href="/blog/rss.xml">rss feed</a>.</span>`;
+const kbd = (key: string) => `<span class="kbd">${key}</span>`;
+const introExtra = `Press ${kbd(latestPostRange)} for the latest posts, ${kbd("j")} ${kbd("k")} to move, ${kbd("enter")} to open.`;
 ---
 
 <SiteLayout
@@ -20,37 +22,36 @@ const introExtra = `use <span class="text-tone-mid">[${latestPostRange}]</span> 
 	path="/blog"
 	previewPath="/blog/preview"
 >
-	<section class="space-y-4">
+	<section class="space-y-10">
+		<div class="space-y-4">
 		<PageIntro
-			label="blog"
 			title="Notes, builds, and rabbit holes."
-			description="From tiny thoughts to full project writeups. Every post is just an mdx file — the latest nine get a keyboard shortcut."
 			extra={posts.length > 0 ? introExtra : undefined}
-			prompt="ls *.mdx"
-			cwd="~/blog"
 		/>
+		<p class="text-sm" data-reveal>
+			<a class="action" href="/blog/rss.xml"><Icon name="rss" />rss feed</a>
+		</p>
+		</div>
 
 		{posts.length === 0 ? (
 			<p class="text-tone-soft text-sm" data-reveal>no posts yet.</p>
 		) : (
-			<ol class="space-y-5" data-reveal>
+			<ol class="space-y-7" data-reveal>
 				{posts.map((post, index) => (
-					<li data-tui-row class="group space-y-1">
-						<p class="text-tone-faint text-xs tracking-[0.28em] uppercase">
-							{formatDate(post.data.updatedDate ?? post.data.pubDate)}
-						</p>
-						<p class="text-base leading-8 sm:text-lg">
-							<a
-								class="terminal-link group-hover:underline"
-								href={getBlogPostUrl(post.id)}
-							>
+					<li data-tui-row class="space-y-1">
+						<div class="flex items-baseline gap-3">
+							<a class="min-w-0 font-[575] no-underline" href={getBlogPostUrl(post.id)}>
 								{post.data.title}
 							</a>
 							{index < latestPostCount && (
-								<span class="text-tone-faint"> [{index + 1}]</span>
+								<span class="kbd shrink-0" aria-hidden="true">{index + 1}</span>
 							)}
-						</p>
-						<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+							<span aria-hidden="true" class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"></span>
+							<time class="text-tone-faint ml-auto shrink-0 font-mono text-xs">
+								{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
+							</time>
+						</div>
+						<p class="text-tone-soft text-sm leading-6">
 							{post.data.description}
 						</p>
 					</li>

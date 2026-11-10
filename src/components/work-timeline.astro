@@ -5,54 +5,52 @@ import { parseInlineLinks } from "@/lib/inline-links";
 export interface Props {
 	work: readonly WorkExperience[];
 	detail?: "summary" | "highlights";
-	/** End the rail with a terminator dash. Disable for truncated lists that link to more. */
-	capped?: boolean;
 }
 
-const { work, detail = "summary", capped = true } = Astro.props;
+const { work, detail = "summary" } = Astro.props;
 ---
 
-<ol
-	class:list={[
-		"border-border relative border-l-2 border-dotted pl-6",
-		capped &&
-			"after:bg-border after:absolute after:bottom-0 after:-left-1.5 after:h-0.5 after:w-2.5",
-	]}
->
+<ol class="border-border relative space-y-8 border-l pl-6">
 	{work.map((job, index) => (
-		<li class="mb-8 last:mb-0">
-			<span class="absolute -left-1.5 mt-1.5 flex h-2.5 w-2.5">
+		<li class="group">
+			<span class="absolute -left-[4.5px] mt-2 flex size-2 transition-[scale] duration-200 ease-(--ease-reveal) group-hover:scale-150 motion-reduce:transition-none">
 				{index === 0 && (
-					<span class="bg-foreground absolute inline-flex h-full w-full animate-ping opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
+					<span class="bg-link absolute inline-flex size-full animate-ping rounded-full opacity-60 [animation-duration:2.5s] motion-reduce:hidden" />
 				)}
-				<span class="bg-foreground relative inline-flex h-2.5 w-2.5" />
+				<span
+					class:list={[
+						"ring-background relative inline-flex size-2 rounded-full ring-4",
+						index === 0 ? "bg-link" : "bg-tone-faint group-hover:bg-link transition-colors duration-200",
+					]}
+				/>
 			</span>
-			<time class="text-tone-faint text-sm">{job.period}</time>
-			<p class="mt-1 text-base leading-8 sm:text-lg">
-				<span class="text-foreground">{job.role}</span>
-				<span class="text-tone-faint"> @ </span>
-				{job.url ? (
-					<a
-						class="terminal-link"
-						href={job.url}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{job.company}
-					</a>
-				) : (
-					<span class="text-tone-strong">{job.company}</span>
-				)}
+			<p>
+					<span class="text-foreground font-[575]">{job.role}</span>
+					<span class="text-tone-faint"> at </span>
+					{job.url ? (
+						<a
+							class="site-link"
+							href={job.url}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{job.company}
+						</a>
+					) : (
+						<span>{job.company}</span>
+					)}
 			</p>
-			<p class="text-tone-soft text-sm leading-7 sm:text-base">{job.place}</p>
+			<p class="text-tone-soft flex flex-wrap items-baseline justify-between gap-x-4 text-sm">
+				<span>{job.place}</span>
+				<time class="text-tone-faint font-mono text-xs">{job.period}</time>
+			</p>
 			{detail === "highlights" && job.highlights ? (
-				<ul class="space-y-1 pt-1">
+				<ul class="marker:text-tone-faint text-tone-mid mt-2 list-disc space-y-1.5 pl-4">
 					{job.highlights.map((highlight) => (
-						<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
-							<span class="text-tone-faint">- </span>
+						<li>
 							{parseInlineLinks(highlight).map((segment) =>
 								segment.url ? (
-									<a class="terminal-link" href={segment.url}>
+									<a class="site-link" href={segment.url}>
 										{segment.text}
 									</a>
 								) : (
@@ -64,7 +62,7 @@ const { work, detail = "summary", capped = true } = Astro.props;
 				</ul>
 			) : (
 				(job.summary ?? job.highlights?.[0]) && (
-					<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+					<p class="text-tone-mid mt-2">
 						{job.summary ?? job.highlights?.[0]}
 					</p>
 				)

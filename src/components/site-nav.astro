@@ -16,7 +16,7 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 <div class="shrink-0" data-site-nav>
 	<MobileDrawer menu="nav" currentPath={currentPath} client:load />
 	<nav aria-label="Primary" class="hidden sm:block sm:w-auto">
-		<ul class="flex items-center gap-x-5 gap-y-2 text-sm sm:justify-start">
+		<ul class="flex items-center gap-x-5 gap-y-2 sm:justify-start">
 			{navItems.map((item) => (
 				<li>
 					<a
@@ -24,12 +24,12 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 						aria-current={item.isActive ? "page" : undefined}
 						aria-keyshortcuts={item.shortcut}
 						class:list={[
-							"terminal-link inline-flex items-center gap-2",
-							item.isActive ? "text-foreground" : "text-tone-mid",
+							"hover:text-foreground inline-flex items-center gap-1.5 no-underline transition-colors duration-150",
+							item.isActive ? "text-foreground" : "text-tone-soft",
 						]}
 					>
-						<span class="text-tone-faint">[{item.shortcut}]</span>
-						<span class:list={["lowercase", item.isActive && "underline"]}>{item.title}</span>
+						<span class="lowercase">{item.title}</span>
+						<span class="kbd" aria-hidden="true">{item.shortcut}</span>
 					</a>
 				</li>
 			))}

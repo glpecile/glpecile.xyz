@@ -1,5 +1,6 @@
 ---
 import FilmListLoader from "@/components/film-list";
+import MoreLink from "@/components/more-link.astro";
 import PageIntro from "@/components/page-intro.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { withBlurPlaceholders } from "@/lib/blur";
@@ -23,22 +24,14 @@ try {
 	path="/films"
 	previewPath="/films/preview"
 >
-	<section class="space-y-6">
+	<section class="space-y-5">
 		<PageIntro
-			label="films"
 			title="Recently watched."
 			description="A feed of films I've logged on Letterboxd."
 		/>
 
-		<p class="text-sm sm:text-base" data-reveal>
-			<a
-				class="terminal-link"
-				href={siteConfig.links.letterboxd}
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				view all on letterboxd →
-			</a>
+		<p data-reveal>
+			<MoreLink href={siteConfig.links.letterboxd} label="view all on letterboxd" external />
 		</p>
 	</section>
 
@@ -47,15 +40,8 @@ try {
 	</section>
 
 	<section class="space-y-3" data-reveal>
-		<p class="text-sm sm:text-base">
-			<a
-				class="terminal-link"
-				href={siteConfig.links.letterboxd}
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				view all on letterboxd →
-			</a>
+		<p>
+			<MoreLink href={siteConfig.links.letterboxd} label="view all on letterboxd" external />
 		</p>
 	</section>
 </SiteLayout>

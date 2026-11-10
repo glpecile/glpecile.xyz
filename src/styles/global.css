@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
-/* Self-hosted JetBrains Mono, subset by scripts/subset-fonts.py (rerun it
-   when content needs new characters). Weights match what the UI uses:
-   400 body, 500 `font-medium`, 700 `font-bold`. */
+/* Self-hosted Inter (variable) and JetBrains Mono (400/500/700), subset by
+   scripts/subset-fonts.py (rerun it when content needs new characters).
+   Inter sets all text; mono is for page headlines, dates, keys and code. */
 @import "./fonts.css";
 
 @theme {
 	--font-mono: "JetBrains Mono", monospace;
-	--font-sans: "JetBrains Mono", monospace;
-	--text-blog: clamp(1.125rem, 1.08rem + 0.2vw, 1.25rem);
+	--font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+	--text-blog: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
 	--text-blog--line-height: 1.7;
 
 	--color-border: hsl(var(--border));
@@ -38,8 +38,6 @@
 	--color-card: hsl(var(--card));
 	--color-card-foreground: hsl(var(--card-foreground));
 	--color-heading: hsl(var(--heading));
-	--color-heading-soft: hsl(var(--heading-soft));
-	--color-section: hsl(var(--section));
 	--color-link: hsl(var(--link));
 	--color-tone-strong: hsl(var(--tone-strong));
 	--color-tone-mid: hsl(var(--tone-mid));
@@ -69,43 +67,42 @@
 	:root {
 		color-scheme: light;
 
-		--background: 220 22% 92%;
-		--foreground: 234 21% 27%;
+		/* Cool neutrals around one accent: the blue (--heading, --link, --ring). */
+		--background: 220 23% 97%;
+		--foreground: 225 16% 12%;
 
-		--card: 220 21% 89%;
-		--card-foreground: 234 21% 27%;
+		--card: 0 0% 100%;
+		--card-foreground: 225 16% 12%;
 
-		--popover: 220 21% 89%;
-		--popover-foreground: 234 21% 27%;
+		--popover: 220 20% 94%;
+		--popover-foreground: 225 16% 12%;
 
-		--primary: 234 21% 27%;
-		--primary-foreground: 220 22% 92%;
+		--primary: 225 16% 12%;
+		--primary-foreground: 220 23% 97%;
 
-		--secondary: 223 16% 83%;
-		--secondary-foreground: 234 21% 27%;
+		--secondary: 220 16% 90%;
+		--secondary-foreground: 225 16% 12%;
 
-		--muted: 220 21% 89%;
-		--muted-foreground: 233 15% 34%;
+		--muted: 220 18% 93%;
+		--muted-foreground: 225 8% 38%;
 
-		--accent: 223 16% 83%;
-		--accent-foreground: 234 21% 27%;
+		--accent: 220 16% 90%;
+		--accent-foreground: 225 16% 12%;
 
 		--destructive: 347 87% 44%;
-		--destructive-foreground: 220 22% 92%;
+		--destructive-foreground: 220 23% 97%;
 
-		--border: 225 13% 71%;
-		--input: 225 13% 71%;
-		--ring: 220 91% 54%;
+		--border: 220 14% 86%;
+		--input: 220 14% 86%;
+		--ring: 220 91% 46%;
 		--heading: 220 91% 46%;
-		--heading-soft: 231 97% 72%;
-		--section: 220 91% 46%;
-		--link: 192 60% 44%;
-		--selection: 223 16% 83%;
-		--selection-foreground: 234 21% 27%;
-		--tone-strong: 234 21% 27%;
-		--tone-mid: 233 15% 34%;
-		--tone-soft: 233 11% 42%;
-		--tone-faint: 231 10% 51%;
+		--link: 220 91% 46%;
+		--selection: 220 90% 88%;
+		--selection-foreground: 225 16% 12%;
+		--tone-strong: 225 16% 12%;
+		--tone-mid: 225 9% 30%;
+		--tone-soft: 225 7% 40%;
+		--tone-faint: 225 6% 46%;
 
 		--radius: 0.5rem;
 
@@ -120,43 +117,41 @@
 	:root[data-theme="dark"] {
 		color-scheme: dark;
 
-		--background: 240 21% 15%;
-		--foreground: 226 64% 88%;
+		--background: 225 14% 8%;
+		--foreground: 220 16% 92%;
 
-		--card: 240 21% 12%;
-		--card-foreground: 226 64% 88%;
+		--card: 225 10% 18%;
+		--card-foreground: 220 16% 92%;
 
-		--popover: 240 21% 12%;
-		--popover-foreground: 226 64% 88%;
+		--popover: 225 13% 11%;
+		--popover-foreground: 220 16% 92%;
 
-		--primary: 226 64% 88%;
-		--primary-foreground: 240 21% 15%;
+		--primary: 220 16% 92%;
+		--primary-foreground: 225 14% 8%;
 
-		--secondary: 237 16% 23%;
-		--secondary-foreground: 226 64% 88%;
+		--secondary: 225 11% 14%;
+		--secondary-foreground: 220 16% 92%;
 
-		--muted: 237 16% 23%;
-		--muted-foreground: 228 24% 72%;
+		--muted: 225 11% 14%;
+		--muted-foreground: 220 8% 66%;
 
-		--accent: 237 16% 23%;
-		--accent-foreground: 226 64% 88%;
+		--accent: 225 11% 14%;
+		--accent-foreground: 220 16% 92%;
 
 		--destructive: 343 81% 75%;
-		--destructive-foreground: 240 23% 9%;
+		--destructive-foreground: 225 14% 8%;
 
-		--border: 234 13% 31%;
-		--input: 234 13% 31%;
-		--ring: 217 92% 76%;
-		--heading: 267 84% 81%;
-		--heading-soft: 232 97% 85%;
-		--section: 41 86% 83%;
-		--link: 172 39% 65%;
-		--selection: 237 16% 23%;
-		--selection-foreground: 226 64% 88%;
-		--tone-strong: 226 64% 88%;
-		--tone-mid: 227 35% 80%;
-		--tone-soft: 228 24% 72%;
-		--tone-faint: 230 13% 55%;
+		--border: 225 9% 20%;
+		--input: 225 9% 20%;
+		--ring: 220 95% 72%;
+		--heading: 220 95% 72%;
+		--link: 220 95% 72%;
+		--selection: 220 60% 30%;
+		--selection-foreground: 220 16% 96%;
+		--tone-strong: 220 16% 92%;
+		--tone-mid: 220 9% 74%;
+		--tone-soft: 220 7% 62%;
+		--tone-faint: 220 6% 52%;
 	}
 
 	* {
@@ -174,12 +169,19 @@
 
 	body {
 		font-family: var(--font-sans);
-		font-size: 15px;
-		letter-spacing: -0.01em;
+		font-size: 1rem;
+		line-height: 1.6;
+		letter-spacing: -0.006em;
 	}
 
 	a {
-		text-underline-offset: 0.15em;
+		text-underline-offset: 0.2em;
+	}
+
+	:focus-visible {
+		outline: 2px solid hsl(var(--ring));
+		outline-offset: 2px;
+		border-radius: 2px;
 	}
 
 	::selection {
@@ -189,15 +191,12 @@
 }
 
 @layer components {
-	.eyebrow {
-		color: hsl(var(--heading-soft) / 0.6);
-		font-size: 0.75rem;
-		letter-spacing: 0.35em;
-		text-transform: uppercase;
-	}
-
+	/* The one loud element per page: mono, bold, blue. */
 	.page-heading {
 		color: var(--color-heading);
+		font-family: var(--font-mono);
+		letter-spacing: -0.03em;
+		text-wrap: balance;
 	}
 
 	.text-tone-strong {
@@ -217,21 +216,207 @@
 	}
 
 	.section-label {
-		color: hsl(var(--section) / 0.82);
-		font-size: 0.75rem;
-		letter-spacing: 0.35em;
-		text-transform: uppercase;
+		color: var(--color-foreground);
+		font-weight: 575;
+		letter-spacing: -0.012em;
 	}
 
-	.terminal-link {
-		color: var(--color-link);
-		text-decoration: none;
-	}
-
-	.terminal-link:hover,
-	.terminal-link:focus-visible {
+	/* Text-coloured link with a quiet underline that turns blue on hover. */
+	.site-link {
+		color: inherit;
 		text-decoration: underline;
-		outline: none;
+		text-decoration-thickness: 1px;
+		text-decoration-color: hsl(var(--foreground) / 0.25);
+		transition:
+			color 150ms ease,
+			text-decoration-color 150ms ease;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.site-link:hover {
+			color: var(--color-link);
+			text-decoration-color: currentcolor;
+		}
+	}
+
+	.icon {
+		fill: none;
+		flex-shrink: 0;
+		height: 1em;
+		stroke: currentcolor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 2;
+		width: 1em;
+	}
+
+	/*
+		Two stacked icons: the action, then a check. The check takes over
+		while an ancestor reports data-copy-state="success".
+	*/
+	.icon-swap {
+		display: inline-grid;
+	}
+
+	.icon-swap > * {
+		grid-area: 1 / 1;
+		transition:
+			opacity 200ms var(--ease-reveal),
+			scale 200ms var(--ease-reveal),
+			filter 200ms var(--ease-reveal);
+	}
+
+	.icon-swap > :last-child,
+	[data-copy-state="success"] .icon-swap > :first-child {
+		filter: blur(2px);
+		opacity: 0;
+		scale: 0.5;
+	}
+
+	[data-copy-state="success"] .icon-swap > :last-child {
+		color: var(--color-link);
+		filter: none;
+		opacity: 1;
+		scale: 1;
+	}
+
+	/* Quiet icon + label control: share, download, markdown, source. */
+	.action {
+		align-items: center;
+		color: hsl(var(--tone-mid));
+		cursor: pointer;
+		display: inline-flex;
+		gap: 0.4rem;
+		text-decoration: none;
+		transition:
+			color 150ms ease,
+			scale 150ms var(--ease-reveal);
+	}
+
+	.action .icon {
+		color: hsl(var(--tone-faint));
+		transition: color 150ms ease;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.action:hover {
+			color: hsl(var(--foreground));
+		}
+
+		.action:hover .icon {
+			color: var(--color-link);
+		}
+	}
+
+	.action:active {
+		scale: 0.97;
+	}
+
+	/* Raised surface for a project; lifts on hover. */
+	.card {
+		background: hsl(var(--card));
+		border-radius: 0.875rem;
+		box-shadow:
+			0 0 0 1px hsl(var(--foreground) / 0.07),
+			0 1px 2px hsl(var(--foreground) / 0.05);
+		transition:
+			translate 200ms var(--ease-reveal),
+			box-shadow 200ms ease;
+	}
+
+	:root[data-theme="dark"] .card {
+		background: hsl(var(--muted));
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.card:hover {
+			box-shadow:
+				0 0 0 1px hsl(var(--foreground) / 0.1),
+				0 8px 24px hsl(var(--foreground) / 0.08);
+			translate: 0 -2px;
+		}
+	}
+
+	/* Soft raised pill for a link with an icon; presses in on click. */
+	.chip {
+		align-items: center;
+		background: hsl(var(--card));
+		border-radius: 9999px;
+		box-shadow:
+			0 0 0 1px hsl(var(--foreground) / 0.07),
+			0 1px 2px hsl(var(--foreground) / 0.06);
+		display: inline-flex;
+		gap: 0.5rem;
+		padding: 0.4rem 0.9rem 0.4rem 0.75rem;
+		text-decoration: none;
+		transition:
+			scale 150ms var(--ease-reveal),
+			box-shadow 150ms ease;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.chip:hover {
+			box-shadow:
+				0 0 0 1px hsl(var(--foreground) / 0.1),
+				0 4px 12px hsl(var(--foreground) / 0.08);
+		}
+	}
+
+	.chip:active {
+		scale: 0.97;
+	}
+
+	/*
+		Thumb of the footer theme switch. It follows the preference the head
+		script sets on <html>; offsets match the auto, light, dark order in
+		siteConfig.shortcuts.theme.
+	*/
+	.theme-thumb {
+		box-shadow: 0 1px 2px hsl(var(--foreground) / 0.12);
+		transition: translate 250ms var(--ease-reveal);
+	}
+
+	:root[data-theme-preference="light"] .theme-thumb {
+		translate: 100%;
+	}
+
+	:root[data-theme-preference="dark"] .theme-thumb {
+		translate: 200%;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.action,
+		.card,
+		.chip,
+		.theme-thumb {
+			transition: none;
+		}
+
+		.card:hover {
+			translate: none;
+		}
+
+		.icon-swap > * {
+			filter: none !important;
+			scale: 1 !important;
+			transition: opacity 200ms ease;
+		}
+	}
+
+	/* Keyboard shortcut hint, drawn as a keycap. */
+	.kbd {
+		background: hsl(var(--card));
+		border: 1px solid hsl(var(--border));
+		border-bottom-width: 2px;
+		border-radius: 0.3rem;
+		color: hsl(var(--tone-soft));
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		letter-spacing: 0;
+		line-height: 1;
+		padding: 0.2em 0.4em;
+		vertical-align: 0.08em;
 	}
 
 	.blog-back-link {
@@ -259,19 +444,20 @@
 	.blog-prose h1,
 	.blog-prose h2,
 	.blog-prose h3 {
-		color: var(--color-heading);
-		font-family: var(--font-mono);
-		font-weight: 700;
-		line-height: 1.2;
+		color: var(--color-foreground);
+		font-weight: 575;
+		letter-spacing: -0.015em;
+		line-height: 1.3;
+		text-wrap: balance;
 	}
 
 	.blog-prose h1 {
-		font-size: clamp(1.9rem, 4vw, 2.8rem);
+		font-size: 1.5rem;
 		margin-top: 2rem;
 	}
 
 	.blog-prose h2 {
-		font-size: clamp(1.4rem, 2vw, 1.8rem);
+		font-size: 1.25rem;
 		margin-top: 2.5rem;
 	}
 
@@ -293,7 +479,7 @@
 		background: transparent;
 		border: 0;
 		cursor: pointer;
-		font-family: var(--font-mono);
+		font: inherit;
 		padding: 0;
 		text-align: left;
 		transition: color 180ms ease;
@@ -372,11 +558,16 @@
 		color: var(--color-link);
 		text-decoration: underline;
 		text-decoration-thickness: 1px;
+		text-decoration-color: hsl(var(--link) / 0.4);
+	}
+
+	.blog-prose a:hover {
+		text-decoration-color: currentcolor;
 	}
 
 	.blog-prose strong {
 		color: hsl(var(--foreground));
-		font-weight: 700;
+		font-weight: 600;
 	}
 
 	.blog-prose code {
@@ -387,7 +578,7 @@
 
 	.blog-prose :not(pre) > code {
 		background: hsl(var(--muted));
-		border-radius: 0.2rem;
+		border-radius: 0.3rem;
 		color: hsl(var(--foreground));
 		padding: 0.08rem 0.35rem;
 	}
@@ -422,9 +613,9 @@
 
 	.blog-prose .astro-code {
 		background-color: hsl(var(--muted));
-		border-radius: 0.4rem;
+		border-radius: 0.5rem;
 		color: var(--shiki-light);
-		font-size: 0.94rem;
+		font-size: 0.8125rem;
 		line-height: 1.7;
 		margin: 0;
 		padding: 3.1rem 1.125rem 1rem;
@@ -446,6 +637,9 @@
 		font-family: var(--font-mono);
 		font-size: 0.78rem;
 		letter-spacing: 0.04em;
+		align-items: center;
+		display: inline-flex;
+		gap: 0.35rem;
 		padding: 0;
 		padding-bottom: 0.45rem;
 		position: static;
@@ -486,7 +680,7 @@
 		color: hsl(var(--tone-strong));
 		margin-left: 0;
 		padding-left: 1rem;
-		border-left: 1px solid hsl(var(--tone-faint) / 0.38);
+		border-left: 2px solid hsl(var(--border));
 	}
 
 	.blog-prose blockquote p {
@@ -665,41 +859,26 @@
 }
 
 /*
-	TUI row selection: subtle surface highlight with a `>` gutter cursor,
-	opencode-TUI style — no reverse video, descendant tone/link colors are
-	preserved so the row just steps one shade up from the page background.
-	Rows opt in with [data-tui-row]; the layout script moves
-	[data-tui-selected] with j/k and opens with enter.
+	Row selection: the row steps one shade up from the page and the fill
+	bleeds past the text column, so the text itself never moves. Rows opt in
+	with [data-tui-row]; the layout script moves [data-tui-selected] with j/k
+	and opens with enter.
 */
 [data-tui-row] {
+	border-radius: 0.25rem;
 	position: relative;
 }
 
 [data-tui-row][data-tui-selected],
 [data-tui-row]:focus-within {
 	background: hsl(var(--muted));
-}
-
-[data-tui-row][data-tui-selected]::before,
-[data-tui-row]:focus-within::before {
-	color: hsl(var(--foreground));
-	content: ">";
-	position: absolute;
-	left: -1.6ch;
-	top: 0;
+	box-shadow: 0 0 0 0.5rem hsl(var(--muted));
 }
 
 @media (hover: hover) and (pointer: fine) {
 	[data-tui-row]:hover {
 		background: hsl(var(--muted));
+		box-shadow: 0 0 0 0.5rem hsl(var(--muted));
 		cursor: pointer;
-	}
-
-	[data-tui-row]:hover::before {
-		color: hsl(var(--foreground));
-		content: ">";
-		position: absolute;
-		left: -1.6ch;
-		top: 0;
 	}
 }

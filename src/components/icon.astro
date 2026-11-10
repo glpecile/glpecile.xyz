@@ -1,0 +1,21 @@
+---
+import { type IconName, iconSwapHtml, icons } from "@/lib/icons";
+
+export interface Props {
+	name: IconName;
+	/** Swap to a check while an ancestor has `data-copy-state="success"`. */
+	swap?: boolean;
+}
+
+const { name, swap = false } = Astro.props;
+---
+
+{
+	swap ? (
+		<Fragment set:html={iconSwapHtml(name)} />
+	) : (
+		<svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+			<path d={icons[name]} />
+		</svg>
+	)
+}
