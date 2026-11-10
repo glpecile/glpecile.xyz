@@ -85,20 +85,15 @@ const themeItems = siteConfig.shortcuts.theme;
 					}
 
 					const isActive = button.dataset.themeOption === theme;
-					const label = button.querySelector("[data-theme-label]");
-
 					button.dataset.active = isActive ? "true" : "false";
 					button.setAttribute("aria-pressed", isActive ? "true" : "false");
 					button.classList.toggle("text-foreground", isActive);
 					button.classList.toggle("text-tone-soft", !isActive);
-
-					if (label instanceof HTMLElement) {
-						label.classList.toggle("underline", isActive);
-					}
 				});
 			};
 
-			const syncThemeButtons = (theme) => {
+			const syncThemeButtons = (theme, animate = false) => {
+				footer.dataset.instant = String(!animate);
 				window.__glpecileTheme.apply(theme);
 				setThemeButtonState(theme);
 			};
@@ -133,7 +128,7 @@ const themeItems = siteConfig.shortcuts.theme;
 				}
 
 				window.__glpecileTheme.persist(theme);
-				syncThemeButtons(theme);
+				syncThemeButtons(theme, event.detail > 0);
 			});
 
 			document.addEventListener("keydown", (event) => {

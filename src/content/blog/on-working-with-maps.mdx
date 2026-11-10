@@ -336,12 +336,12 @@ WebGL can't read CSS custom properties. You have to pass an actual color
 value, and switch it yourself when the theme changes. And one more trap
 inside the trap: mapbox's color parser only understands the *legacy*
 comma-separated HSL syntax. Modern space-separated HSL —
-`hsl(172 39% 65%)` — fails validation silently and the layer never renders:
+`hsl(220 95% 72%)` — fails validation silently and the layer never renders:
 
 ```tsx
 const FILL_COLOR = {
-  dark: "hsl(172, 39%, 65%)",
-  light: "hsl(192, 60%, 44%)",
+  dark: "hsl(220, 95%, 72%)",
+  light: "hsl(220, 91%, 46%)",
 };
 
 const theme = useSiteTheme();
@@ -485,8 +485,8 @@ literal color values, switched yourself when the theme changes:
 ```tsx
 // ✅ Works — real color values, swapped per theme
 const COLORS = {
-  dark: "hsl(172 39% 65%)",
-  light: "hsl(192 60% 44%)",
+  dark: "hsl(220 95% 72%)",
+  light: "hsl(220 91% 46%)",
 };
 
 const theme = useSiteTheme();

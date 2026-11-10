@@ -110,7 +110,7 @@ const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 				{film.image ? (
 					<Poster
 						film={film}
-						className="w-full transition-transform duration-200 ease-(--ease-reveal) group-hover:-translate-y-1 group-hover:rotate-(--tilt) group-active:scale-[0.97] motion-reduce:transform-none motion-reduce:transition-none"
+						className="w-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]"
 					/>
 				) : (
 					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 transition-colors duration-150 motion-reduce:transition-none">

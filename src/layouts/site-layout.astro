@@ -214,7 +214,7 @@ const jsonLd = {
 						loading="eager"
 						decoding="sync"
 						fetchpriority="high"
-						class="h-7 w-7 shrink-0 rounded-full transition-transform duration-200 ease-(--ease-reveal) group-hover:scale-110 group-hover:-rotate-6 motion-reduce:transform-none"
+						class="h-7 w-7 shrink-0 rounded-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:scale-110 motion-safe:group-hover:-rotate-6"
 					/>
 					<span class="font-mono text-lg font-bold tracking-tight" data-scramble data-text={siteConfig.shortName}>
 						{siteConfig.shortName}
