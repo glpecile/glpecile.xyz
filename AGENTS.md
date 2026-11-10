@@ -10,7 +10,7 @@ Project-specific guidance for working in this repo.
 - Use `better-accessibility` for semantics, keyboard and focus behavior; `better-typography` for text rendering; `better-layout` for responsive structure; and `better-colors` for tokens and measured contrast.
 - Use `mobile-native` for phone-specific viewport, touch and safe-area bugs. This is a scrolling personal site, not an app shell: preserve native scrolling, zoom and selectable content instead of applying its app baseline globally.
 - Use `break-ui` when asked to stress-test a component with realistic edge-case data. Keep fixtures and toggles dev-only; do not ship a test route or list it in machine-readable surfaces.
-- The site's monospace, lowercase content titles, existing tokens, square TUI panes and instant keyboard navigation take precedence over generic skill styling defaults. Fix usability failures without restyling the site.
+- The site's narrow column, Inter text with mono accents, lowercase content titles, existing tokens and instant keyboard navigation take precedence over generic skill styling defaults. Fix usability failures without restyling the site.
 
 ## Gotchas
 
@@ -33,7 +33,7 @@ Project-specific guidance for working in this repo.
 - Use kebab-case for component, layout, and route-related filenames. Avoid PascalCase filenames like `SiteLayout.astro` or `SectionLabel.astro`.
 - When adding or changing first-class routes, keep machine-readable surfaces in sync: `sitemap.xml`, `/llms.txt`, relevant `index.html.md` mirrors, and `SiteLayout` alternate metadata.
 - Do not edit generated output under `dist/` or `.astro/`; make source changes under `src/` or `config/`.
-- Web fonts are subset by hand with `uv run scripts/subset-fonts.py`, which writes `src/assets/fonts/*.woff2` and `src/styles/fonts.css`; commit the output. Rerun it when content needs a character it reports as dropped, when a weight or OpenType feature is added, or after upgrading `@fontsource/jetbrains-mono`. Pixel-diff before/after (Chromium, Firefox and WebKit) when changing its options.
+- Web fonts are subset by hand with `uv run scripts/subset-fonts.py`, which writes `src/assets/fonts/*.woff2` and `src/styles/fonts.css`; commit the output. It subsets Inter (one variable file) and JetBrains Mono (400/500/700). Rerun it when content needs a character it reports as dropped, when a weight or OpenType feature is added, or after upgrading `@fontsource-variable/inter` or `@fontsource/jetbrains-mono`. Pixel-diff before/after (Chromium, Firefox and WebKit) when changing its options.
 - Use Astro's `<Image>` component from `astro:assets` instead of native `<img>` tags. Configure remote image domains in `astro.config.mjs` under `image.remotePatterns`.
 - When deploying to Cloudflare, set `imageService: 'compile'` on the Cloudflare adapter so remote `<Image>` assets are optimized at build time. This site is fully prerendered, so runtime services like `passthrough` do not work: no worker route serves `/_image`, and those URLs 404 in production.
 
@@ -48,13 +48,18 @@ Every first-class route should have a corresponding `index.html.md.ts` endpoint 
 
 ## Style
 
-- Preserve the site's plain-text terminal aesthetic.
-- Prefer monospace typography, simple section labels, inline nav, text lists, and understated separators over cards, pills, panels, and dashboard-like chrome.
-- Do not introduce decorative gradients or glowing background effects.
-- Avoid heavy borders, shadows, blur, and oversized containers unless the user explicitly asks for them.
-- Prefer links and lists over boxed CTAs. The UI should feel closer to a personal terminal page than a SaaS landing page.
-- Keep motion subtle and rare. Keyboard-driven navigation should stay instant with no decorative animation.
-- List rows opt into TUI selection with `data-tui-row`: a subtle surface highlight (one shade up from the background, opencode-TUI style — no reverse video, descendant text colors preserved), a `>` gutter cursor, and `j`/`k` + `enter` keyboard navigation (script in `site-layout.astro`, styles at the end of `global.css`). New link lists should use it — but only for text rows; rows containing media (posters, images) skip it, the full-width band reads poorly there.
-- "Cards" are TUI panes when explicitly requested: 1px `border-border`, square corners, no shadow/fill, label overlapping the top border (see `/work` projects). Never SaaS cards.
-- Page intros can show a shell prompt (`prompt`/`cwd` props on `page-intro.astro`, e.g. `glpecile@web:~/blog$ ls *.mdx`); the home hero also has a blinking `▊` cursor (`.tui-cursor`, respects reduced motion).
-- The footer is a sticky TUI status bar showing the current path as a shell cwd (`~`, `~/blog`) — keep it slim and single-row.
+- The look is a narrow personal page with small, playful interaction details (references: Benji Taylor's product work, aiforui.dev): one `max-w-[42rem]` column, generous vertical space, little chrome.
+- Keep the fun parts: the name scramble (load and hover), the live pulse on the current role, poster tilt on hover, the sliding theme switch, keycap `.kbd` hints, press feedback (`active:scale-[0.97]`). New interactive pieces should get the same care.
+- Brand logos come from `simple-icons` (build-time import, inline SVG path).
+- Actions carry an icon: use `.action` with `icon.astro` (paths in `src/lib/icons.ts`) for share, download, markdown, rss and source links. Actions that complete in place use `<Icon swap />`, which changes to a check while an ancestor has `data-copy-state="success"`.
+- Projects on `/work` are `.card`s (soft ring, lift on hover, stretched title link). Use cards only for self-contained items like these, not for sections.
+- Inter sets all text (body 400, names and section labels `font-[575]`). JetBrains Mono is an accent only: the page headline (`.page-heading`), dates, key hints (`.kbd`) and code.
+- One accent color: the blue (`--heading`, `--link`, `--ring`). Use it for the page headline, link hover, focus rings and small state marks. Everything else is the cool neutral tone scale (`text-tone-*`). Do not add a second accent.
+- One loud element per page: the mono blue `h1`. Section labels are plain lowercase `h2`s (`section-label.astro`), no eyebrows, rules or all-caps tracking.
+- Links use `.site-link`: text color with a faint underline that turns blue on hover. Titles inside list rows drop the underline (`no-underline`).
+- Lists are text rows: title left, a dashed leader, mono date right. Icon links are `.chip` pills (soft 1px ring plus a small shadow). No SaaS cards, gradients, blur or glow.
+- Radii: `rounded-md` for media and code, 4px for row highlights and `.kbd`, full for chips and the theme switch.
+- List rows opt into keyboard selection with `data-tui-row`: a subtle fill that bleeds past the column, `j`/`k` + `enter` navigation (script in `site-layout.astro`, styles at the end of `global.css`). Use it for text rows only; rows with media skip it.
+- Show shortcut keys as `.kbd` hints next to their label, derived from `siteConfig.shortcuts`.
+- Motion answers the user (hover, press, toggle) and uses `--ease-reveal`; the page-enter cascade is the only unprompted sequence. Respect reduced motion. Keyboard-driven navigation stays instant with no decorative animation.
+- The footer is a short rule, the source link and the theme switch (`.theme-thumb` follows `data-theme-preference`). It is not sticky.
