@@ -858,6 +858,16 @@
 	box-shadow: 0 0 0 0.5rem hsl(var(--muted));
 }
 
+/* The fill alone is too faint to find the j/k row, so it gets a blue mark. */
+[data-tui-row][data-tui-selected]::before {
+	background: hsl(var(--ring));
+	border-radius: 9999px;
+	content: "";
+	inset: 0 auto 0 -0.5rem;
+	position: absolute;
+	width: 2px;
+}
+
 @media (hover: hover) and (pointer: fine) {
 	[data-tui-row]:hover {
 		background: hsl(var(--muted));

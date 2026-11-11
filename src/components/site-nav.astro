@@ -28,7 +28,7 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 							item.isActive ? "text-foreground" : "text-tone-soft",
 						]}
 					>
-						<span class="lowercase">{item.title}</span>
+						<span class:list={["lowercase", item.isActive && "decoration-link underline underline-offset-4"]}>{item.title}</span>
 						<span class="kbd" aria-hidden="true">{item.shortcut}</span>
 					</a>
 				</li>
