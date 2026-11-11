@@ -321,6 +321,7 @@
 			0 1px 2px hsl(var(--foreground) / 0.05);
 		transition:
 			translate 200ms var(--ease-reveal),
+			scale 150ms var(--ease-reveal),
 			box-shadow 200ms ease;
 	}
 
@@ -331,6 +332,13 @@
 				0 8px 24px hsl(var(--foreground) / 0.08);
 			translate: 0 -2px;
 		}
+	}
+
+	/* Sinks into the page on press: drops the lift and the shadow, shrinks a bit. */
+	.card:active {
+		box-shadow: 0 0 0 1px hsl(var(--foreground) / 0.1);
+		scale: 0.985;
+		translate: 0;
 	}
 
 	/* Soft raised pill for a link with an icon; presses in on click. */

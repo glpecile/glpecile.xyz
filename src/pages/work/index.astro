@@ -1,5 +1,6 @@
 ---
 import Icon from "@/components/icon.astro";
+import { Toaster } from "@/components/ui/sonner";
 import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
@@ -83,6 +84,7 @@ const cvFileName = cvDownloadName();
 									href={project.url}
 									target="_blank"
 									rel="noopener noreferrer"
+									data-hello={project.url === siteConfig.siteUrl ? "" : undefined}
 								>
 									{project.name}
 								</a>
@@ -131,6 +133,19 @@ const cvFileName = cvDownloadName();
 			</ol>
 		)}
 	</section>
+
+	<Toaster client:load position="bottom-center" />
+
+	<script>
+		import { sayHello } from "@/components/hello-toast";
+
+		// Easter egg: the card for this site greets you instead of reopening it.
+		document.querySelector("[data-hello]")?.addEventListener("click", (event) => {
+			if (event instanceof MouseEvent && (event.metaKey || event.ctrlKey || event.shiftKey)) return;
+			event.preventDefault();
+			sayHello();
+		});
+	</script>
 
 	<script is:inline>
 		(() => {
