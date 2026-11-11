@@ -1,5 +1,5 @@
 ---
-import { type IconName, iconSwapHtml, icons } from "@/lib/icons";
+import { type IconName, iconSwapHtml, svg } from "@/lib/icons";
 
 export interface Props {
 	name: IconName;
@@ -10,12 +10,4 @@ export interface Props {
 const { name, swap = false } = Astro.props;
 ---
 
-{
-	swap ? (
-		<Fragment set:html={iconSwapHtml(name)} />
-	) : (
-		<svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
-			<path d={icons[name]} />
-		</svg>
-	)
-}
+<Fragment set:html={swap ? iconSwapHtml(name) : svg(name)} />

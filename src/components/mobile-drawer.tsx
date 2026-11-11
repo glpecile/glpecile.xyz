@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Drawer } from "vaul";
 
 import { icons } from "@/lib/icons";
+import { cn } from "@/lib/utils";
 import { siteConfig } from "#config/site";
 
 type Props = { menu: "nav" | "footer"; currentPath?: string };
@@ -67,7 +68,7 @@ export default function MobileDrawer({ menu, currentPath = "/" }: Props) {
 										const active = item.href === "/" ? currentPath === "/" : currentPath === item.href || currentPath.startsWith(`${item.href}/`);
 										return (
 											<li key={item.href} data-tui-row="">
-												<a href={item.href} aria-current={active ? "page" : undefined} aria-keyshortcuts={item.shortcut} onClick={() => setOpen(false)} className={`flex min-h-12 items-center justify-between gap-4 no-underline ${active ? "text-foreground font-[575]" : "text-tone-mid"}`}><span className="lowercase">{item.title}</span><span className="kbd" aria-hidden="true">{item.shortcut}</span>
+												<a href={item.href} aria-current={active ? "page" : undefined} aria-keyshortcuts={item.shortcut} onClick={() => setOpen(false)} className={cn("flex min-h-12 items-center justify-between gap-4 no-underline", active ? "text-foreground font-[575]" : "text-tone-mid")}><span className="lowercase">{item.title}</span><span className="kbd" aria-hidden="true">{item.shortcut}</span>
 												</a>
 											</li>
 										);
@@ -80,7 +81,7 @@ export default function MobileDrawer({ menu, currentPath = "/" }: Props) {
 								<fieldset className="flex flex-col">
 									<legend className="text-tone-soft mb-2 text-sm">theme</legend>
 									{siteConfig.shortcuts.theme.map((item) => (
-										<button key={item.theme} type="button" aria-pressed={theme === item.theme} aria-keyshortcuts={item.shortcut} onClick={() => document.querySelector<HTMLButtonElement>(`footer [data-theme-option="${item.theme}"]`)?.click()} className={`flex min-h-12 cursor-pointer items-center justify-between gap-4 text-left ${theme === item.theme ? "text-foreground font-[575]" : "text-tone-mid"}`}><span>{item.theme}</span><span className="kbd" aria-hidden="true">{item.shortcut}</span>
+										<button key={item.theme} type="button" aria-pressed={theme === item.theme} aria-keyshortcuts={item.shortcut} onClick={() => document.querySelector<HTMLButtonElement>(`footer [data-theme-option="${item.theme}"]`)?.click()} className={cn("flex min-h-12 cursor-pointer items-center justify-between gap-4 text-left", theme === item.theme ? "text-foreground font-[575]" : "text-tone-mid")}><span>{item.theme}</span><span className="kbd" aria-hidden="true">{item.shortcut}</span>
 										</button>
 									))}
 								</fieldset>

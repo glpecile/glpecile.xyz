@@ -12,8 +12,8 @@ export const icons = {
 
 export type IconName = keyof typeof icons;
 
-const svg = (name: IconName) =>
-	`<svg viewBox="0 0 24 24" class="icon"><path d="${icons[name]}"></path></svg>`;
+export const svg = (name: IconName) =>
+	`<svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path d="${icons[name]}"></path></svg>`;
 
 /** Markup for an icon that swaps to a check while an ancestor has `data-copy-state="success"`. */
 export const iconSwapHtml = (name: IconName) =>

@@ -9,6 +9,7 @@ import { TextMorph } from "torph/react";
 import type { FilmWithBlur } from "@/lib/blur";
 import type { LetterboxdFilm } from "@/lib/letterboxd";
 import { textMorphOptions } from "@/lib/text-morph";
+import { cn } from "@/lib/utils";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -93,7 +94,7 @@ const Poster = ({
 		height={450}
 		loading="lazy"
 		style={film.blur ? { backgroundImage: `url(${film.blur})` } : undefined}
-		className={`bg-muted border-border aspect-[2/3] rounded-md border bg-cover bg-center object-cover ${className}`}
+		className={cn("bg-muted border-border aspect-[2/3] rounded-md border bg-cover bg-center object-cover", className)}
 	/>
 );
 

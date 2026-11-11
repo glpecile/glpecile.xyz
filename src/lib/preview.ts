@@ -29,7 +29,6 @@ type PreviewTheme = {
 	foreground: string;
 	heading: string;
 	muted: string;
-	section: string;
 	subtitle: string;
 };
 
@@ -40,7 +39,6 @@ const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
 		foreground: "#1a1c23",
 		heading: "#0b52e0",
 		muted: "#676a74",
-		section: "#676a74",
 		subtitle: "#464953",
 	},
 	dark: {
@@ -48,7 +46,6 @@ const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
 		foreground: "#e7e9ee",
 		heading: "#74a1fb",
 		muted: "#858a93",
-		section: "#858a93",
 		subtitle: "#b7bbc3",
 	},
 };
@@ -196,7 +193,7 @@ function createPreviewNode(
 										type: "div",
 										props: {
 											style: {
-												color: theme.section,
+												color: theme.muted,
 												display: "flex",
 												fontSize: sectionSize,
 												lineHeight: 1.3,
