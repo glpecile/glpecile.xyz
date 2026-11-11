@@ -324,10 +324,6 @@
 			box-shadow 200ms ease;
 	}
 
-	:root[data-theme="dark"] .card {
-		background: hsl(var(--muted));
-	}
-
 	@media (hover: hover) and (pointer: fine) {
 		.card:hover {
 			box-shadow:
