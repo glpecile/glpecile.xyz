@@ -31,7 +31,7 @@ const themeItems = siteConfig.shortcuts.theme;
 					aria-keyshortcuts={item.shortcut}
 					aria-label={`${item.theme} theme`}
 					title={`${item.theme} theme (${item.shortcut})`}
-					class="text-tone-soft hover:text-foreground relative grid h-7 w-9 cursor-pointer place-items-center rounded-full transition-[color,scale] duration-150 active:scale-90"
+					class="text-tone-soft hover:text-foreground relative grid h-7 w-9 cursor-pointer place-items-center rounded-full transition-[color,scale] duration-150 ease-(--ease-reveal) active:scale-[0.97] motion-reduce:transition-colors"
 				>
 					<svg
 						viewBox="0 0 24 24"

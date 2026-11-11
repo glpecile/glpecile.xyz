@@ -113,7 +113,7 @@ const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 						className="w-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]"
 					/>
 				) : (
-					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 transition-colors duration-150 motion-reduce:transition-none">
+					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 motion-safe:transition-[border-color,translate,rotate,scale] motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]">
 						<p className="text-tone-mid text-sm leading-relaxed">{film.title}</p>
 					</div>
 				)}
