@@ -135,8 +135,17 @@ const jsonLd = {
 						return this.media.matches ? "dark" : "light";
 					},
 					apply(theme) {
-						this.root.dataset.theme = theme === "auto" ? this.getSystemTheme() : theme;
+						const next = theme === "auto" ? this.getSystemTheme() : theme;
+						// On a real swap, turn transitions off so every color changes at once.
+						// The first call in <head> and same-theme calls skip the forced reflow.
+						const swap = this.root.dataset.theme !== undefined && this.root.dataset.theme !== next;
+						if (swap) this.root.dataset.themeSwitching = "";
+						this.root.dataset.theme = next;
 						this.root.dataset.themePreference = theme;
+						if (swap) {
+							void this.root.offsetHeight;
+							delete this.root.dataset.themeSwitching;
+						}
 					},
 					persist(theme) {
 						try {

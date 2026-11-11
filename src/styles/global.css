@@ -887,3 +887,10 @@
 		cursor: pointer;
 	}
 }
+
+/* Set by the theme controller around one forced style flush, so colors switch at once. */
+:root[data-theme-switching] *:not(.theme-thumb),
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+	transition: none !important;
+}
