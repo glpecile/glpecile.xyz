@@ -486,17 +486,7 @@
 		font: inherit;
 		padding: 0;
 		text-align: left;
-		transition: color 180ms ease;
 		width: fit-content;
-	}
-
-	.blog-share-button:hover,
-	.blog-share-button:focus-visible {
-		color: hsl(var(--foreground));
-		outline: none;
-		text-decoration: underline;
-		text-decoration-thickness: 1px;
-		text-underline-offset: 0.15em;
 	}
 
 	.blog-share-button[data-copy-state="success"] {
@@ -517,13 +507,6 @@
 		position: relative;
 		text-align: left;
 		vertical-align: top;
-	}
-
-	.blog-heading-button:focus-visible {
-		outline: none;
-		text-decoration: underline;
-		text-decoration-thickness: 1px;
-		text-underline-offset: 0.15em;
 	}
 
 	.blog-heading-label {
@@ -654,7 +637,6 @@
 	.blog-prose .code-copy-button:hover,
 	.blog-prose .code-copy-button:focus-visible {
 		color: hsl(var(--foreground));
-		outline: none;
 	}
 
 	.blog-prose .code-copy-button[data-copy-state="success"] {
