@@ -1,4 +1,5 @@
 ---
+import Icon from "@/components/icon.astro";
 import PageIntro from "@/components/page-intro.astro";
 import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
@@ -35,27 +36,24 @@ const cvFileName = cvDownloadName();
 	path="/work"
 	previewPath="/work/preview"
 >
-	<section class="space-y-6">
+	<section class="space-y-5">
 		<PageIntro
-			label="work"
 			title="Past work experience."
 			description="+ projects, skills, education & certificates."
-			prompt="history"
-			cwd="~/work"
 		/>
 
 		<div class="space-y-2" data-reveal>
-			<p class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:text-base">
-				<a
-					class="terminal-link inline-flex items-center gap-2"
-					href={cv.href}
-					download={cvFileName}
-				>
-					[{cv.label}]
+			<p class="flex flex-wrap items-center gap-x-5 gap-y-1">
+				<a class="action" href={cv.href} download={cvFileName} data-download>
+					<Icon name="download" swap />
+					{cv.label}
 				</a>
-				<a class="terminal-link" href="/work/index.html.md">[markdown]</a>
+				<a class="action" href="/work/index.html.md">
+					<Icon name="markdown" />
+					markdown
+				</a>
 			</p>
-			<p class="text-tone-faint text-sm">{contact.email} · {contact.location}</p>
+			<p class="text-tone-soft text-sm">{contact.email}, {contact.location}</p>
 		</div>
 	</section>
 
@@ -69,24 +67,19 @@ const cvFileName = cvDownloadName();
 		)}
 	</section>
 
-	<section data-reveal>
-		<div class="border-border relative border px-5 py-6 sm:px-6">
-			<SectionLabel
-				label="projects"
-				rule={false}
-				class="bg-background absolute -top-[0.55em] left-3 px-2 leading-none"
-			/>
+	<section class="space-y-4" data-reveal>
+		<SectionLabel label="projects" count={projects.length} />
 
 		{projects.length === 0 ? (
 			<p class="text-tone-soft text-sm">no projects yet.</p>
 		) : (
-			<ol class="space-y-5">
+			<ol class="space-y-4">
 				{projects.map((project) => (
-					<li class="space-y-1">
-						<p class="text-base leading-8 sm:text-lg">
+					<li class="card group relative space-y-2 p-5">
+						<p class="flex items-start justify-between gap-4 font-[575]">
 							{project.url ? (
 								<a
-									class="terminal-link"
+									class="no-underline after:absolute after:inset-0 after:rounded-[inherit]"
 									href={project.url}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -96,21 +89,34 @@ const cvFileName = cvDownloadName();
 							) : (
 								<span class="text-foreground">{project.name}</span>
 							)}
-							<span class="text-tone-faint"> · </span>
-							<span class="text-tone-soft">{project.stack}</span>
+							{project.url && (
+								<svg
+									viewBox="0 0 16 16"
+									aria-hidden="true"
+									class="text-tone-faint group-hover:text-link mt-1 h-4 w-4 shrink-0 fill-current transition-[rotate,color] duration-200 ease-(--ease-reveal) group-hover:rotate-45 motion-reduce:transition-none"
+								>
+									<path d="M3.75 4a.75.75 0 0 0 0 1.5h6.69l-7.22 7.22a.75.75 0 1 0 1.06 1.06l7.22-7.22v6.69a.75.75 0 0 0 1.5 0V4.75A.75.75 0 0 0 12.25 4h-8.5Z" />
+								</svg>
+							)}
 						</p>
+						<ul class="flex flex-wrap gap-1.5">
+							{project.stack.split(" / ").map((tech) => (
+								<li class="bg-muted text-tone-soft rounded-md px-1.5 py-0.5 font-mono text-xs">
+									{tech}
+								</li>
+							))}
+						</ul>
 						{project.period && (
-							<p class="text-tone-soft text-sm leading-7 sm:text-base">
+							<p class="text-tone-soft text-sm">
 								{project.period}
 							</p>
 						)}
-						<ul class="space-y-1 pt-1">
+						<ul class="marker:text-tone-faint text-tone-mid list-disc space-y-1.5 pt-1 pl-4">
 							{project.highlights.map((highlight) => (
-								<li class="text-tone-mid max-w-3xl text-sm leading-7 sm:text-base">
-									<span class="text-tone-faint">- </span>
+								<li>
 									{parseInlineLinks(highlight).map((segment) =>
 										segment.url ? (
-											<a class="terminal-link" href={segment.url}>
+											<a class="site-link relative z-10" href={segment.url}>
 												{segment.text}
 											</a>
 										) : (
@@ -124,17 +130,30 @@ const cvFileName = cvDownloadName();
 				))}
 			</ol>
 		)}
-		</div>
 	</section>
+
+	<script is:inline>
+		(() => {
+			// Show the check on the download link for a moment after a click.
+			const link = document.querySelector("[data-download]");
+			let timer = 0;
+
+			link?.addEventListener("click", () => {
+				window.clearTimeout(timer);
+				link.dataset.copyState = "success";
+				timer = window.setTimeout(() => delete link.dataset.copyState, 1600);
+			});
+		})();
+	</script>
 
 	<section class="space-y-4" data-reveal>
 		<SectionLabel label="skills" />
 
-		<ul class="grid gap-x-10 gap-y-2 sm:grid-cols-2">
+		<ul class="grid gap-y-2">
 			{skills.map((group) => (
 				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
-					<p class="text-foreground text-sm sm:text-base">{group.category}</p>
-					<p class="text-tone-soft text-sm leading-7 sm:text-base">
+					<p class="text-foreground">{group.category}</p>
+					<p class="text-tone-soft text-sm">
 						{group.items.join(", ")}
 					</p>
 				</li>
@@ -151,10 +170,10 @@ const cvFileName = cvDownloadName();
 			<ol class="space-y-5">
 				{education.map((item) => (
 					<li class="space-y-1">
-						<p class="text-base leading-8 sm:text-lg">
+						<p class="font-[575]">
 							{item.url ? (
 								<a
-									class="terminal-link"
+									class="site-link"
 									href={item.url}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -165,14 +184,14 @@ const cvFileName = cvDownloadName();
 								<span class="text-foreground">{item.school}</span>
 							)}
 						</p>
-						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+						<p class="text-tone-soft text-sm">
 							{item.credential}
 						</p>
-						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+						<p class="text-tone-soft text-sm">
 							{item.period}
 						</p>
 						{item.details?.map((detail) => (
-							<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+							<p class="text-tone-mid">
 								{detail}
 							</p>
 						))}
@@ -185,11 +204,11 @@ const cvFileName = cvDownloadName();
 	<section class="space-y-4" data-reveal>
 		<SectionLabel label="languages" />
 
-		<ul class="grid gap-x-10 gap-y-2 sm:grid-cols-2">
+		<ul class="grid gap-y-2">
 			{languages.map((item) => (
 				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
-					<p class="text-foreground text-sm sm:text-base">{item.language}</p>
-					<p class="text-tone-soft text-sm leading-7 sm:text-base">{item.level}</p>
+					<p class="text-foreground">{item.language}</p>
+					<p class="text-tone-soft text-sm">{item.level}</p>
 				</li>
 			))}
 		</ul>
@@ -204,10 +223,10 @@ const cvFileName = cvDownloadName();
 			<ol class="space-y-5">
 				{certificates.map((certificate) => (
 					<li class="space-y-1">
-						<p class="text-base leading-8 sm:text-lg">
+						<p class="font-[575]">
 							{certificate.url ? (
 								<a
-									class="terminal-link"
+									class="site-link"
 									href={certificate.url}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -218,14 +237,14 @@ const cvFileName = cvDownloadName();
 								<span class="text-foreground">{certificate.title}</span>
 							)}
 						</p>
-						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+						<p class="text-tone-soft text-sm">
 							{certificate.issuer}
 						</p>
-						<p class="text-tone-soft text-sm leading-7 sm:text-base">
+						<p class="text-tone-soft text-sm">
 							Issued {certificate.issued}
 						</p>
 						{certificate.details?.map((detail) => (
-							<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+							<p class="text-tone-mid">
 								{detail}
 							</p>
 						))}

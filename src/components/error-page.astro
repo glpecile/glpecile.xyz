@@ -1,7 +1,6 @@
 ---
 import { siteConfig } from "#config/site";
 
-import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 
 export interface Props {
@@ -29,37 +28,36 @@ const details =
 
 <SiteLayout title={`${code} | ${title}`} description={description} path={path}>
 	<section class="space-y-6">
-		<SectionLabel label="error" />
 		<div class="space-y-3">
-			<p class="text-tone-faint text-sm tracking-[0.32em] uppercase">{code}</p>
-			<h1 class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
+			<p class="text-tone-faint font-mono text-xs">{code}</p>
+			<h1 class="page-heading text-3xl leading-tight font-bold sm:text-4xl sm:leading-tight">
 				{title}
 			</h1>
-			<p class="text-tone-mid max-w-3xl text-sm leading-8 sm:text-base">
+			<p class="text-tone-mid">
 				{description}
 			</p>
 			{hint && (
-				<p class="text-tone-soft max-w-3xl text-sm leading-8 sm:text-base">
+				<p class="text-tone-soft text-sm">
 					{hint}
 				</p>
 			)}
 		</div>
 
-		<div class="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm sm:text-base">
+		<div class="flex flex-wrap items-center gap-x-5 gap-y-3">
 			{navItems.map((item) => (
 				<a
 					href={item.href}
-					class="terminal-link inline-flex items-center gap-2"
+					class="site-link inline-flex items-center gap-1.5"
 					aria-keyshortcuts={item.shortcut}
 				>
-					<span class="text-tone-faint">[{item.shortcut}]</span>
 					<span>{item.label}</span>
+					<span class="kbd" aria-hidden="true">{item.shortcut}</span>
 				</a>
 			))}
 		</div>
 
 		{details && (
-			<pre class="text-tone-soft border-foreground/18 overflow-x-auto border-l pl-4 text-sm leading-7">{details}</pre>
+			<pre class="text-tone-soft border-border overflow-x-auto border-l-2 pl-4 font-mono text-xs leading-6">{details}</pre>
 		)}
 	</section>
 </SiteLayout>

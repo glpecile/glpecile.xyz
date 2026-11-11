@@ -1,8 +1,6 @@
 ---
 import type { MarkdownHeading } from "astro";
 
-import SectionLabel from "@/components/section-label.astro";
-
 export interface Props {
 	title: string;
 	headings: MarkdownHeading[];
@@ -16,24 +14,21 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 	headings.length > 0 && (
 		<nav
 			aria-label="Table of contents"
-			class="fixed top-44.5 right-[calc(50%+29rem)] hidden w-60 space-y-5 text-sm min-[90rem]:block"
+			class="fixed top-40 right-[calc(50%+24rem)] hidden w-56 space-y-4 text-sm min-[80rem]:block"
 			data-post-toc
 		>
 			<a
 				href="#"
 				title="Back to top"
-				class="text-foreground invisible absolute bottom-full mb-5 block w-full translate-y-1 leading-6 font-bold no-underline opacity-0 blur-[2px] transition-[opacity,translate,filter,visibility] duration-200 ease-(--ease-reveal) data-visible:visible data-visible:translate-y-0 data-visible:opacity-100 data-visible:blur-none motion-reduce:translate-y-0 motion-reduce:blur-none"
+				class="text-foreground invisible absolute bottom-full mb-5 block w-full translate-y-1 font-[575] leading-6 no-underline opacity-0 blur-[2px] transition-[opacity,translate,filter,visibility] duration-200 ease-(--ease-reveal) data-visible:visible data-visible:translate-y-0 data-visible:opacity-100 data-visible:blur-none motion-reduce:translate-y-0 motion-reduce:blur-none"
 				data-toc-title
 			>
 				{title}
 			</a>
-			<SectionLabel label="tree" rule={false} />
+			<p class="section-label">on this page</p>
 			<ol class="space-y-1.5">
 				{headings.map(({ depth, slug, text }) => (
-					<li class:list={["flex gap-2", depth === 3 && "pl-4"]}>
-						<span aria-hidden="true" class="text-tone-faint">
-							└
-						</span>
+					<li class:list={["flex", depth === 3 && "pl-3"]}>
 						<a
 							href={`#${slug}`}
 							class="text-tone-soft hover:text-foreground aria-[current=location]:text-foreground truncate no-underline transition-colors duration-200"
@@ -45,10 +40,10 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 				))}
 			</ol>
 			<p class="text-tone-soft flex items-center gap-3 tabular-nums" aria-hidden="true">
-				<span class="bg-border h-2 w-40 overflow-hidden">
-					<span class="bg-tone-soft block h-full w-0" data-toc-bar></span>
+				<span class="bg-border h-0.5 w-32 overflow-hidden rounded-full">
+					<span class="bg-link block h-full w-0" data-toc-bar></span>
 				</span>
-				<span data-toc-percent>0%</span>
+				<span class="font-mono text-xs" data-toc-percent>0%</span>
 			</p>
 		</nav>
 	)
@@ -73,9 +68,9 @@ const headings = Astro.props.headings.filter(({ depth }) => depth === 2 || depth
 		const title = toc.querySelector("[data-toc-title]");
 		const heading = document.querySelector("article h1");
 
-		// Matches the rail's `min-[90rem]:block`; below it the toc is display:none, so skip
+		// Matches the rail's `min-[80rem]:block`; below it the toc is display:none, so skip
 		// the per-scroll layout reads entirely.
-		const wide = window.matchMedia("(min-width: 90rem)");
+		const wide = window.matchMedia("(min-width: 80rem)");
 
 		const update = () => {
 			if (!wide.matches) {

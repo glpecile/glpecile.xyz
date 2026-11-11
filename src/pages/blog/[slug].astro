@@ -2,9 +2,9 @@
 import type { GetStaticPaths } from "astro";
 import { render, type CollectionEntry } from "astro:content";
 
+import Icon from "@/components/icon.astro";
 import PostToc from "@/components/post-toc.astro";
 import PostAuthors from "@/components/post-authors.astro";
-import SectionLabel from "@/components/section-label.astro";
 import SiteLayout from "@/layouts/site-layout.astro";
 import { formatDate, getBlogPosts } from "@/lib/blog";
 import { formatReadingTime, getReadingTimeMinutes } from "@/lib/reading-time";
@@ -42,14 +42,13 @@ const postPath = `/blog/${post.id}`;
 	<article class="space-y-6">
 		<a
 			href="/blog"
-			class="blog-back-link terminal-link inline-flex items-center gap-2 text-sm"
-			data-tui-row
+			class="blog-back-link text-tone-soft hover:text-foreground inline-flex items-center gap-1.5 text-sm no-underline transition-colors duration-150"
 			data-reveal
 		>
 			<svg
 				viewBox="0 0 16 16"
 				aria-hidden="true"
-				class="blog-back-link-icon h-4 w-4 fill-current"
+				class="blog-back-link-icon h-3.5 w-3.5 fill-current"
 			>
 				<path d="M7.3 3.22a.75.75 0 0 1 1.06 1.06L5.65 7h7.6a.75.75 0 0 1 0 1.5h-7.6l2.71 2.72a.75.75 0 1 1-1.06 1.06L3.31 8.28a.75.75 0 0 1 0-1.06L7.3 3.22Z"></path>
 			</svg>
@@ -57,37 +56,38 @@ const postPath = `/blog/${post.id}`;
 		</a>
 
 		<header class="space-y-4">
-			<SectionLabel label="post" data-reveal />
-			<p class="text-tone-soft text-sm" data-reveal>
-				{formatDate(displayDate)} · {readingTime}
+			<p class="text-tone-faint font-mono text-xs" data-reveal>
+				{formatDate(displayDate).toLowerCase()}, {readingTime}
 			</p>
 			<h1
-				class="page-heading max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl"
+				class="page-heading text-[1.75rem] leading-tight font-bold sm:text-[2rem] sm:leading-tight"
 				data-reveal
 			>
 				{post.data.title}
 			</h1>
 			<PostAuthors authorIds={post.data.authors} data-reveal />
-			<div class="flex items-center gap-3 text-sm" data-reveal>
+			<div class="flex items-center gap-4 text-sm" data-reveal>
 				<button
 					type="button"
-					class="blog-share-button text-tone-soft text-sm"
+					class="blog-share-button action text-sm"
 					data-post-share
 					aria-label={`share: copy link to post: ${post.data.title}`}
 					title={`Copy link to post: ${post.data.title}`}
 				>
-					<span class="blog-share-button-label">[share]</span>
+					<Icon name="share" swap />
+					<span class="blog-share-button-label">share</span>
 				</button>
 				<a
 					href={`${postPath}/index.html.md`}
-					class="terminal-link text-tone-soft"
+					class="action"
 					aria-label={`View this post as markdown: ${post.data.title}`}
 					title="View this post as markdown"
 				>
-					[markdown]
+					<Icon name="markdown" />
+					markdown
 				</a>
 			</div>
-			<p class="text-tone-mid text-blog max-w-3xl" data-reveal>
+			<p class="text-tone-mid text-blog" data-reveal>
 				{post.data.description}
 			</p>
 		</header>
@@ -98,6 +98,7 @@ const postPath = `/blog/${post.id}`;
 
 		<script>
 			import { attachCopyState, type CopyLabels } from "@/lib/copy";
+			import { iconSwapHtml } from "@/lib/icons";
 			import { createTextMorph } from "@/lib/text-morph";
 
 			(() => {
@@ -107,19 +108,19 @@ const postPath = `/blog/${post.id}`;
 					".blog-prose h2[id], .blog-prose h3[id], .blog-prose h4[id], .blog-prose h5[id], .blog-prose h6[id]",
 				);
 				const copyLabels: CopyLabels = {
-					idle: "[copy]",
-					success: "[copied]",
-					error: "[unavailable]",
+					idle: "copy",
+					success: "copied",
+					error: "unavailable",
 				};
 				const headingLabels: CopyLabels = {
-					idle: "[#]",
-					success: "[✔︎]",
-					error: "[unavailable]",
+					idle: "#",
+					success: "✔︎",
+					error: "unavailable",
 				};
 				const shareLabels: CopyLabels = {
-					idle: "[share]",
-					success: "[copied to clipboard]",
-					error: "[unavailable]",
+					idle: "share",
+					success: "copied to clipboard",
+					error: "unavailable",
 				};
 
 				const formatLanguage = (value: string | undefined) => {
@@ -277,6 +278,7 @@ const postPath = `/blog/${post.id}`;
 					button.type = "button";
 					button.className = "code-copy-button";
 					button.setAttribute("aria-label", "Copy code to clipboard");
+					button.innerHTML = iconSwapHtml("copy");
 					const label = document.createElement("span");
 					label.textContent = copyLabels.idle;
 					button.append(label);

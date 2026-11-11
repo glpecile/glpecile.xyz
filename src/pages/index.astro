@@ -9,10 +9,17 @@ import { formatDate, getBlogPostUrl, getBlogPosts } from "@/lib/blog";
 import { withBlurPlaceholders } from "@/lib/blur";
 import { getLetterboxdFilms } from "@/lib/letterboxd";
 
+import { siBluesky, siGithub, siX } from "simple-icons";
+
 import { siteConfig } from "#config/site";
 import type { WorkExperience } from "#config/site";
 
-const socialLinks = Object.entries(siteConfig.links).filter(([label]) => label !== "letterboxd");
+const socialIcons: Record<string, { title: string; path: string }> = {
+	x: siX,
+	bluesky: siBluesky,
+	github: siGithub,
+};
+const socialLinks = Object.entries(siteConfig.links).filter(([label]) => label in socialIcons);
 const posts = await getBlogPosts();
 const latestPosts = posts.slice(0, 3);
 const work: readonly WorkExperience[] = siteConfig.work;
@@ -28,22 +35,17 @@ try {
 	// Fail silently: the section will render an empty state.
 }
 
+const kbd = (key: string) => `<span class="kbd">${key}</span>`;
 const navShortcutCopy = siteConfig.shortcuts.nav
-	.map(
-		(item) =>
-			`<span class="text-tone-mid">[${item.shortcut}] ${item.title.toLowerCase()}</span>`,
-	)
-	.join('<span class="text-tone-faint"> / </span>');
-const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">move with <span class="text-tone-mid">[j]/[k]</span>, open with <span class="text-tone-mid">[enter]</span>.</span><span class="mt-2 block">are you an agent? start with <a class="terminal-link" href="/llms.txt">/llms.txt</a>.</span>`;
+	.map((item) => `${kbd(item.shortcut)} ${item.title.toLowerCase()}`)
+	.join(", ");
+const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move through lists with ${kbd("j")} ${kbd("k")}, open with ${kbd("enter")}.</span><span class="block">Are you an agent? Start with <a class="site-link" href="/llms.txt">/llms.txt</a>.</span>`;
 ---
 
 <SiteLayout>
 	<PageIntro
-		label="home"
 		title="Software / Frontend Engineer."
-		description="I don't build everything. I just build what I build."
 		extra={introExtra}
-		prompt="whoami"
 	/>
 
 	<section class="space-y-4" data-reveal>
@@ -52,40 +54,36 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">mo
 		{latestPosts.length === 0 ? (
 			<p class="text-tone-soft text-sm">no posts yet.</p>
 		) : (
-			<ol class="space-y-4">
+			<ol class="space-y-3">
 				{latestPosts.map((post) => (
-					<li data-tui-row class="group grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-5">
-						<p class="text-tone-faint text-sm leading-7 sm:text-base">
+					<li data-tui-row class="flex items-baseline gap-3">
+						<a class="min-w-0 no-underline" href={getBlogPostUrl(post.id)}>
+							{post.data.title}
+						</a>
+						<span aria-hidden="true" class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"></span>
+						<time class="text-tone-faint ml-auto shrink-0 font-mono text-xs">
 							{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
-						</p>
-						<p class="text-base leading-8 sm:text-lg">
-							<a
-								class="terminal-link group-hover:underline"
-								href={getBlogPostUrl(post.id)}
-							>
-								{post.data.title}
-							</a>
-						</p>
+						</time>
 					</li>
 				))}
 			</ol>
 		)}
 
-		{posts.length > 0 && <MoreLink href="/blog" />}
+		{posts.length > 0 && <MoreLink href="/blog" label="all posts" />}
 	</section>
 
 	<section class="space-y-4" data-reveal>
 		<SectionLabel label="work" />
-		<WorkTimeline work={featuredWork} capped={false} />
-		{hasMoreWork && <MoreLink href="/work" />}
+		<WorkTimeline work={featuredWork} />
+		{hasMoreWork && <MoreLink href="/work" label="full history" />}
 	</section>
 
 	<section class="space-y-4" data-reveal>
 		<SectionLabel label="films" />
-		<p class="text-tone-soft text-sm sm:text-base">
+		<p class="text-tone-soft">
 			Latest watches. Follow along on{" "}
 			<a
-				class="terminal-link"
+				class="site-link"
 				href={siteConfig.links.letterboxd}
 				target="_blank"
 				rel="noopener noreferrer"
@@ -97,24 +95,23 @@ const introExtra = `shortcut keys: ${navShortcutCopy}<span class="mt-2 block">mo
 
 		<FilmListLoader client:load limit={4} layout="grid" films={latestFilms} />
 
-		<MoreLink href="/films" />
+		<MoreLink href="/films" label="all films" />
 	</section>
 
 	<section class="space-y-3" data-reveal>
 		<SectionLabel label="socials" />
-		<ul class="space-y-2 text-sm sm:text-base">
-			{socialLinks.map(([label, href], index) => (
-				<li data-tui-row class="group">
-					<a
-						href={href}
-						target="_blank"
-						rel="noopener noreferrer"
-					class="terminal-link inline-flex items-center gap-2 group-hover:underline"
-				>
-						<span class="text-tone-faint" aria-hidden="true">
-							{index === socialLinks.length - 1 ? "└──" : "├──"}
-						</span>
-						<span class="capitalize">{label}</span>
+		<ul class="flex flex-wrap gap-2.5">
+			{socialLinks.map(([label, href]) => (
+				<li>
+					<a href={href} target="_blank" rel="noopener noreferrer" class="chip group">
+						<svg
+							viewBox="0 0 24 24"
+							aria-hidden="true"
+							class="text-tone-soft group-hover:text-link h-4 w-4 fill-current transition-colors duration-150"
+						>
+							<path d={socialIcons[label].path}></path>
+						</svg>
+						<span>{socialIcons[label].title}</span>
 					</a>
 				</li>
 			))}

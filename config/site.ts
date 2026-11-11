@@ -123,8 +123,8 @@ export const siteConfig = {
 		"buenos aires",
 	],
 	emoji: "🧙",
-	backgroundColor: "#eff1f5",
-	themeColor: "#eff1f5",
+	backgroundColor: "#f6f7f9",
+	themeColor: "#f6f7f9",
 	siteUrl: "https://glpecile.xyz",
 	category: "personal site",
 	shortcuts: {

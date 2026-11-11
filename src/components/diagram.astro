@@ -15,8 +15,8 @@ const { svg } = render(code, {
 	measurer: { width: (text, size) => [...text].length * size * 0.6 },
 	fontFamily: "JetBrains Mono, monospace",
 	fontFamilyMono: "JetBrains Mono, monospace",
-	// The site column: max-w-4xl (896px) less the sm:px-8 padding.
-	maxWidth: 832,
+	// The site column: max-w-[42rem] (672px) less the px-6 padding.
+	maxWidth: 624,
 	idPrefix: `d${createHash("sha1").update(code).digest("hex").slice(0, 8)}`,
 });
 

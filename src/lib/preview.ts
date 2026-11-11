@@ -29,26 +29,24 @@ type PreviewTheme = {
 	foreground: string;
 	heading: string;
 	muted: string;
-	section: string;
 	subtitle: string;
 };
 
+// Hex copies of the site tokens in src/styles/global.css.
 const previewThemes: Record<PreviewThemeName, PreviewTheme> = {
 	light: {
-		background: "#dce0e8",
-		foreground: "#45475a",
-		heading: "#1d5fe3",
-		muted: "rgba(92, 95, 119, 0.82)",
-		section: "#1d5fe3",
-		subtitle: "#4f97b1",
+		background: "#f6f7f9",
+		foreground: "#1a1c23",
+		heading: "#0b52e0",
+		muted: "#676a74",
+		subtitle: "#464953",
 	},
 	dark: {
-		background: "#1e1e2e",
-		foreground: "#cdd6f4",
-		heading: "#cba6f7",
-		muted: "rgba(186, 194, 222, 0.78)",
-		section: "#f9e2af",
-		subtitle: "#89b4fa",
+		background: "#121317",
+		foreground: "#e7e9ee",
+		heading: "#74a1fb",
+		muted: "#858a93",
+		subtitle: "#b7bbc3",
 	},
 };
 
@@ -195,15 +193,13 @@ function createPreviewNode(
 										type: "div",
 										props: {
 											style: {
-												color: theme.section,
+												color: theme.muted,
 												display: "flex",
 												fontSize: sectionSize,
-												letterSpacing: "0.28em",
 												lineHeight: 1.3,
 												maxWidth: "860px",
-												textTransform: "uppercase",
 											},
-											children: `* ${section}`,
+											children: section,
 										},
 									},
 									{
@@ -214,7 +210,7 @@ function createPreviewNode(
 												display: "flex",
 												fontSize: titleSize,
 												fontWeight: 700,
-												letterSpacing: "-0.05em",
+												letterSpacing: "-0.04em",
 												lineHeight: 1,
 												maxWidth: "860px",
 											},
@@ -227,11 +223,9 @@ function createPreviewNode(
 											style: {
 												color: theme.subtitle,
 												display: "flex",
-												fontSize: 34,
-												letterSpacing: "0.12em",
+												fontSize: 32,
 												lineHeight: 1.3,
 												maxWidth: "860px",
-												textTransform: "uppercase",
 											},
 											children: subtitle,
 										},
@@ -243,9 +237,7 @@ function createPreviewNode(
 												color: theme.muted,
 												display: "flex",
 												fontSize: 22,
-												letterSpacing: "0.08em",
 												lineHeight: 1.4,
-												textTransform: "uppercase",
 											},
 											children: "glpecile.xyz",
 										},

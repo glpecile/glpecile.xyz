@@ -9,6 +9,7 @@ import { TextMorph } from "torph/react";
 import type { FilmWithBlur } from "@/lib/blur";
 import type { LetterboxdFilm } from "@/lib/letterboxd";
 import { textMorphOptions } from "@/lib/text-morph";
+import { cn } from "@/lib/utils";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -93,14 +94,14 @@ const Poster = ({
 		height={450}
 		loading="lazy"
 		style={film.blur ? { backgroundImage: `url(${film.blur})` } : undefined}
-		className={`bg-muted border-border aspect-[2/3] border bg-cover bg-center object-cover ${className}`}
+		className={cn("bg-muted border-border aspect-[2/3] rounded-md border bg-cover bg-center object-cover", className)}
 	/>
 );
 
 const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 	<ol className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4">
 		{films.map((film) => (
-			<li key={film.url}>
+			<li key={film.url} className="odd:[--tilt:-1.5deg] even:[--tilt:1.5deg]">
 				<a
 					href={film.url}
 					target="_blank"
@@ -110,15 +111,15 @@ const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 				{film.image ? (
 					<Poster
 						film={film}
-						className="group-hover:border-tone-mid w-full transition-colors duration-150 motion-reduce:transition-none"
+						className="w-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]"
 					/>
 				) : (
-					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full border p-3 transition-colors duration-150 motion-reduce:transition-none">
+					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 motion-safe:transition-[border-color,translate,rotate,scale] motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]">
 						<p className="text-tone-mid text-sm leading-relaxed">{film.title}</p>
 					</div>
 				)}
 					<p className="mt-2 text-sm leading-snug">
-						<span className="text-foreground group-hover:underline group-focus-visible:underline">
+						<span className="text-foreground">
 							{film.title}
 						</span>
 						<span className="text-tone-faint">, {film.year}</span>
@@ -139,13 +140,13 @@ const FilmTimeline = ({
 	<ol className="space-y-8">
 		{groupFilmsByMonth(films).map((group) => (
 			<li key={group.month} className="space-y-4">
-				<h3 className="bg-background text-tone-mid sticky top-0 z-10 -mx-6 px-6 py-2 text-sm tracking-wider uppercase">
+				<h3 className="bg-background text-foreground sticky top-0 z-10 -mx-6 px-6 py-2 font-[575] lowercase">
 					{group.label}
 				</h3>
-				<ol className="border-border after:bg-border relative border-l-2 border-dotted pl-6 after:absolute after:bottom-0 after:-left-1.5 after:h-0.5 after:w-2.5">
+				<ol className="border-border relative border-l pl-6">
 					{group.films.map((film) => (
 						<li key={film.url} className="mb-6 last:mb-0">
-							<div className="bg-foreground absolute -left-1.5 mt-1.5 h-2.5 w-2.5" />
+							<div className="bg-tone-faint ring-background absolute -left-[4.5px] mt-2 size-2 rounded-full ring-4" />
 							<div className="flex gap-4">
 								{film.image && (
 									<a
@@ -159,23 +160,23 @@ const FilmTimeline = ({
 								)}
 								<div className="flex-1">
 									{film.watchedDate && (
-										<time className="text-tone-faint text-sm">
+										<time className="text-tone-faint font-mono text-xs">
 											{formatDate(film.watchedDate)}
 										</time>
 									)}
-									<p className="mt-1 text-base leading-8 sm:text-lg">
+									<p className="mt-0.5">
 										<a
 											href={film.url}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="terminal-link"
+											className="site-link"
 										>
 											{film.title}
 										</a>
 										<span className="text-tone-faint">, {film.year}</span>
 										{film.liked && (
 											<span
-												className="text-link ml-2 inline-block text-xl leading-none"
+												className="text-link ml-2 inline-block text-base leading-none"
 												role="img"
 												aria-label="Liked"
 											>
@@ -265,10 +266,10 @@ const FilmListContent = ({ films: initialFilms, limit, tags, layout, allowLayout
 							setAnimate(event.detail > 0);
 							setView(view === "grid" ? "timeline" : "grid");
 						}}
-						className="text-link min-h-6 cursor-pointer hover:underline focus-visible:underline"
+						className="site-link min-h-6 cursor-pointer"
 					>
 						<TextMorph {...textMorphOptions} disabled={!animate}>
-							{`[${view}]`}
+							{`${view} view`}
 						</TextMorph>
 					</button>
 				</div>

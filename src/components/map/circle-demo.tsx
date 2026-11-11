@@ -67,8 +67,8 @@ export function circlePolygon(
  * space-separated syntax fails paint validation and the layer never renders.
  */
 export const FILL_COLOR = {
-	dark: "hsl(172, 39%, 65%)",
-	light: "hsl(192, 60%, 44%)",
+	dark: "hsl(220, 95%, 72%)",
+	light: "hsl(220, 91%, 46%)",
 } as const;
 
 export const RADIUS_MIN_KM = 1;

@@ -1,0 +1,13 @@
+---
+import { type IconName, iconSwapHtml, svg } from "@/lib/icons";
+
+export interface Props {
+	name: IconName;
+	/** Swap to a check while an ancestor has `data-copy-state="success"`. */
+	swap?: boolean;
+}
+
+const { name, swap = false } = Astro.props;
+---
+
+<Fragment set:html={swap ? iconSwapHtml(name) : svg(name)} />
