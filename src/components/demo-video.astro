@@ -1,0 +1,36 @@
+---
+interface Props {
+	src: string;
+	label: string;
+	width: number;
+	height: number;
+}
+
+const { src, label, width, height } = Astro.props;
+---
+
+<figure class="my-8">
+	<video
+		src={src}
+		aria-label={label}
+		width={width}
+		height={height}
+		muted
+		loop
+		playsinline
+		controls
+		preload="metadata"
+		data-demo-video
+		class="h-auto w-full rounded-md"
+	></video>
+	<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]"><slot /></figcaption>
+</figure>
+
+<script>
+	// Autoplay only when the reader allows motion; otherwise the controls start it.
+	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
+			void video.play();
+		}
+	}
+</script>
