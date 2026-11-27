@@ -10,7 +10,7 @@ const { href, label = "more", external = false } = Astro.props;
 ---
 
 <a
-	class="site-link text-tone-soft group inline-flex items-center gap-1.5 text-sm"
+	class="site-link group inline-flex items-center gap-1.5 text-sm text-tone-soft"
 	href={href}
 	target={external ? "_blank" : undefined}
 	rel={external ? "noopener noreferrer" : undefined}

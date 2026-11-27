@@ -123,8 +123,8 @@ export function FlyToDemo() {
 								aria-hidden="true"
 								className={
 									activeId === place.id
-										? "font-mono text-[hsl(var(--link))] text-base leading-none"
-										: "font-mono text-[hsl(var(--tone-faint))] text-base leading-none"
+										? "font-mono text-base leading-none text-[hsl(var(--link))]"
+										: "font-mono text-base leading-none text-[hsl(var(--tone-faint))]"
 								}
 							>
 								{activeId === place.id ? "●" : "○"}
@@ -132,7 +132,7 @@ export function FlyToDemo() {
 						</Marker>
 					))}
 				</MapGL>
-				<ul className="border-border m-0 list-none divide-y divide-[hsl(var(--tone-faint)/0.18)] border-t p-0 font-mono text-xs">
+				<ul className="m-0 list-none divide-y divide-[hsl(var(--tone-faint)/0.18)] border-t border-border p-0 font-mono text-xs">
 					{places.map((place) => {
 						const isActive = activeId === place.id;
 

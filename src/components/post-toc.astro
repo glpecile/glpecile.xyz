@@ -21,7 +21,7 @@ const headings = Astro.props.headings.filter(
 		<a
 			href="#"
 			title="Back to top"
-			class="text-foreground invisible absolute bottom-full mb-5 block w-full translate-y-1 font-[575] leading-6 no-underline opacity-0 blur-[2px] transition-[opacity,translate,filter,visibility] duration-200 ease-(--ease-reveal) data-visible:visible data-visible:translate-y-0 data-visible:opacity-100 data-visible:blur-none motion-reduce:translate-y-0 motion-reduce:blur-none"
+			class="invisible absolute bottom-full mb-5 block w-full translate-y-1 leading-6 font-[575] text-foreground no-underline opacity-0 blur-[2px] transition-[opacity,translate,filter,visibility] duration-200 ease-(--ease-reveal) data-visible:visible data-visible:translate-y-0 data-visible:opacity-100 data-visible:blur-none motion-reduce:translate-y-0 motion-reduce:blur-none"
 			data-toc-title
 		>
 			{title}
@@ -32,7 +32,7 @@ const headings = Astro.props.headings.filter(
 				<li class:list={["flex", depth === 3 && "pl-3"]}>
 					<a
 						href={`#${slug}`}
-						class="text-tone-soft hover:text-foreground aria-[current=location]:text-foreground truncate no-underline transition-colors duration-200"
+						class="truncate text-tone-soft no-underline transition-colors duration-200 hover:text-foreground aria-[current=location]:text-foreground"
 						title={text}
 					>
 						{text}
@@ -41,11 +41,11 @@ const headings = Astro.props.headings.filter(
 			))}
 		</ol>
 		<p
-			class="text-tone-soft flex items-center gap-3 tabular-nums"
+			class="flex items-center gap-3 text-tone-soft tabular-nums"
 			aria-hidden="true"
 		>
-			<span class="bg-border h-0.5 w-32 overflow-hidden rounded-full">
-				<span class="bg-link block h-full w-0" data-toc-bar></span>
+			<span class="h-0.5 w-32 overflow-hidden rounded-full bg-border">
+				<span class="block h-full w-0 bg-link" data-toc-bar></span>
 			</span>
 			<span class="font-mono text-xs" data-toc-percent>
 				0%

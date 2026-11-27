@@ -27,14 +27,14 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 						aria-current={item.isActive ? "page" : undefined}
 						aria-keyshortcuts={item.shortcut}
 						class:list={[
-							"hover:text-foreground inline-flex items-center gap-1.5 no-underline transition-colors duration-150",
+							"inline-flex items-center gap-1.5 no-underline transition-colors duration-150 hover:text-foreground",
 							item.isActive ? "text-foreground" : "text-tone-soft",
 						]}
 					>
 						<span
 							class:list={[
 								"lowercase",
-								item.isActive && "decoration-link underline underline-offset-4",
+								item.isActive && "underline decoration-link underline-offset-4",
 							]}
 						>
 							{item.title}

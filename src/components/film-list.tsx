@@ -117,8 +117,8 @@ const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 							className="w-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]"
 						/>
 					) : (
-						<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 motion-safe:transition-[border-color,translate,rotate,scale] motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]">
-							<p className="text-tone-mid text-sm leading-relaxed">
+						<div className="aspect-[2/3] w-full rounded-md border border-border bg-muted p-3 group-hover:border-tone-mid motion-safe:transition-[border-color,translate,rotate,scale] motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]">
+							<p className="text-sm leading-relaxed text-tone-mid">
 								{film.title}
 							</p>
 						</div>
@@ -143,13 +143,13 @@ const FilmTimeline = ({
 	<ol className="space-y-8">
 		{groupFilmsByMonth(films).map((group) => (
 			<li key={group.month} className="space-y-4">
-				<h3 className="bg-background text-foreground sticky top-0 z-10 -mx-6 px-6 py-2 font-[575] lowercase">
+				<h3 className="sticky top-0 z-10 -mx-6 bg-background px-6 py-2 font-[575] text-foreground lowercase">
 					{group.label}
 				</h3>
-				<ol className="border-border relative border-l pl-6">
+				<ol className="relative border-l border-border pl-6">
 					{group.films.map((film) => (
 						<li key={film.url} className="mb-6 last:mb-0">
-							<div className="bg-tone-faint ring-background absolute -left-[4.5px] mt-2 size-2 rounded-full ring-4" />
+							<div className="absolute -left-[4.5px] mt-2 size-2 rounded-full bg-tone-faint ring-4 ring-background" />
 							<div className="flex gap-4">
 								{film.image && (
 									<a
@@ -163,7 +163,7 @@ const FilmTimeline = ({
 								)}
 								<div className="flex-1">
 									{film.watchedDate && (
-										<time className="text-tone-faint font-mono text-xs">
+										<time className="font-mono text-xs text-tone-faint">
 											{formatDate(film.watchedDate)}
 										</time>
 									)}
@@ -179,7 +179,7 @@ const FilmTimeline = ({
 										<span className="text-tone-faint">, {film.year}</span>
 										{film.liked && (
 											<span
-												className="text-link ml-2 inline-block text-base leading-none"
+												className="ml-2 inline-block text-base leading-none text-link"
 												role="img"
 												aria-label="Liked"
 											>
@@ -188,14 +188,14 @@ const FilmTimeline = ({
 										)}
 									</p>
 									{withTags && film.tags.length > 0 && (
-										<ul className="text-tone-faint mt-1 flex flex-wrap gap-x-3 text-sm">
+										<ul className="mt-1 flex flex-wrap gap-x-3 text-sm text-tone-faint">
 											{film.tags.map((tag) => (
 												<li key={tag.url}>
 													<a
 														href={tag.url}
 														target="_blank"
 														rel="noopener noreferrer"
-														className="hover:text-foreground focus-visible:text-foreground hover:underline focus-visible:underline"
+														className="hover:text-foreground hover:underline focus-visible:text-foreground focus-visible:underline"
 													>
 														#{tag.name}
 													</a>
@@ -241,7 +241,7 @@ type Props = {
 };
 
 const EmptyState = () => (
-	<p className="text-tone-soft text-sm">no films yet.</p>
+	<p className="text-sm text-tone-soft">no films yet.</p>
 );
 
 const FilmListContent = ({
@@ -268,7 +268,7 @@ const FilmListContent = ({
 	return (
 		<div className="space-y-4">
 			{allowLayoutSwitch && (
-				<div className="text-tone-soft flex flex-wrap items-center justify-between gap-3 text-sm">
+				<div className="flex flex-wrap items-center justify-between gap-3 text-sm text-tone-soft">
 					<span>{films.length} recent watches</span>
 					<button
 						type="button"

@@ -102,7 +102,7 @@ export function SearchDemo() {
 	return (
 		<MapTokenGate>
 			<MapFrame label="react-map-gl · geocoding search">
-				<div className="border-border bg-muted/30 relative border-b">
+				<div className="relative border-b border-border bg-muted/30">
 					<div className="flex items-center gap-2 px-3 py-2 font-mono text-sm">
 						<span aria-hidden="true" className="text-tone-faint">
 							&gt;
@@ -119,17 +119,17 @@ export function SearchDemo() {
 								}
 							}}
 							aria-label="Search a location"
-							className="text-tone-mid placeholder:text-tone-faint flex-1 bg-transparent font-mono text-sm focus:outline-none"
+							className="flex-1 bg-transparent font-mono text-sm text-tone-mid placeholder:text-tone-faint focus:outline-none"
 						/>
 					</div>
 					{results.length > 0 ? (
-						<ul className="border-border bg-background absolute inset-x-0 top-full z-10 m-0 list-none border-y p-0">
+						<ul className="absolute inset-x-0 top-full z-10 m-0 list-none border-y border-border bg-background p-0">
 							{results.map((feature) => (
 								<li key={feature.id} className="mt-0">
 									<button
 										type="button"
 										onClick={() => selectFeature(feature)}
-										className="text-tone-soft hover:bg-muted hover:text-tone-mid block w-full px-4 py-2 text-left font-mono text-xs"
+										className="block w-full px-4 py-2 text-left font-mono text-xs text-tone-soft hover:bg-muted hover:text-tone-mid"
 									>
 										{feature.place_name}
 									</button>

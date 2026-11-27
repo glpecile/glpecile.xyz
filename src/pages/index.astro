@@ -51,7 +51,7 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 		<SectionLabel label="blog" />
 
 		{latestPosts.length === 0 ? (
-			<p class="text-tone-soft text-sm">no posts yet.</p>
+			<p class="text-sm text-tone-soft">no posts yet.</p>
 		) : (
 			<ol class="space-y-3">
 				{latestPosts.map((post) => (
@@ -61,9 +61,9 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 						</a>
 						<span
 							aria-hidden="true"
-							class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"
+							class="hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed border-border sm:block"
 						></span>
-						<time class="text-tone-faint ml-auto shrink-0 font-mono text-xs">
+						<time class="ml-auto shrink-0 font-mono text-xs text-tone-faint">
 							{formatDate(
 								post.data.updatedDate ?? post.data.pubDate,
 							).toLowerCase()}
@@ -116,7 +116,7 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 						<svg
 							viewBox="0 0 24 24"
 							aria-hidden="true"
-							class="text-tone-soft group-hover:text-link h-4 w-4 fill-current transition-colors duration-150"
+							class="h-4 w-4 fill-current text-tone-soft transition-colors duration-150 group-hover:text-link"
 						>
 							<path d={socialIcons[label].path}></path>
 						</svg>

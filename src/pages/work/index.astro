@@ -54,7 +54,7 @@ const cvFileName = cvDownloadName();
 					markdown
 				</a>
 			</p>
-			<p class="text-tone-soft text-sm">
+			<p class="text-sm text-tone-soft">
 				{contact.email}, {contact.location}
 			</p>
 		</div>
@@ -64,7 +64,7 @@ const cvFileName = cvDownloadName();
 		<SectionLabel label="roles" />
 
 		{work.length === 0 ? (
-			<p class="text-tone-soft text-sm">no work yet.</p>
+			<p class="text-sm text-tone-soft">no work yet.</p>
 		) : (
 			<WorkTimeline work={work} detail="highlights" />
 		)}
@@ -74,7 +74,7 @@ const cvFileName = cvDownloadName();
 		<SectionLabel label="projects" count={projects.length} />
 
 		{projects.length === 0 ? (
-			<p class="text-tone-soft text-sm">no projects yet.</p>
+			<p class="text-sm text-tone-soft">no projects yet.</p>
 		) : (
 			<ol class="grid gap-3 sm:grid-cols-2">
 				{projects.map((project) => (
@@ -104,16 +104,16 @@ const cvFileName = cvDownloadName();
 								<svg
 									viewBox="0 0 16 16"
 									aria-hidden="true"
-									class="text-tone-faint group-hover:text-link mt-1 h-4 w-4 shrink-0 fill-current transition-[rotate,color] duration-200 ease-(--ease-reveal) group-hover:rotate-45 motion-reduce:transition-none"
+									class="mt-1 h-4 w-4 shrink-0 fill-current text-tone-faint transition-[rotate,color] duration-200 ease-(--ease-reveal) group-hover:rotate-45 group-hover:text-link motion-reduce:transition-none"
 								>
 									<path d="M3.75 4a.75.75 0 0 0 0 1.5h6.69l-7.22 7.22a.75.75 0 1 0 1.06 1.06l7.22-7.22v6.69a.75.75 0 0 0 1.5 0V4.75A.75.75 0 0 0 12.25 4h-8.5Z" />
 								</svg>
 							)}
 						</p>
 						{project.period && (
-							<p class="text-tone-soft text-sm">{project.period}</p>
+							<p class="text-sm text-tone-soft">{project.period}</p>
 						)}
-						<ul class="marker:text-tone-faint text-tone-mid list-disc space-y-1.5 pt-1 pl-4">
+						<ul class="list-disc space-y-1.5 pt-1 pl-4 text-tone-mid marker:text-tone-faint">
 							{project.highlights.map((highlight) => (
 								<li>
 									{parseInlineLinks(highlight).map((segment) =>
@@ -130,7 +130,7 @@ const cvFileName = cvDownloadName();
 						</ul>
 						<ul class="mt-auto flex flex-wrap gap-1.5 pt-2">
 							{project.stack.split(" / ").map((tech) => (
-								<li class="bg-muted text-tone-soft rounded-md px-1.5 py-0.5 font-mono text-xs">
+								<li class="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-tone-soft">
 									{tech}
 								</li>
 							))}
@@ -181,7 +181,7 @@ const cvFileName = cvDownloadName();
 			{skills.map((group) => (
 				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
 					<p class="text-foreground">{group.category}</p>
-					<p class="text-tone-soft text-sm">{group.items.join(", ")}</p>
+					<p class="text-sm text-tone-soft">{group.items.join(", ")}</p>
 				</li>
 			))}
 		</ul>
@@ -191,7 +191,7 @@ const cvFileName = cvDownloadName();
 		<SectionLabel label="education" />
 
 		{education.length === 0 ? (
-			<p class="text-tone-soft text-sm">no education yet.</p>
+			<p class="text-sm text-tone-soft">no education yet.</p>
 		) : (
 			<ol class="space-y-5">
 				{education.map((item) => (
@@ -210,8 +210,8 @@ const cvFileName = cvDownloadName();
 								<span class="text-foreground">{item.school}</span>
 							)}
 						</p>
-						<p class="text-tone-soft text-sm">{item.credential}</p>
-						<p class="text-tone-soft text-sm">{item.period}</p>
+						<p class="text-sm text-tone-soft">{item.credential}</p>
+						<p class="text-sm text-tone-soft">{item.period}</p>
 						{item.details?.map((detail) => (
 							<p class="text-tone-mid">{detail}</p>
 						))}
@@ -228,7 +228,7 @@ const cvFileName = cvDownloadName();
 			{languages.map((item) => (
 				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
 					<p class="text-foreground">{item.language}</p>
-					<p class="text-tone-soft text-sm">{item.level}</p>
+					<p class="text-sm text-tone-soft">{item.level}</p>
 				</li>
 			))}
 		</ul>
@@ -238,7 +238,7 @@ const cvFileName = cvDownloadName();
 		<SectionLabel label="certificates" />
 
 		{certificates.length === 0 ? (
-			<p class="text-tone-soft text-sm">no certificates yet.</p>
+			<p class="text-sm text-tone-soft">no certificates yet.</p>
 		) : (
 			<ol class="space-y-5">
 				{certificates.map((certificate) => (
@@ -257,8 +257,8 @@ const cvFileName = cvDownloadName();
 								<span class="text-foreground">{certificate.title}</span>
 							)}
 						</p>
-						<p class="text-tone-soft text-sm">{certificate.issuer}</p>
-						<p class="text-tone-soft text-sm">Issued {certificate.issued}</p>
+						<p class="text-sm text-tone-soft">{certificate.issuer}</p>
+						<p class="text-sm text-tone-soft">Issued {certificate.issued}</p>
 						{certificate.details?.map((detail) => (
 							<p class="text-tone-mid">{detail}</p>
 						))}
