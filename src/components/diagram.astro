@@ -52,11 +52,30 @@ const html = svg.replace(
 		--pele-border: var(--color-border);
 		--pele-accent: var(--color-ring);
 		--pele-radius: 0;
-		/* Timelines color each period with a series color: keep them on the neutral scale. */
-		--pele-series-1: var(--color-tone-mid);
-		--pele-series-2: var(--color-tone-mid);
-		--pele-series-3: var(--color-tone-mid);
-		--pele-series-4: var(--color-tone-mid);
-		--pele-series-5: var(--color-tone-mid);
+		/* Timelines fill each period with a series color: use the quiet neutral fill. */
+		--pele-series-1: var(--color-secondary);
+		--pele-series-2: var(--color-secondary);
+		--pele-series-3: var(--color-secondary);
+		--pele-series-4: var(--color-secondary);
+		--pele-series-5: var(--color-secondary);
+	}
+
+	/* pele writes period labels in the page color and tints events with the series color. */
+	.diagram :global(.pele-timeline .pele-period > text) {
+		fill: var(--pele-fg);
+	}
+
+	.diagram :global(.pele-timeline .pele-event rect) {
+		fill: var(--color-muted);
+		fill-opacity: 1;
+	}
+
+	/* The border token is too faint for connectors (Lc 0 in dark): draw them like the axis. */
+	.diagram :global(.pele-timeline .pele-dot) {
+		fill: var(--pele-line);
+	}
+
+	.diagram :global(.pele-timeline .pele-edge) {
+		stroke: var(--pele-line);
 	}
 </style>
