@@ -29,7 +29,7 @@ const { metrics, highlight, caption } = Astro.props;
 							const own = name === highlight;
 							return (
 								<li class="mt-0 grid grid-cols-[7rem_1fr] items-center gap-3 text-[0.85rem]">
-									<span class:list={[own ? "text-foreground font-[575]" : "text-tone-soft"]}>{name}</span>
+									<span class={own ? "text-foreground font-[575]" : "text-tone-soft"}>{name}</span>
 									<span class="flex min-w-0 items-center gap-2">
 										<span
 											aria-hidden="true"
