@@ -20,7 +20,7 @@ Then the tool that drew it changed names. Twice. A year after the second name, t
 
 This is the story of how I got it back. It involves one acquisition, one rebrand, one Node process per terminal, a plan written for an agent, and my first Rust project. It ends with [`hachikuji`](https://github.com/glpecile/hachikuji): an IDE-style completion popup for zsh that uses about 2 MB per shell.
 
-<DemoVideo src={demo} label="Typing git, cd, make and docker commands in zsh. A popup under the line lists subcommands, branches, folders, make targets and options. Up and Down move the selection, Tab inserts it." width={1100} height={540}>
+<DemoVideo src={demo} label="Typing git, cd, make and docker commands in zsh. A popup under the line lists subcommands, branches, folders, make targets and options. Up and Down move the selection, Tab inserts it.">
 	hachikuji in Catppuccin Mocha: subcommands, branches, folders, make targets and options. Recorded with <a class="site-link" href="https://github.com/charmbracelet/vhs">VHS</a>.
 </DemoVideo>
 
@@ -94,7 +94,7 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 8. **zsh only**, macOS first, Linux must build.
 9. **Colors follow the terminal.** Only the 16 ANSI palette colors and reverse video. Never RGB, never the 256-color cube, because terminals do not change those when the theme changes.
 
-<DemoVideo src={latte} label="The same zsh demo in the light Catppuccin Latte theme. The popup under git checkout lists branches and tags on a light background, with the selected row in reverse video." width={1100} height={540}>
+<DemoVideo src={latte} label="The same zsh demo in the light Catppuccin Latte theme. The popup under git checkout lists branches and tags on a light background, with the selected row in reverse video.">
 	The same popup in Catppuccin Latte. No theme config: the terminal's palette does the work.
 </DemoVideo>
 
@@ -181,7 +181,7 @@ And the three workarounds in my dotfiles are deleted. Herdr shows the right fold
 
 The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a popup. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), because the same friend who showed me Fig asked for it. There, hachikuji supplies the items and nushell's own menu shows them.
 
-<DemoVideo src={nu} label="In nushell, Tab after git ch, make and docker run --r opens nushell's menu next to the line. It lists subcommands, branches, make targets and options, with the description of the selected item in a box beside it." width={1100} height={540}>
+<DemoVideo src={nu} label="In nushell, Tab after git ch, make and docker run --r opens nushell's menu next to the line. It lists subcommands, branches, make targets and options, with the description of the selected item in a box beside it.">
 	In nushell, the same specs feed nushell's own completion menu.
 </DemoVideo>
 

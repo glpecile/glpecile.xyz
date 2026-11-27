@@ -2,16 +2,16 @@
 interface Props {
 	src: string;
 	label: string;
-	width: number;
-	height: number;
+	width?: number;
+	height?: number;
 }
 
-const { src, label, width, height } = Astro.props;
+const { src, label, width = 1100, height = 540 } = Astro.props;
 ---
 
 <figure class="my-8">
 	<video
-		src={src}
+		src={`${src}#t=0.001`}
 		aria-label={label}
 		width={width}
 		height={height}
@@ -28,8 +28,25 @@ const { src, label, width, height } = Astro.props;
 
 <script>
 	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+		const play = async (video: HTMLVideoElement) => {
+			try {
+				await video.play();
+			} catch {
+				return;
+			}
+		};
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const { target, isIntersecting } of entries) {
+					if (!(target instanceof HTMLVideoElement)) continue;
+					if (isIntersecting) void play(target);
+					else target.pause();
+				}
+			},
+			{ threshold: 0.5 },
+		);
 		for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
-			void video.play();
+			observer.observe(video);
 		}
 	}
 </script>
