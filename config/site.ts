@@ -168,7 +168,7 @@ export const siteConfig = {
 			url: "https://roubaix.com.ar",
 			highlights: [
 				"Designed and built roubaix.com.ar, the catalogue site for a professional hair-colour brand: products, four tone charts with the printed hair locks, and a downloadable PDF catalogue.",
-				"Built a password-protected admin to edit products, tones, and images on Cloudflare D1 and R2, with an audit history that highlights each change.",
+				"Built an admin tool to edit products, tones, and images on Cloudflare D1 and R2, with an audit history that highlights each change.",
 				"Shipped it with Next.js 16 and Effect on Cloudflare Workers, with shared-element photo transitions, Cmd+K catalogue search, and keyboard-navigable tone charts.",
 			],
 		},
