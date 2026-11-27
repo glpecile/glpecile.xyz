@@ -12,7 +12,7 @@ import demo from "@/assets/blog/hachikuji/demo.mp4";
 import latte from "@/assets/blog/hachikuji/latte.mp4";
 import nu from "@/assets/blog/hachikuji/nu.mp4";
 
-For years, I had a small popup under my prompt.
+For years, I had a small popup under my prompt. A friend put it there: he showed me Fig, and I never went back.
 
 Type `git ch`, and a list opened under the cursor: `checkout`, `cherry-pick`, `cherry`, each with a one-line description. Type `git checkout `, and it listed my branches. Press Tab, and the word was there. It felt like an IDE had quietly moved into the terminal.
 
@@ -179,7 +179,7 @@ Inside the helper, a request takes 0.14 ms at p99. The binary is about 700 KB. T
 
 And the three workarounds in my dotfiles are deleted. Herdr shows the right folder, because zsh is the foreground process again. The popup follows Latte and Mocha, because it only knows palette colors. There's nothing to work around.
 
-The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a popup. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), where hachikuji supplies the items and nushell's own menu shows them.
+The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a popup. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), because the same friend who showed me Fig asked for it. There, hachikuji supplies the items and nushell's own menu shows them.
 
 <DemoVideo src={nu} label="In nushell, Tab after git ch, make and docker run --r opens nushell's menu next to the line. It lists subcommands, branches, make targets and options, with the description of the selected item in a box beside it." width={1100} height={540}>
 	In nushell, the same specs feed nushell's own completion menu.
