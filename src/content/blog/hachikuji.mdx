@@ -15,7 +15,7 @@ For years, I had a small popup under my prompt.
 
 Type `git ch`, and a list opened under the cursor: `checkout`, `cherry-pick`, `cherry`, each with a one-line description. Type `git checkout `, and it listed my branches. Press Tab, and the word was there. It felt like an IDE had quietly moved into the terminal.
 
-Then the tool that drew it changed names. Twice. And the second time, the popup was gone.
+Then the tool that drew it changed names. Twice. A year after the second name, the popup was gone.
 
 This is the story of how I got it back. It involves one acquisition, one rebrand, one Node process per terminal, a plan written for an agent, and my first Rust project. It ends with [`hachikuji`](https://github.com/glpecile/hachikuji): an IDE-style completion popup for zsh that uses about 2 MB per shell.
 
@@ -43,13 +43,11 @@ There was also a good sign: the Amazon Q Developer CLI was [open source](https:/
 
 ## Then it became Kiro CLI
 
-In November 2025, the Amazon Q Developer CLI became [Kiro CLI](https://kiro.dev/docs/upgrade-guides/migrating-from-q/). Two things changed with the name.
+In November 2025, the Amazon Q Developer CLI became [Kiro CLI](https://kiro.dev/docs/upgrade-guides/migrating-from-q/), and the source closed. The old repository now says it will only get critical security fixes, and that the CLI continues as Kiro CLI, a closed-source product.
 
-First, the source closed. The old repository now says it will only get critical security fixes, and that the CLI continues as Kiro CLI, a closed-source product.
+The popup lasted one more year. On 3 November 2026, [Kiro CLI 3.0](https://kiro.dev/changelog/cli/3-0/) became the default. It is a chat agent, and its changelog says it plainly: inline shell autocomplete is retired, with "no standalone replacement". The Homebrew casks `kiro-cli` and `amazon-q` both install it now.
 
-Second, the product changed shape. Kiro CLI 3 is a chat agent. It has [no completion popup](https://github.com/glpecile/hachikuji/blob/main/docs/MIGRATION.md#kiro-cli-3x). The Homebrew casks `kiro-cli` and `amazon-q` both install it now.
-
-I understand why. In 2025 the attention was on agents, not on a popup that tells you `git rebase` takes `--onto`. But the feature I installed Fig for, years earlier, was no longer in any product.
+I understand why. The attention is on agents, not on a popup that tells you `git rebase` takes `--onto`. But the feature I installed Fig for, years earlier, was no longer in any product.
 
 Three names, one acquisition, and the thing I actually used was the part that got cut.
 
@@ -189,7 +187,7 @@ Inside the helper, a request takes 0.14 ms at p99. The binary is about 700 KB. T
 
 And the three workarounds in my dotfiles are deleted. Herdr shows the right folder, because zsh is the foreground process again. The popup follows Latte and Mocha, because it only knows palette colors. There's nothing to work around.
 
-The plan was written on 3 November. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), where hachikuji supplies the items and nushell's own menu shows them.
+The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a popup. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), where hachikuji supplies the items and nushell's own menu shows them.
 
 <DemoVideo src={nu} label="In nushell, Tab after git ch, make and docker run --r opens nushell's menu next to the line. It lists subcommands, branches, make targets and options, with the description of the selected item in a box beside it." width={1100} height={540}>
 	In nushell, the same specs feed nushell's own completion menu.
