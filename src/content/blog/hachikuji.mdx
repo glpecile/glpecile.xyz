@@ -51,16 +51,6 @@ I understand why. The attention is on agents, not on a popup that tells you `git
 
 Three names, one acquisition, and the thing I actually used was the part that got cut.
 
-<Diagram
-	caption="Six years, three products, one popup. The MIT specs are in every step."
-	code={`timeline
-    2020 : Fig publishes its specs (MIT)
-    2023 : AWS acquires Fig : Microsoft ships inshellisense
-    2024 : Fig shuts down : The popup moves to Amazon Q
-    2025 : Amazon Q CLI becomes Kiro CLI : Its source closes
-    2026 : Kiro CLI 3 retires the popup`}
-/>
-
 ## inshellisense, and 1.1 GB of popup
 
 The obvious replacement was [inshellisense](https://github.com/microsoft/inshellisense), from Microsoft. Open source, MIT, and built on the same Fig specs. Same popup, same commands, no account.
@@ -74,6 +64,16 @@ It worked. It also cost more than I expected, in three ways.
 **Colors.** Its theme did not follow the system light and dark mode. My terminal switches between [Catppuccin](https://catppuccin.com) Latte and Mocha with the system. The popup did not.
 
 Each problem had a workaround in my dotfiles. Each workaround was a few more lines that existed only to fix a tool that was supposed to save me time. And every new shell took about 140 ms to show a prompt, against 18 ms without it.
+
+<Diagram
+	caption="Six years, three products, one popup. The MIT specs are in every step."
+	code={`timeline
+    2020 : Fig publishes its specs (MIT)
+    2023 : AWS acquires Fig : Microsoft ships inshellisense
+    2024 : Fig shuts down : The popup moves to Amazon Q
+    2025 : Amazon Q CLI becomes Kiro CLI : Its source closes
+    2026 : Kiro CLI 3 retires the popup`}
+/>
 
 At some point, the honest question was: what does a completion popup actually need?
 
