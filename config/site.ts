@@ -31,6 +31,8 @@ export type ProjectEntry = {
 	stack: string;
 	period?: string;
 	url?: string;
+	/** Spans the full row of the bento grid on /work. */
+	wide?: boolean;
 	highlights: readonly string[];
 };
 
@@ -159,6 +161,18 @@ export const siteConfig = {
 			],
 		},
 		{
+			role: "Freelance Software Engineer",
+			company: "Roubaix",
+			period: "Sep 2026 - Oct 2026",
+			place: "Buenos Aires · Remote",
+			url: "https://roubaix.com.ar",
+			highlights: [
+				"Designed and built roubaix.com.ar, the catalogue site for a professional hair-colour brand: products, four tone charts with the printed hair locks, and a downloadable PDF catalogue.",
+				"Built an admin tool to edit products, tones, and images on Cloudflare D1 and R2, with an audit history that highlights each change.",
+				"Shipped it with Next.js 16 and Effect on Cloudflare Workers, with shared-element photo transitions and Cmd+K catalogue search.",
+			],
+		},
+		{
 			role: "Software / Frontend Engineer",
 			company: "POAP - Proof Of Attendance Protocol",
 			period: "Jan 2025 - Aug 2026",
@@ -240,6 +254,7 @@ export const siteConfig = {
 			name: "glpecile.xyz — Personal site & design system",
 			stack: "Astro / TypeScript / Tailwind CSS",
 			url: "https://glpecile.xyz",
+			wide: true,
 			highlights: [
 				"Designed and built this site as a hand-crafted component system — consistent type, color, and motion tokens driving every page from a single config.",
 				"Engineered a custom CV generator that renders a typeset PDF programmatically (pdf-lib) from the same content source as the live site.",
@@ -266,11 +281,12 @@ export const siteConfig = {
 			],
 		},
 		{
-			name: "lugia",
-			stack: "React Native / Expo",
-			url: "https://github.com/glpecile/lugia",
+			name: "norph",
+			stack: "React Native / Reanimated / TypeScript",
+			url: "https://github.com/glpecile/norph",
 			highlights: [
-				"Built a cross-platform (iOS / Android / web) blog application with Expo from a single shared UI codebase.",
+				"Published @glpecile/norph, a Reanimated port of torph: text that morphs into its next value on iOS, Android, and web from one implementation.",
+				"Shared words and characters slide to their new places, and numbers roll digit by digit, aligned on the decimal point.",
 			],
 		},
 		{
@@ -285,6 +301,7 @@ export const siteConfig = {
 			name: "ITBA Coursework",
 			stack: "Python / PyTorch / C / Java / PostgreSQL / Redis",
 			url: "https://github.com/glpecile",
+			wide: true,
 			highlights: [
 				"Thesis: a PyTorch CNN that detects people in images, compiled with Concrete ML to run inference on FHE-encrypted data, with a web demo.",
 				"Perceptrons, search and optimization algorithms written from scratch in Python.",
