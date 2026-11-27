@@ -19,9 +19,9 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "14.4.6",
-		"@astrojs/mdx": "8.1.3",
-		"@astrojs/react": "6.0.5",
+		"@astrojs/cloudflare": "14.4.9",
+		"@astrojs/mdx": "8.1.6",
+		"@astrojs/react": "7.1.9",
 		"@fontsource-variable/inter": "^5.3.0",
 		"@fontsource/jetbrains-mono": "^5.3.0",
 		"@pdf-lib/fontkit": "^1.1.1",
@@ -32,7 +32,7 @@
 		"@types/mapbox-gl": "^3.5.0",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"astro": "7.4.7",
+		"astro": "7.4.13",
 		"class-variance-authority": "^0.7.1",
 		"cn": "^0.5.2",
 		"mapbox-gl": "^3.35.2",
