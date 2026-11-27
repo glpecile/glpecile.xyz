@@ -135,7 +135,8 @@ export function CircleDemo() {
 	React.useEffect(() => {
 		if (!mapReady) return;
 		const source = mapRef.current?.getSource("circle") as
-			{ setData: (d: GeoJSONTypes.GeoJSON) => void } | undefined;
+			| { setData: (d: GeoJSONTypes.GeoJSON) => void }
+			| undefined;
 		source?.setData(data);
 	}, [data, mapReady]);
 
@@ -204,7 +205,7 @@ export function CircleDemo() {
 						</Marker>
 					</MapGL>
 				</div>
-				<div className="text-tone-soft flex items-center gap-3 px-4 py-3 font-mono text-xs">
+				<div className="flex items-center gap-3 px-4 py-3 font-mono text-xs text-tone-soft">
 					<label htmlFor="circle-radius" className="shrink-0">
 						radius
 					</label>
@@ -220,7 +221,7 @@ export function CircleDemo() {
 						}
 						className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-[hsl(var(--tone-faint)/0.3)] accent-[hsl(var(--link))]"
 					/>
-					<code className="text-tone-mid shrink-0 tabular-nums">
+					<code className="shrink-0 text-tone-mid tabular-nums">
 						{radius} km
 					</code>
 				</div>

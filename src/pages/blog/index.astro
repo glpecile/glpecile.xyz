@@ -37,7 +37,7 @@ const introExtra = `Press ${kbd(latestPostRange)} for the latest posts, ${kbd("j
 		</div>
 
 		{posts.length === 0 ? (
-			<p class="text-tone-soft text-sm" data-reveal>
+			<p class="text-sm text-tone-soft" data-reveal>
 				no posts yet.
 			</p>
 		) : (
@@ -58,15 +58,15 @@ const introExtra = `Press ${kbd(latestPostRange)} for the latest posts, ${kbd("j
 							)}
 							<span
 								aria-hidden="true"
-								class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"
+								class="hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed border-border sm:block"
 							></span>
-							<time class="text-tone-faint ml-auto shrink-0 font-mono text-xs">
+							<time class="ml-auto shrink-0 font-mono text-xs text-tone-faint">
 								{formatDate(
 									post.data.updatedDate ?? post.data.pubDate,
 								).toLowerCase()}
 							</time>
 						</div>
-						<p class="text-tone-soft text-sm leading-6">
+						<p class="text-sm leading-6 text-tone-soft">
 							{post.data.description}
 						</p>
 					</li>

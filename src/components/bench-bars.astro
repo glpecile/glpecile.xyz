@@ -20,7 +20,7 @@ const { metrics, highlight, caption } = Astro.props;
 		const id = `bench-${index}`;
 		return (
 			<div>
-				<p id={id} class="mb-2 font-[575] text-[0.9rem]">
+				<p id={id} class="mb-2 text-[0.9rem] font-[575]">
 					{label}
 				</p>
 				<ul
@@ -33,7 +33,7 @@ const { metrics, highlight, caption } = Astro.props;
 						return (
 							<li class="mt-0 grid grid-cols-[7rem_1fr] items-center gap-3 text-[0.85rem]">
 								<span
-									class={own ? "text-foreground font-[575]" : "text-tone-soft"}
+									class={own ? "font-[575] text-foreground" : "text-tone-soft"}
 								>
 									{name}
 								</span>
@@ -57,5 +57,5 @@ const { metrics, highlight, caption } = Astro.props;
 			</div>
 		);
 	})}
-	<figcaption class="text-tone-soft text-[0.85rem]">{caption}</figcaption>
+	<figcaption class="text-[0.85rem] text-tone-soft">{caption}</figcaption>
 </figure>

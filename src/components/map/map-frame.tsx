@@ -34,8 +34,8 @@ export function labelMapCanvas(
  */
 export function MapFrame({ label, children }: MapFrameProps) {
 	return (
-		<figure className="map-frame border-border my-10 overflow-hidden rounded-md border text-sm">
-			<figcaption className="border-border bg-muted/40 text-tone-soft border-b px-3 py-1.5 font-mono text-xs">
+		<figure className="map-frame my-10 overflow-hidden rounded-md border border-border text-sm">
+			<figcaption className="border-b border-border bg-muted/40 px-3 py-1.5 font-mono text-xs text-tone-soft">
 				{label}
 			</figcaption>
 			{children}

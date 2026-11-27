@@ -43,7 +43,7 @@ export default function MobileDrawer({ menu, currentPath = "/" }: Props) {
 			<Drawer.Trigger
 				aria-label={isNav ? "Open navigation" : "Open footer menu"}
 				onClick={(event) => setInstant(event.detail === 0)}
-				className="text-tone-mid hover:text-foreground -mr-3 inline-flex size-11 cursor-pointer items-center justify-center sm:hidden"
+				className="-mr-3 inline-flex size-11 cursor-pointer items-center justify-center text-tone-mid hover:text-foreground sm:hidden"
 			>
 				{isNav ? (
 					<span aria-hidden="true" className="flex w-5 flex-col gap-1.5">
@@ -69,20 +69,20 @@ export default function MobileDrawer({ menu, currentPath = "/" }: Props) {
 					aria-describedby={undefined}
 					onKeyDownCapture={() => setInstant(true)}
 					onPointerDownCapture={() => setInstant(false)}
-					className="border-border bg-background text-foreground fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-xl border-t outline-none"
+					className="fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-xl border-t border-border bg-background text-foreground outline-none"
 				>
 					<div className="mx-auto min-h-0 w-full max-w-[42rem] overflow-y-auto overscroll-contain px-6 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
 						<div
 							aria-hidden="true"
-							className="bg-border mx-auto mb-3 h-1 w-8 rounded-full"
+							className="mx-auto mb-3 h-1 w-8 rounded-full bg-border"
 						/>
 						<div className="mb-3 flex items-center justify-between gap-4">
-							<Drawer.Title className="text-tone-soft text-sm">
+							<Drawer.Title className="text-sm text-tone-soft">
 								{isNav ? "navigation" : "settings"}
 							</Drawer.Title>
 							<Drawer.Close
 								aria-label="Close drawer"
-								className="text-tone-soft -mr-2 inline-flex min-h-11 cursor-pointer items-center px-2 text-sm"
+								className="-mr-2 inline-flex min-h-11 cursor-pointer items-center px-2 text-sm text-tone-soft"
 							>
 								close
 							</Drawer.Close>
@@ -135,7 +135,7 @@ export default function MobileDrawer({ menu, currentPath = "/" }: Props) {
 									source code
 								</a>
 								<fieldset className="flex flex-col">
-									<legend className="text-tone-soft mb-2 text-sm">theme</legend>
+									<legend className="mb-2 text-sm text-tone-soft">theme</legend>
 									{siteConfig.shortcuts.theme.map((item) => (
 										<button
 											key={item.theme}

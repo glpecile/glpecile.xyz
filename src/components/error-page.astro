@@ -29,12 +29,12 @@ const details =
 <SiteLayout title={`${code} | ${title}`} description={description} path={path}>
 	<section class="space-y-6">
 		<div class="space-y-3">
-			<p class="text-tone-faint font-mono text-xs">{code}</p>
+			<p class="font-mono text-xs text-tone-faint">{code}</p>
 			<h1 class="page-heading text-3xl leading-tight font-bold sm:text-4xl sm:leading-tight">
 				{title}
 			</h1>
 			<p class="text-tone-mid">{description}</p>
-			{hint && <p class="text-tone-soft text-sm">{hint}</p>}
+			{hint && <p class="text-sm text-tone-soft">{hint}</p>}
 		</div>
 
 		<div class="flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -52,6 +52,6 @@ const details =
 			))}
 		</div>
 
-		{details && <pre class="text-tone-soft border-border overflow-x-auto border-l-2 pl-4 font-mono text-xs leading-6">{details}</pre>}
+		{details && <pre class="overflow-x-auto border-l-2 border-border pl-4 font-mono text-xs leading-6 text-tone-soft">{details}</pre>}
 	</section>
 </SiteLayout>

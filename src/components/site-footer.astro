@@ -6,8 +6,8 @@ import { siteConfig } from "#config/site";
 const themeItems = siteConfig.shortcuts.theme;
 ---
 
-<footer class="text-tone-soft mt-20 text-sm">
-	<div aria-hidden="true" class="bg-border mb-6 h-px w-12"></div>
+<footer class="mt-20 text-sm text-tone-soft">
+	<div aria-hidden="true" class="mb-6 h-px w-12 bg-border"></div>
 	<div class="flex items-center justify-between gap-x-6">
 		<a
 			class="action"
@@ -19,12 +19,12 @@ const themeItems = siteConfig.shortcuts.theme;
 			source code
 		</a>
 		<span
-			class="bg-muted relative hidden rounded-full p-0.5 sm:inline-flex"
+			class="relative hidden rounded-full bg-muted p-0.5 sm:inline-flex"
 			data-theme-picker
 		>
 			<span
 				aria-hidden="true"
-				class="theme-thumb bg-card absolute inset-y-0.5 left-0.5 w-9 rounded-full"
+				class="theme-thumb absolute inset-y-0.5 left-0.5 w-9 rounded-full bg-card"
 			></span>
 			{themeItems.map((item) => (
 				<button
@@ -34,7 +34,7 @@ const themeItems = siteConfig.shortcuts.theme;
 					aria-keyshortcuts={item.shortcut}
 					aria-label={`${item.theme} theme`}
 					title={`${item.theme} theme (${item.shortcut})`}
-					class="text-tone-soft hover:text-foreground relative grid h-7 w-9 cursor-pointer place-items-center rounded-full transition-[color,scale] duration-150 ease-(--ease-reveal) active:scale-[0.97] motion-reduce:transition-colors"
+					class="relative grid h-7 w-9 cursor-pointer place-items-center rounded-full text-tone-soft transition-[color,scale] duration-150 ease-(--ease-reveal) hover:text-foreground active:scale-[0.97] motion-reduce:transition-colors"
 				>
 					<svg
 						viewBox="0 0 24 24"

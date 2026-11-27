@@ -74,7 +74,7 @@ export function LocateDemo() {
 						</Marker>
 					) : null}
 				</MapGL>
-				<div className="text-tone-soft flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 font-mono text-xs">
+				<div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 font-mono text-xs text-tone-soft">
 					<span>
 						state:{" "}
 						<code className="text-tone-mid">

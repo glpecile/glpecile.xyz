@@ -8,7 +8,7 @@ export const sayHello = () =>
 				type="button"
 				title="dismiss"
 				onClick={() => toast.dismiss(id)}
-				className="bg-card text-foreground focus-visible:ring-ring flex min-h-11 cursor-pointer items-center rounded-full px-4 py-2 text-sm shadow-[0_0_0_1px_hsl(var(--foreground)/0.07),0_4px_12px_hsl(var(--foreground)/0.08)] transition-[scale] duration-150 ease-(--ease-reveal) focus-visible:ring-2 focus-visible:outline-none active:scale-[0.97] motion-reduce:transition-none"
+				className="flex min-h-11 cursor-pointer items-center rounded-full bg-card px-4 py-2 text-sm text-foreground shadow-[0_0_0_1px_hsl(var(--foreground)/0.07),0_4px_12px_hsl(var(--foreground)/0.08)] transition-[scale] duration-150 ease-(--ease-reveal) focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97] motion-reduce:transition-none"
 			>
 				<span className="transition-opacity duration-200 group-data-[expanded=false]/toast:group-data-[front=false]/toast:opacity-0 motion-reduce:transition-none">
 					hello there 👋

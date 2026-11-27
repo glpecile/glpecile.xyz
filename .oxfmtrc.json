@@ -1,0 +1,25 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"printWidth": 80,
+	"sortPackageJson": false,
+	"astro": {},
+	"overrides": [
+		{
+			"files": ["*.md", "*.mdx"],
+			"options": {
+				"embeddedLanguageFormatting": "off"
+			}
+		}
+	],
+	"associations": [
+		{
+			"files": ["*.astro"],
+			"language": "astro"
+		}
+	],
+	"ignorePatterns": [".agents/", "skills-lock.json", "src/styles/fonts.css"],
+	"sortTailwindcss": {
+		"stylesheet": "./src/styles/global.css"
+	}
+}

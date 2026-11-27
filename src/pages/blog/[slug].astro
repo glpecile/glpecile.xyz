@@ -42,7 +42,7 @@ const postPath = `/blog/${post.id}`;
 	<article class="space-y-6">
 		<a
 			href="/blog"
-			class="blog-back-link text-tone-soft hover:text-foreground inline-flex items-center gap-1.5 text-sm no-underline transition-colors duration-150"
+			class="blog-back-link inline-flex items-center gap-1.5 text-sm text-tone-soft no-underline transition-colors duration-150 hover:text-foreground"
 			data-reveal
 		>
 			<svg
@@ -56,7 +56,7 @@ const postPath = `/blog/${post.id}`;
 		</a>
 
 		<header class="space-y-4">
-			<p class="text-tone-faint font-mono text-xs" data-reveal>
+			<p class="font-mono text-xs text-tone-faint" data-reveal>
 				{formatDate(displayDate).toLowerCase()}, {readingTime}
 			</p>
 			<h1
@@ -87,7 +87,7 @@ const postPath = `/blog/${post.id}`;
 					markdown
 				</a>
 			</div>
-			<p class="text-tone-mid text-blog" data-reveal>
+			<p class="text-blog text-tone-mid" data-reveal>
 				{post.data.description}
 			</p>
 		</header>

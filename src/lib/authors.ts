@@ -1,7 +1,11 @@
 import meAvatar from "@/assets/me-avatar.webp?inline";
 
 export type AuthorId =
-	"glpecile" | "chatgpt" | "claude" | "claude-opus" | "glm";
+	| "glpecile"
+	| "chatgpt"
+	| "claude"
+	| "claude-opus"
+	| "glm";
 
 export type Author = {
 	name: string;
