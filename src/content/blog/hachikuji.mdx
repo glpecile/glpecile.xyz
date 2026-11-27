@@ -5,7 +5,11 @@ pubDate: 2026-11-27
 authors: [glpecile, claude]
 ---
 
+import { Image } from "astro:assets";
 import Diagram from "@/components/diagram.astro";
+import demo from "@/assets/blog/hachikuji/demo.webp";
+import latte from "@/assets/blog/hachikuji/latte.webp";
+import nu from "@/assets/blog/hachikuji/nu.webp";
 
 For years, I had a small popup under my prompt.
 
@@ -14,6 +18,11 @@ Type `git ch`, and a list opened under the cursor: `checkout`, `cherry-pick`, `c
 Then the tool that drew it changed names. Twice. And the second time, the popup was gone.
 
 This is the story of how I got it back. It involves one acquisition, one rebrand, one Node process per terminal, a plan written for an agent, and my first time with Rust. It ends with [`hachikuji`](https://github.com/glpecile/hachikuji): an IDE-style completion popup for zsh that uses about 2 MB per shell.
+
+<figure class="my-8">
+	<Image src={demo} alt="Typing git, cd, make and docker commands in zsh. A popup under the line lists subcommands, branches, folders, make targets and options. Up and Down move the selection, Tab inserts it." class="w-full rounded-md" />
+	<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">hachikuji in Catppuccin Mocha: subcommands, branches, folders, make targets and options. Recorded with <a class="site-link" href="https://github.com/charmbracelet/vhs">VHS</a>.</figcaption>
+</figure>
 
 ## Fig was the good part
 
@@ -85,6 +94,11 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 9. **Colors follow the terminal.** Only the 16 ANSI palette colors and reverse video. Never RGB, never the 256-color cube, because terminals do not change those when the theme changes.
 
 Number 9 is my favorite, because it deletes a feature instead of adding one. If the popup only uses palette colors, the terminal does the theming. No config, no code, no restart. Switch to Latte, and the popup is Latte.
+
+<figure class="my-8">
+	<Image src={latte} alt="The same zsh demo in the light Catppuccin Latte theme. The popup under git checkout lists branches and tags on a light background, with the selected row in reverse video." class="w-full rounded-md" />
+	<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">The same popup in Catppuccin Latte. No theme config: the terminal's palette does the work.</figcaption>
+</figure>
 
 The plan also has milestones, and the first one is "stop and report". Milestone 0 was a [pure zsh spike](https://github.com/glpecile/hachikuji/tree/main/spike), no helper, eight fake items in a popup, to answer one question before anything else: can ZLE draw this reliably?
 
@@ -185,6 +199,11 @@ Inside the helper, a request takes 0.14 ms at p99. The binary is about 700 KB. T
 And the three workarounds in my dotfiles are deleted. Herdr shows the right folder, because zsh is the foreground process again. The popup follows Latte and Mocha, because it only knows palette colors. There's nothing to work around.
 
 The plan was written on 3 November. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), where hachikuji supplies the items and nushell's own menu shows them.
+
+<figure class="my-8">
+	<Image src={nu} alt="In nushell, Tab after git ch, make and docker run --r opens nushell's menu next to the line. It lists subcommands, branches, make targets and options, with the description of the selected item in a box beside it." class="w-full rounded-md" />
+	<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">In nushell, the same specs feed nushell's own completion menu.</figcaption>
+</figure>
 
 ## A short detour into Homebrew
 
