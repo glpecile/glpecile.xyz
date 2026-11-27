@@ -16,6 +16,7 @@ Project-specific guidance for working in this repo.
 
 - Assume the user is already running a dev server. Do not start another one unless they explicitly ask.
 - Always run code validation after making changes. Prefer `bun run check`, and run `bun run lint` when the change affects linted files.
+- Format with `bun fmt` (Prettier style, tabs, settings in `.prettierrc.json`). It formats `.astro` files through the installed `prettier` and `prettier-plugin-astro`, so keep both. Embedded code in `.md` and `.mdx` is left as written. `.prettierignore` skips the vendored skills and the generated `fonts.css`.
 - Use Bun only. Prefer `bun`, `bunx`, and `bun install`, and do not add `pnpm-lock.yaml`, `package-lock.json`, or `yarn.lock`.
 - Prefer Tailwind CSS utilities over custom `<style>` blocks or one-off CSS when implementing UI changes.
 - Tailwind CSS is configured through `@tailwindcss/vite` and `src/styles/global.css`. Do not add `tailwind.config.*` unless there is a real project need.
