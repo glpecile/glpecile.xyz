@@ -110,7 +110,7 @@ The helper ended at 2.19 MB and a 700 KB binary, well inside the budget.
 
 I respect Rust from the outside, through what people build with it. [GPUI](https://www.gpui.rs), the GPU-accelerated UI framework that the [Zed](https://zed.dev) editor is built on, is a good example. That track record made Rust an easy pick, even though I would not be the one writing it.
 
-I wrote the plan, the agent wrote the Rust, and I did not read it. I checked the results against what the plan asked for: whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper. Yes, that makes me a vibe coder. A vibe coder with a test suite and a memory budget, but a vibe coder.
+I wrote the plan and the agent wrote the Rust. I did not read a line of it, which makes me a vibe coder. A vibe coder with a test suite and a memory budget, though: I checked every result against the plan. Does `footprint` say 2.19 MB? Does `cd` update the folder in Herdr? Does Ctrl-C at the prompt leave the helper alive?
 
 The constraints did the reviewing. Each one is a number or a yes/no check, and each check is a script in the repo. A design that broke a constraint failed a test, whatever language it was in.
 
