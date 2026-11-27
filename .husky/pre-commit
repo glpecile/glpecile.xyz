@@ -1,1 +1,16 @@
+# Format staged files with oxfmt and stage them again. A file with both staged
+# and unstaged changes is only checked: restaging it would commit the rest.
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+if [ -n "$staged" ]; then
+	partial=$(git diff --name-only -- $staged)
+	full=$(echo "$staged" | grep -vxF "$partial" || true)
+	if [ -n "$partial" ] && ! bunx oxfmt --check --no-error-on-unmatched-pattern $partial; then
+		echo "Partly staged files need formatting. Stage all of each file, then commit again."
+		exit 1
+	fi
+	if [ -n "$full" ]; then
+		bunx oxfmt --no-error-on-unmatched-pattern $full
+		git add -- $full
+	fi
+fi
 bun run lint
