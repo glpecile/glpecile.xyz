@@ -2,19 +2,17 @@
 interface Props {
 	src: string;
 	label: string;
-	width?: number;
-	height?: number;
 }
 
-const { src, label, width = 1100, height = 540 } = Astro.props;
+const { src, label } = Astro.props;
 ---
 
 <figure class="my-8">
 	<video
 		src={`${src}#t=0.001`}
 		aria-label={label}
-		width={width}
-		height={height}
+		width="1100"
+		height="540"
 		muted
 		loop
 		playsinline
@@ -27,26 +25,34 @@ const { src, label, width = 1100, height = 540 } = Astro.props;
 </figure>
 
 <script>
-	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-		const play = async (video: HTMLVideoElement) => {
-			try {
-				await video.play();
-			} catch {
-				return;
-			}
-		};
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const { target, isIntersecting } of entries) {
-					if (!(target instanceof HTMLVideoElement)) continue;
-					if (isIntersecting) void play(target);
-					else target.pause();
-				}
-			},
-			{ threshold: 0.5 },
-		);
-		for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
-			observer.observe(video);
+	const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+	const visible = new WeakSet<HTMLVideoElement>();
+	const play = async (video: HTMLVideoElement) => {
+		try {
+			await video.play();
+		} catch {
+			return;
 		}
+	};
+	const observer = new IntersectionObserver(
+		(entries) => {
+			for (const { target, isIntersecting } of entries) {
+				if (!(target instanceof HTMLVideoElement)) continue;
+				if (isIntersecting) {
+					visible.add(target);
+					if (!reducedMotion.matches) void play(target);
+				} else {
+					visible.delete(target);
+					target.pause();
+				}
+			}
+		},
+		{ threshold: 0.5 },
+	);
+	for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
+		video.addEventListener("pause", () => {
+			if (visible.has(video)) observer.unobserve(video);
+		});
+		observer.observe(video);
 	}
 </script>
