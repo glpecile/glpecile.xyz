@@ -24,7 +24,7 @@ const { metrics, highlight, caption } = Astro.props;
 					<p id={id} class="mb-2 font-[575] text-[0.9rem]">
 						{label}
 					</p>
-					<ul aria-labelledby={id} class="grid list-none gap-1.5 pl-0">
+					<ul role="list" aria-labelledby={id} class="grid list-none gap-1.5 pl-0">
 						{rows.map(([name, value]) => {
 							const own = name === highlight;
 							return (
