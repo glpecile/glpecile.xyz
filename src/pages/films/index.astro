@@ -31,17 +31,31 @@ try {
 		/>
 
 		<p data-reveal>
-			<MoreLink href={siteConfig.links.letterboxd} label="view all on letterboxd" external />
+			<MoreLink
+				href={siteConfig.links.letterboxd}
+				label="view all on letterboxd"
+				external
+			/>
 		</p>
 	</section>
 
 	<section class="space-y-4" data-reveal>
-		<FilmListLoader client:load layout="timeline" allowLayoutSwitch tags films={films} />
+		<FilmListLoader
+			client:load
+			layout="timeline"
+			allowLayoutSwitch
+			tags
+			films={films}
+		/>
 	</section>
 
 	<section class="space-y-3" data-reveal>
 		<p>
-			<MoreLink href={siteConfig.links.letterboxd} label="view all on letterboxd" external />
+			<MoreLink
+				href={siteConfig.links.letterboxd}
+				label="view all on letterboxd"
+				external
+			/>
 		</p>
 	</section>
 </SiteLayout>

@@ -12,5 +12,7 @@ const { label, count, class: className, ...rest } = Astro.props;
 
 <h2 class:list={["section-label", className]} {...rest}>
 	{label}
-	{count !== undefined && <span class="text-tone-faint ml-1 font-normal tabular-nums">{count}</span>}
+	{count !== undefined && (
+		<span class="text-tone-faint ml-1 font-normal tabular-nums">{count}</span>
+	)}
 </h2>

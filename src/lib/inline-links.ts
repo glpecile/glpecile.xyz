@@ -14,7 +14,8 @@ export const parseInlineLinks = (text: string): InlineSegment[] => {
 		const [full, label, url] = match;
 
 		if (!label || !url) continue;
-		if (match.index > cursor) segments.push({ text: text.slice(cursor, match.index) });
+		if (match.index > cursor)
+			segments.push({ text: text.slice(cursor, match.index) });
 
 		segments.push({ text: label, url });
 		cursor = match.index + full.length;
@@ -25,10 +26,15 @@ export const parseInlineLinks = (text: string): InlineSegment[] => {
 	return segments;
 };
 
-const displayUrl = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+const displayUrl = (url: string) =>
+	url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 /** Flatten [label](url) links to "label (host/path)" for plain-text surfaces like the CV PDF. */
 export const flattenInlineLinks = (text: string): string =>
 	parseInlineLinks(text)
-		.map((segment) => (segment.url ? `${segment.text} (${displayUrl(segment.url)})` : segment.text))
+		.map((segment) =>
+			segment.url
+				? `${segment.text} (${displayUrl(segment.url)})`
+				: segment.text,
+		)
 		.join("");

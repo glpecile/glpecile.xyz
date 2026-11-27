@@ -30,7 +30,7 @@ This is the story of how I got it back. It involves one acquisition, one rebrand
 
 The app was the visible part. The valuable part was a repository.
 
-Every command Fig knew about came from a *completion spec*: a TypeScript file that describes a CLI. Which subcommands `git` has. Which options take an argument. That `git checkout` wants a branch, and how to list branches. Those specs lived in [withfig/autocomplete](https://github.com/withfig/autocomplete), under the MIT license, and the community wrote them by the hundreds. `docker`, `kubectl`, `npm`, `ssh`, `make`, `brew`, `ffmpeg`. If you used it, someone had probably written its spec.
+Every command Fig knew about came from a _completion spec_: a TypeScript file that describes a CLI. Which subcommands `git` has. Which options take an argument. That `git checkout` wants a branch, and how to list branches. Those specs lived in [withfig/autocomplete](https://github.com/withfig/autocomplete), under the MIT license, and the community wrote them by the hundreds. `docker`, `kubectl`, `npm`, `ssh`, `make`, `brew`, `ffmpeg`. If you used it, someone had probably written its spec.
 
 Keep that repository in mind. It is the one piece of this story that never went away.
 
@@ -140,6 +140,7 @@ The whole thing is two pieces: about 350 lines of zsh ([`shell/hachikuji.zsh`](h
     D -- "response (FIFO)" --> F
     G -- "async update" --> F
     S --> I`}
+
 />
 
 - **The zsh side** hooks `line-pre-redraw`, not `self-insert`, so it plays well with [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) and [starship](https://starship.rs), which wrap widgets. It sends a request only when the buffer or the cursor changed. Otherwise the redraw from a response would send a new request, forever.

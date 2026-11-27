@@ -109,7 +109,8 @@ export const siteConfig = {
 	author: "Gian Luca Pecile",
 	name: "glpecile's personal site",
 	shortName: "glpecile",
-	description: "Frontend engineer focused on design systems and high-craft product UI.",
+	description:
+		"Frontend engineer focused on design systems and high-craft product UI.",
 	keywords: [
 		"gian luca pecile",
 		"glpecile",
@@ -334,11 +335,26 @@ export const siteConfig = {
 		},
 		{
 			category: "Languages",
-			items: ["TypeScript", "JavaScript", "Python", "Rust", "Elixir", "Java", "C", "SQL"],
+			items: [
+				"TypeScript",
+				"JavaScript",
+				"Python",
+				"Rust",
+				"Elixir",
+				"Java",
+				"C",
+				"SQL",
+			],
 		},
 		{
 			category: "Backend & Data",
-			items: ["Phoenix (Elixir)", "Effect (TypeScript)", "Data pipelines & indexing", "PostgreSQL", "REST APIs"],
+			items: [
+				"Phoenix (Elixir)",
+				"Effect (TypeScript)",
+				"Data pipelines & indexing",
+				"PostgreSQL",
+				"REST APIs",
+			],
 		},
 		{
 			category: "AI / ML",
@@ -365,11 +381,14 @@ export const siteConfig = {
 			title: "Animations on the Web Course",
 			issuer: "Emil Kowalski",
 			issued: "Aug 2024",
-			details: ["Certificate: Animations on the Web Course Certificate taught by Emil Kowalski"],
+			details: [
+				"Certificate: Animations on the Web Course Certificate taught by Emil Kowalski",
+			],
 			url: "https://animations.dev/",
 		},
 		{
-			title: "Certificazione di Lingua Italiana come Lingua Straniera, livello C1 (CILS)",
+			title:
+				"Certificazione di Lingua Italiana come Lingua Straniera, livello C1 (CILS)",
 			issuer: "Universita per Stranieri di Siena",
 			issued: "Dec 2016",
 			url: "https://cils.unistrasi.it/",
@@ -392,6 +411,7 @@ export const siteConfig = {
 		href: "/work/cv.pdf",
 		fileName: "gian-luca-pecile-cv.pdf",
 		label: "download cv",
-		heading: "Frontend engineer building design systems and high-craft product interfaces.",
+		heading:
+			"Frontend engineer building design systems and high-craft product interfaces.",
 	} satisfies CvFile,
 } as const;

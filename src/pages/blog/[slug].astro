@@ -102,7 +102,9 @@ const postPath = `/blog/${post.id}`;
 			import { createTextMorph } from "@/lib/text-morph";
 
 			(() => {
-				const codeBlocks = document.querySelectorAll(".blog-prose pre.astro-code");
+				const codeBlocks = document.querySelectorAll(
+					".blog-prose pre.astro-code",
+				);
 				const postShareButton = document.querySelector("[data-post-share]");
 				const copyableHeadings = document.querySelectorAll(
 					".blog-prose h2[id], .blog-prose h3[id], .blog-prose h4[id], .blog-prose h5[id], .blog-prose h6[id]",
@@ -124,7 +126,11 @@ const postPath = `/blog/${post.id}`;
 				};
 
 				const formatLanguage = (value: string | undefined) => {
-					if (typeof value !== "string" || value.length === 0 || value === "plaintext") {
+					if (
+						typeof value !== "string" ||
+						value.length === 0 ||
+						value === "plaintext"
+					) {
 						return "text";
 					}
 
@@ -163,7 +169,10 @@ const postPath = `/blog/${post.id}`;
 					onBeforeCopy?(): void;
 				};
 
-				const attachCopyButton = (button: Element | null, options: CopyOptions) => {
+				const attachCopyButton = (
+					button: Element | null,
+					options: CopyOptions,
+				) => {
 					if (
 						!(button instanceof HTMLButtonElement) ||
 						button.dataset.copyButton === "true"
@@ -193,8 +202,14 @@ const postPath = `/blog/${post.id}`;
 					});
 				};
 
-				const enhanceCopyTarget = (heading: Element, options: CopyOptions & { ariaLabel: string }) => {
-					if (!(heading instanceof HTMLElement) || heading.dataset.copyHeading === "true") {
+				const enhanceCopyTarget = (
+					heading: Element,
+					options: CopyOptions & { ariaLabel: string },
+				) => {
+					if (
+						!(heading instanceof HTMLElement) ||
+						heading.dataset.copyHeading === "true"
+					) {
 						return;
 					}
 

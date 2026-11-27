@@ -96,7 +96,9 @@ async function getAvatar(requestUrl: string) {
 
 async function getFont(requestUrl: string) {
 	if (!fontPromise) {
-		fontPromise = fetchBinary(resolveAssetUrl(jetBrainsMonoBoldUrl, requestUrl));
+		fontPromise = fetchBinary(
+			resolveAssetUrl(jetBrainsMonoBoldUrl, requestUrl),
+		);
 	}
 
 	return await fontPromise;
@@ -122,7 +124,8 @@ function getPreviewLabel(requestUrl: string) {
 	const { pathname } = new URL(requestUrl);
 	const segments = pathname.split("/").filter(Boolean);
 	const previewIndex = segments.lastIndexOf("preview");
-	const segment = previewIndex > 0 ? segments[previewIndex - 1] : segments.at(-1);
+	const segment =
+		previewIndex > 0 ? segments[previewIndex - 1] : segments.at(-1);
 
 	if (!segment || segment === "preview") {
 		return "home";
@@ -298,6 +301,8 @@ export async function renderPreview(
 				fontBuffers: [new Uint8Array(font)],
 				monospaceFamily: fontName,
 			},
-		}).render().asPng(),
+		})
+			.render()
+			.asPng(),
 	);
 }

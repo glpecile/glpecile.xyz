@@ -106,7 +106,9 @@ export function FlyToDemo() {
 					}
 					interactiveLayerIds={[]}
 					attributionControl={false}
-					onLoad={(event) => labelMapCanvas(event.target, "Seven wonders of the world")}
+					onLoad={(event) =>
+						labelMapCanvas(event.target, "Seven wonders of the world")
+					}
 					style={{ width: "100%", height: 380 }}
 				>
 					{places.map((place) => (
@@ -147,13 +149,9 @@ export function FlyToDemo() {
 											: "text-tone-soft hover:bg-muted/40 hover:text-tone-mid")
 									}
 								>
-									<span aria-hidden="true">
-										{isActive ? "●" : "○"}
-									</span>
+									<span aria-hidden="true">{isActive ? "●" : "○"}</span>
 									<span className="flex-1">{place.name}</span>
-									<span className="text-tone-faint">
-										{place.city}
-									</span>
+									<span className="text-tone-faint">{place.city}</span>
 								</button>
 							</li>
 						);

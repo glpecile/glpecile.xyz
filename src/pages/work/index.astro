@@ -54,7 +54,9 @@ const cvFileName = cvDownloadName();
 					markdown
 				</a>
 			</p>
-			<p class="text-tone-soft text-sm">{contact.email}, {contact.location}</p>
+			<p class="text-tone-soft text-sm">
+				{contact.email}, {contact.location}
+			</p>
 		</div>
 	</section>
 
@@ -76,7 +78,12 @@ const cvFileName = cvDownloadName();
 		) : (
 			<ol class="grid gap-3 sm:grid-cols-2">
 				{projects.map((project) => (
-					<li class:list={["card group relative flex flex-col gap-2 p-5", project.wide && "sm:col-span-2"]}>
+					<li
+						class:list={[
+							"card group relative flex flex-col gap-2 p-5",
+							project.wide && "sm:col-span-2",
+						]}
+					>
 						<p class="flex items-start justify-between gap-4 font-[575]">
 							{project.url ? (
 								<a
@@ -84,7 +91,9 @@ const cvFileName = cvDownloadName();
 									href={project.url}
 									target="_blank"
 									rel="noopener noreferrer"
-									data-hello={project.url === siteConfig.siteUrl ? "" : undefined}
+									data-hello={
+										project.url === siteConfig.siteUrl ? "" : undefined
+									}
 								>
 									{project.name}
 								</a>
@@ -102,9 +111,7 @@ const cvFileName = cvDownloadName();
 							)}
 						</p>
 						{project.period && (
-							<p class="text-tone-soft text-sm">
-								{project.period}
-							</p>
+							<p class="text-tone-soft text-sm">{project.period}</p>
 						)}
 						<ul class="marker:text-tone-faint text-tone-mid list-disc space-y-1.5 pt-1 pl-4">
 							{project.highlights.map((highlight) => (
@@ -140,11 +147,17 @@ const cvFileName = cvDownloadName();
 		import { sayHello } from "@/components/hello-toast";
 
 		// Easter egg: the card for this site greets you instead of reopening it.
-		document.querySelector("[data-hello]")?.addEventListener("click", (event) => {
-			if (event instanceof MouseEvent && (event.metaKey || event.ctrlKey || event.shiftKey)) return;
-			event.preventDefault();
-			sayHello();
-		});
+		document
+			.querySelector("[data-hello]")
+			?.addEventListener("click", (event) => {
+				if (
+					event instanceof MouseEvent &&
+					(event.metaKey || event.ctrlKey || event.shiftKey)
+				)
+					return;
+				event.preventDefault();
+				sayHello();
+			});
 	</script>
 
 	<script is:inline>
@@ -168,9 +181,7 @@ const cvFileName = cvDownloadName();
 			{skills.map((group) => (
 				<li class="grid gap-1 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-x-4">
 					<p class="text-foreground">{group.category}</p>
-					<p class="text-tone-soft text-sm">
-						{group.items.join(", ")}
-					</p>
+					<p class="text-tone-soft text-sm">{group.items.join(", ")}</p>
 				</li>
 			))}
 		</ul>
@@ -199,16 +210,10 @@ const cvFileName = cvDownloadName();
 								<span class="text-foreground">{item.school}</span>
 							)}
 						</p>
-						<p class="text-tone-soft text-sm">
-							{item.credential}
-						</p>
-						<p class="text-tone-soft text-sm">
-							{item.period}
-						</p>
+						<p class="text-tone-soft text-sm">{item.credential}</p>
+						<p class="text-tone-soft text-sm">{item.period}</p>
 						{item.details?.map((detail) => (
-							<p class="text-tone-mid">
-								{detail}
-							</p>
+							<p class="text-tone-mid">{detail}</p>
 						))}
 					</li>
 				))}
@@ -252,16 +257,10 @@ const cvFileName = cvDownloadName();
 								<span class="text-foreground">{certificate.title}</span>
 							)}
 						</p>
-						<p class="text-tone-soft text-sm">
-							{certificate.issuer}
-						</p>
-						<p class="text-tone-soft text-sm">
-							Issued {certificate.issued}
-						</p>
+						<p class="text-tone-soft text-sm">{certificate.issuer}</p>
+						<p class="text-tone-soft text-sm">Issued {certificate.issued}</p>
 						{certificate.details?.map((detail) => (
-							<p class="text-tone-mid">
-								{detail}
-							</p>
+							<p class="text-tone-mid">{detail}</p>
 						))}
 					</li>
 				))}

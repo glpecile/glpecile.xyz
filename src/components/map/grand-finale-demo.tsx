@@ -46,9 +46,7 @@ export function GrandFinaleDemo() {
 		latitude: initialViewState.latitude,
 	});
 	const [radius, setRadius] = React.useState(5);
-	const [searchedLabel, setSearchedLabel] = React.useState<string | null>(
-		null,
-	);
+	const [searchedLabel, setSearchedLabel] = React.useState<string | null>(null);
 	const [userPosition, setUserPosition] = React.useState<{
 		longitude: number;
 		latitude: number;
@@ -98,8 +96,7 @@ export function GrandFinaleDemo() {
 	React.useEffect(() => {
 		if (!mapReady) return;
 		const source = mapRef.current?.getSource("finale-circle") as
-			| { setData: (d: GeoJSONTypes.GeoJSON) => void }
-			| undefined;
+			{ setData: (d: GeoJSONTypes.GeoJSON) => void } | undefined;
 		source?.setData(circleData);
 	}, [circleData, mapReady]);
 
@@ -187,11 +184,7 @@ export function GrandFinaleDemo() {
 						}}
 						style={{ width: "100%", height: 360, borderRadius: 4 }}
 					>
-						<Source
-							id="finale-circle"
-							type="geojson"
-							data={circleData}
-						>
+						<Source id="finale-circle" type="geojson" data={circleData}>
 							<Layer
 								id="finale-circle-fill"
 								type="fill"
@@ -301,9 +294,7 @@ export function GrandFinaleDemo() {
 								</code>
 							</>
 						) : (
-							<span className="text-tone-faint">
-								search or locate to begin
-							</span>
+							<span className="text-tone-faint">search or locate to begin</span>
 						)}
 					</span>
 				</div>

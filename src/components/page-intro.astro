@@ -9,7 +9,10 @@ const { title, description, extra } = Astro.props;
 ---
 
 <section class="space-y-4">
-	<h1 class="page-heading text-3xl leading-tight font-bold sm:text-4xl sm:leading-tight" data-reveal>
+	<h1
+		class="page-heading text-3xl leading-tight font-bold sm:text-4xl sm:leading-tight"
+		data-reveal
+	>
 		{title}
 	</h1>
 	{description && (
@@ -17,5 +20,7 @@ const { title, description, extra } = Astro.props;
 			{description}
 		</p>
 	)}
-	{extra && <p class="text-tone-soft text-sm leading-6" set:html={extra} data-reveal />}
+	{extra && (
+		<p class="text-tone-soft text-sm leading-6" set:html={extra} data-reveal />
+	)}
 </section>

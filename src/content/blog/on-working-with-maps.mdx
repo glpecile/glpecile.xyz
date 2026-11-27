@@ -62,19 +62,19 @@ There's one decision hiding in this snippet that took me an embarrassing amount
 of time to internalize: **the token is in the bundle.**
 
 If you're coming from the backend, your instinct will be to hide it. Don't.
-The token *has* to be public — `react-map-gl` runs entirely in the browser, and
+The token _has_ to be public — `react-map-gl` runs entirely in the browser, and
 the bundle ships to whoever loads the page. The only lever that actually
 matters is scoping the token to your domains and a sensible rate limit in the
 Mapbox dashboard. Everything else is theater.
 
-The second thing is the difference between *controlled* and *uncontrolled*. If
+The second thing is the difference between _controlled_ and _uncontrolled_. If
 you've ever touched a `<input>` in React, you already know this dance. An
 **uncontrolled** map is one where you seed an `initialViewState` and let the
 user drive from there. A **controlled** map is one where you hold `viewState`
 in your own state, pass it down, and react to `onMove`.
 
 Most production maps are uncontrolled. You only reach for controlled when
-something *else* on the page needs to have an opinion about the camera — which,
+something _else_ on the page needs to have an opinion about the camera — which,
 conveniently, is exactly the next three sections.
 
 ## flyTo, or: the camera is the product
@@ -85,7 +85,7 @@ the map do?
 Option A: instantly re-center.
 Option B: glide.
 
-*A* is what you get for free. *B* is what makes it feel like a product.
+_A_ is what you get for free. _B_ is what makes it feel like a product.
 
 The difference isn't taste. A hard cut reads as a bug. A smooth arc reads as
 intent. And the only knob you're really turning is `flyTo`:
@@ -116,8 +116,8 @@ other.
 
 **`duration`** is how long the animation takes, in milliseconds. I used to ship
 `4000` and feel smug about it. Then I watched a real user walk up to a demo,
-click, and say *"okay, I get it, stop flying."* One to two seconds is the
-actual sweet spot. Long enough that you can *see* the geography change. Short
+click, and say _"okay, I get it, stop flying."_ One to two seconds is the
+actual sweet spot. Long enough that you can _see_ the geography change. Short
 enough that nobody waits for it.
 
 **`curve`** is the shape of the arc. The camera doesn't fly straight — it zooms
@@ -127,14 +127,14 @@ made a screensaver.
 
 **`essential: true`** is the one nobody tells you about. The browser quietly
 throttles animations in background tabs. If you ever notice a `flyTo` "dying"
-midway when you alt-tab away, *this* is why. Mark it essential and the browser
+midway when you alt-tab away, _this_ is why. Mark it essential and the browser
 keeps it alive.
 
 Try it. Pick a place. Watch the camera decide to be elsewhere:
 
 <FlyToDemo client:only="react" />
 
-It's worth saying out loud what just happened. The map *responded* to a click
+It's worth saying out loud what just happened. The map _responded_ to a click
 that wasn't on the map. The list and the map don't know about each other — the
 list sets state, the camera follows. That's the whole pattern. Everything else
 in this post is a variation on it.
@@ -144,7 +144,7 @@ in this post is a variation on it.
 Geolocation is the one map feature where the failure mode is mostly social.
 
 The technical part is trivial: the browser knows where you are, you ask the
-browser, the browser asks the user. The hard part is *when*. Trigger it the
+browser, the browser asks the user. The hard part is _when_. Trigger it the
 moment the page loads and you've just popped a permission prompt into a
 stranger's face. Bury it in a settings menu and no one will ever find it.
 
@@ -169,16 +169,16 @@ import Map, { GeolocateControl } from "react-map-gl/mapbox";
 ```
 
 By default, this control is just a button. It waits. That's the entire point
-— *the user opts in.* The trap I want you to avoid is `.trigger()`. There's a
+— _the user opts in._ The trap I want you to avoid is `.trigger()`. There's a
 method on the underlying control that lets you fire it programmatically, and
 you'll be tempted to call it on mount so the map "just works". Don't. That's
-the *weird*. Let the crosshair sit there; the user will reach for it when they
+the _weird_. Let the crosshair sit there; the user will reach for it when they
 want to be found:
 
 <LocateDemo client:only="react" />
 
 `trackUserLocation` keeps the marker pinned to the user as they move. That's
-the right default *once they've opted in*. Before that, it's surveillance
+the right default _once they've opted in_. Before that, it's surveillance
 coded as a feature.
 
 ## Search, or: coordinates are not the interesting part
@@ -203,7 +203,7 @@ const searchPlaces = async (query: string) => {
 ```
 
 The second is: once they pick a result, fly the camera there. And — here's the
-part that took me too long to see — *that's the same `flyTo` from earlier.*
+part that took me too long to see — _that's the same `flyTo` from earlier._
 
 ```tsx
 const selectFeature = (feature: GeocodeFeature) => {
@@ -217,14 +217,14 @@ const selectFeature = (feature: GeocodeFeature) => {
 };
 ```
 
-The camera API doesn't care *why* you're moving. A click from a list. A tap on
+The camera API doesn't care _why_ you're moving. A click from a list. A tap on
 a search result. A `geolocate` event. They all reduce to the same call. This is
 the part of the post where I'd encourage you to slow down, because once you
 see it, you can't unsee it: **the entire interaction surface of a map is just
 "what should the camera do, and when."**
 
 The pattern that actually feels good is: debounce the input by ~250ms, render a
-short list while typing, and only commit to a camera move on *explicit*
+short list while typing, and only commit to a camera move on _explicit_
 selection. Flying on every keystroke is nauseating — not just because of the
 camera thrash, but because of the network races. A fast typist on a slow
 connection will out-type their own results, and you'll start flying to places
@@ -334,7 +334,7 @@ One gotcha worth calling out: **Mapbox paint properties are WebGL, not CSS.**
 `"fill-color": "hsl(var(--link))"` looks like it should work — it doesn't.
 WebGL can't read CSS custom properties. You have to pass an actual color
 value, and switch it yourself when the theme changes. And one more trap
-inside the trap: mapbox's color parser only understands the *legacy*
+inside the trap: mapbox's color parser only understands the _legacy_
 comma-separated HSL syntax. Modern space-separated HSL —
 `hsl(220 95% 72%)` — fails validation silently and the layer never renders:
 
@@ -497,13 +497,13 @@ const theme = useSiteTheme();
 />
 ```
 
-Toggle the site theme and both the map style *and* the circle fill change in
-lockstep — but only because *you* wired it, not because CSS cascaded into
+Toggle the site theme and both the map style _and_ the circle fill change in
+lockstep — but only because _you_ wired it, not because CSS cascaded into
 WebGL.
 
 ### Data-driven paint expressions
 
-The real power move is *data-driven* paint — layer properties that change
+The real power move is _data-driven_ paint — layer properties that change
 based on feature data or zoom level. You can make the circle fill get more
 opaque as you zoom in, or change color based on a property:
 
@@ -610,7 +610,7 @@ into native, so you'll spend an afternoon linking native modules and cursing
 at Xcode. That's the tax.
 
 **[`react-native-better-clustering`](https://github.com/gmi-software/react-native-better-clustering)** solves the problem I deliberately didn't cover above:
-what happens when you have *thousands* of points. On the web, mapbox-gl has
+what happens when you have _thousands_ of points. On the web, mapbox-gl has
 built-in clustering via a `cluster: true` GeoJSON source. On React Native,
 that path is slower and jankier than it should be. This library does the
 supercluster math on the JS side and hands clean results to the native map.

@@ -9,7 +9,10 @@ export interface Props {
 const { currentPath } = Astro.props;
 const navItems = siteConfig.shortcuts.nav.map((item) => ({
 	...item,
-	isActive: item.href === "/" ? currentPath === "/" : currentPath === item.href || currentPath.startsWith(`${item.href}/`),
+	isActive:
+		item.href === "/"
+			? currentPath === "/"
+			: currentPath === item.href || currentPath.startsWith(`${item.href}/`),
 }));
 ---
 
@@ -28,8 +31,17 @@ const navItems = siteConfig.shortcuts.nav.map((item) => ({
 							item.isActive ? "text-foreground" : "text-tone-soft",
 						]}
 					>
-						<span class:list={["lowercase", item.isActive && "decoration-link underline underline-offset-4"]}>{item.title}</span>
-						<span class="kbd" aria-hidden="true">{item.shortcut}</span>
+						<span
+							class:list={[
+								"lowercase",
+								item.isActive && "decoration-link underline underline-offset-4",
+							]}
+						>
+							{item.title}
+						</span>
+						<span class="kbd" aria-hidden="true">
+							{item.shortcut}
+						</span>
 					</a>
 				</li>
 			))}

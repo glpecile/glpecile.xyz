@@ -48,7 +48,9 @@ const extractTag = (xml: string, tag: string): string | null => {
 };
 
 const extractCdata = (xml: string, tag: string): string | null => {
-	const match = xml.match(new RegExp(`<${tag}><!\\[CDATA\\[(.*?)\\]\\]></${tag}>`, "s"));
+	const match = xml.match(
+		new RegExp(`<${tag}><!\\[CDATA\\[(.*?)\\]\\]></${tag}>`, "s"),
+	);
 
 	return match?.[1]?.trim() ?? null;
 };

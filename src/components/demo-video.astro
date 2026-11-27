@@ -21,7 +21,9 @@ const { src, label } = Astro.props;
 		data-demo-video
 		class="h-auto w-full rounded-md"
 	></video>
-	<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]"><slot /></figcaption>
+	<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">
+		<slot />
+	</figcaption>
 </figure>
 
 <script>
@@ -38,8 +40,12 @@ const { src, label } = Astro.props;
 			for (const { target, intersectionRatio } of entries) {
 				if (!(target instanceof HTMLVideoElement)) continue;
 				if (intersectionRatio >= 0.5) {
-					if (!reducedMotion.matches && !readerPaused.has(target)) void play(target);
-				} else if (!target.paused && document.pictureInPictureElement !== target) {
+					if (!reducedMotion.matches && !readerPaused.has(target))
+						void play(target);
+				} else if (
+					!target.paused &&
+					document.pictureInPictureElement !== target
+				) {
 					autoPaused.add(target);
 					target.pause();
 				}
@@ -47,7 +53,9 @@ const { src, label } = Astro.props;
 		},
 		{ threshold: 0.5 },
 	);
-	for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
+	for (const video of document.querySelectorAll<HTMLVideoElement>(
+		"video[data-demo-video]",
+	)) {
 		video.addEventListener("pause", () => {
 			if (autoPaused.delete(video)) return;
 			if (!document.hidden) readerPaused.add(video);

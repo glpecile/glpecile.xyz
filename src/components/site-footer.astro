@@ -22,7 +22,10 @@ const themeItems = siteConfig.shortcuts.theme;
 			class="bg-muted relative hidden rounded-full p-0.5 sm:inline-flex"
 			data-theme-picker
 		>
-			<span aria-hidden="true" class="theme-thumb bg-card absolute inset-y-0.5 left-0.5 w-9 rounded-full"></span>
+			<span
+				aria-hidden="true"
+				class="theme-thumb bg-card absolute inset-y-0.5 left-0.5 w-9 rounded-full"
+			></span>
 			{themeItems.map((item) => (
 				<button
 					type="button"
@@ -50,7 +53,9 @@ const themeItems = siteConfig.shortcuts.theme;
 								<path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
 							</Fragment>
 						)}
-						{item.theme === "dark" && <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />}
+						{item.theme === "dark" && (
+							<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+						)}
 					</svg>
 				</button>
 			))}
@@ -63,17 +68,26 @@ const themeItems = siteConfig.shortcuts.theme;
 	(() => {
 		const currentScript = document.currentScript;
 		const footer =
-			currentScript instanceof HTMLScriptElement ? currentScript.previousElementSibling : null;
+			currentScript instanceof HTMLScriptElement
+				? currentScript.previousElementSibling
+				: null;
 
 		if (footer instanceof HTMLElement) {
-			const themeButtons = Array.from(footer.querySelectorAll("[data-theme-option]"));
+			const themeButtons = Array.from(
+				footer.querySelectorAll("[data-theme-option]"),
+			);
 			const themeEditableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 			const themeMap = new Map(
 				themeButtons.flatMap((button) =>
 					button instanceof HTMLButtonElement &&
 					typeof button.dataset.themeOption === "string" &&
 					typeof button.dataset.themeShortcut === "string"
-						? [[button.dataset.themeShortcut.toLowerCase(), button.dataset.themeOption]]
+						? [
+								[
+									button.dataset.themeShortcut.toLowerCase(),
+									button.dataset.themeOption,
+								],
+							]
 						: [],
 				),
 			);
@@ -115,7 +129,9 @@ const themeItems = siteConfig.shortcuts.theme;
 			footer.addEventListener("click", (event) => {
 				const target = event.target;
 				const button =
-					target instanceof Element ? target.closest("[data-theme-option]") : null;
+					target instanceof Element
+						? target.closest("[data-theme-option]")
+						: null;
 
 				if (!(button instanceof HTMLButtonElement)) {
 					return;

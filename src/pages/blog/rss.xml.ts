@@ -26,13 +26,16 @@ export const GET: APIRoute = async () => {
 		posts.length === 0
 			? new Date()
 			: posts.reduce((latest, post) => {
-				const date = post.data.updatedDate ?? post.data.pubDate;
+					const date = post.data.updatedDate ?? post.data.pubDate;
 
-				return date > latest ? date : latest;
-			}, new Date(0));
+					return date > latest ? date : latest;
+				}, new Date(0));
 	const items = posts
 		.map((post) => {
-			const link = new URL(getBlogPostUrl(post.id), siteConfig.siteUrl).toString();
+			const link = new URL(
+				getBlogPostUrl(post.id),
+				siteConfig.siteUrl,
+			).toString();
 
 			return `<item>
 	<title>${escapeXml(post.data.title)}</title>

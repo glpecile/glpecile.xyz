@@ -135,8 +135,7 @@ export function CircleDemo() {
 	React.useEffect(() => {
 		if (!mapReady) return;
 		const source = mapRef.current?.getSource("circle") as
-			| { setData: (d: GeoJSONTypes.GeoJSON) => void }
-			| undefined;
+			{ setData: (d: GeoJSONTypes.GeoJSON) => void } | undefined;
 		source?.setData(data);
 	}, [data, mapReady]);
 
@@ -217,9 +216,7 @@ export function CircleDemo() {
 						step={1}
 						value={sliderFromRadius(radius)}
 						onChange={(event) =>
-							handleSliderChange(
-								Number(event.currentTarget.value),
-							)
+							handleSliderChange(Number(event.currentTarget.value))
 						}
 						className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-[hsl(var(--tone-faint)/0.3)] accent-[hsl(var(--link))]"
 					/>

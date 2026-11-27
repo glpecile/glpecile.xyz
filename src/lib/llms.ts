@@ -29,14 +29,16 @@ export const markdownContentType = "text/markdown; charset=utf-8";
 const joinLines = (lines: Array<string | undefined>) =>
 	lines.filter((line): line is string => line !== undefined).join("\n");
 
-const toAbsoluteUrl = (path: string) => new URL(path, siteConfig.siteUrl).toString();
+const toAbsoluteUrl = (path: string) =>
+	new URL(path, siteConfig.siteUrl).toString();
 
 const toIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 
 const renderCompanyLink = (job: WorkItem) =>
 	job.url ? `[${job.company}](${job.url})` : job.company;
 
-const renderTextLink = (label: string, url?: string) => (url ? `[${label}](${url})` : label);
+const renderTextLink = (label: string, url?: string) =>
+	url ? `[${label}](${url})` : label;
 
 const renderWorkLine = (job: WorkItem) => {
 	const details = `${job.role} @ ${renderCompanyLink(job)} — ${job.period} — ${job.place}`;
@@ -62,9 +64,11 @@ const renderProjectEntry = (project: ProjectEntry) => {
 	return [head, ...bullets].join("\n");
 };
 
-const renderSkillLine = (group: SkillGroup) => `- ${group.category}: ${group.items.join(", ")}`;
+const renderSkillLine = (group: SkillGroup) =>
+	`- ${group.category}: ${group.items.join(", ")}`;
 
-const renderLanguageLine = (item: LanguageItem) => `- ${item.language}: ${item.level}`;
+const renderLanguageLine = (item: LanguageItem) =>
+	`- ${item.language}: ${item.level}`;
 
 const renderEducationLine = (item: EducationItem) => {
 	const details = `${renderTextLink(item.school, item.url)} — ${item.credential} — ${item.period}`;
@@ -87,7 +91,9 @@ const renderFilmLine = (film: LetterboxdFilm) => {
 
 const formatSocialLabel = (label: string) =>
 	socialLabelMap[label] ??
-	(label.length === 0 ? label : `${label.slice(0, 1).toUpperCase()}${label.slice(1)}`);
+	(label.length === 0
+		? label
+		: `${label.slice(0, 1).toUpperCase()}${label.slice(1)}`);
 
 const cleanMarkdownBody = (body?: string) => {
 	if (!body) {
@@ -115,7 +121,9 @@ const renderPostMarkdownLink = (post: BlogPost) =>
 export function getMarkdownPath(path: string) {
 	const normalizedPath = path === "/" ? "/" : path.replace(/\/$/, "");
 
-	return normalizedPath === "/" ? "/index.html.md" : `${normalizedPath}/index.html.md`;
+	return normalizedPath === "/"
+		? "/index.html.md"
+		: `${normalizedPath}/index.html.md`;
 }
 
 export function renderLlmsTxt(posts: BlogPost[]) {
@@ -160,7 +168,10 @@ export function renderLlmsTxt(posts: BlogPost[]) {
 	return lines.join("\n");
 }
 
-export function renderHomeMarkdown(posts: BlogPost[], films: LetterboxdFilm[] = []) {
+export function renderHomeMarkdown(
+	posts: BlogPost[],
+	films: LetterboxdFilm[] = [],
+) {
 	const currentWork = siteConfig.work[0];
 	const featuredWork = siteConfig.work.slice(0, 3);
 	const recentPosts = posts.slice(0, 5);
@@ -185,7 +196,9 @@ export function renderHomeMarkdown(posts: BlogPost[], films: LetterboxdFilm[] = 
 		"",
 		"## Featured work",
 		"",
-		...(featuredWork.length > 0 ? featuredWork.map(renderWorkLine) : ["No work entries yet."]),
+		...(featuredWork.length > 0
+			? featuredWork.map(renderWorkLine)
+			: ["No work entries yet."]),
 		"",
 		"## Recent writing",
 		"",
@@ -222,7 +235,9 @@ export function renderWorkMarkdown() {
 		"",
 		"## Roles",
 		"",
-		...(siteConfig.work.length > 0 ? siteConfig.work.map(renderWorkEntry) : ["No work entries yet."]),
+		...(siteConfig.work.length > 0
+			? siteConfig.work.map(renderWorkEntry)
+			: ["No work entries yet."]),
 		"",
 		"## Projects",
 		"",
@@ -232,7 +247,9 @@ export function renderWorkMarkdown() {
 		"",
 		"## Skills",
 		"",
-		...(siteConfig.skills.length > 0 ? siteConfig.skills.map(renderSkillLine) : ["No skills yet."]),
+		...(siteConfig.skills.length > 0
+			? siteConfig.skills.map(renderSkillLine)
+			: ["No skills yet."]),
 		"",
 		"## Education",
 		"",
@@ -283,7 +300,9 @@ export function renderBlogPostMarkdown(post: BlogPost) {
 		`> ${post.data.description}`,
 		"",
 		`- Published: ${toIsoDate(post.data.pubDate)}`,
-		post.data.updatedDate ? `- Updated: ${toIsoDate(post.data.updatedDate)}` : undefined,
+		post.data.updatedDate
+			? `- Updated: ${toIsoDate(post.data.updatedDate)}`
+			: undefined,
 		`- Canonical HTML: ${toAbsoluteUrl(getBlogPostUrl(post.id))}`,
 		"",
 		body,
@@ -302,7 +321,9 @@ export function renderFilmsMarkdown(films: LetterboxdFilm[]) {
 		"",
 		"## Recently watched",
 		"",
-		...(films.length > 0 ? films.map(renderFilmLine) : ["No films logged yet."]),
+		...(films.length > 0
+			? films.map(renderFilmLine)
+			: ["No films logged yet."]),
 		"",
 		`[View all on Letterboxd](${siteConfig.links.letterboxd})`,
 	]);
