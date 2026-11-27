@@ -180,7 +180,7 @@ Inside the helper, a request takes 0.14 ms at p99. The binary is about 700 KB. T
 
 And the three workarounds in my dotfiles are deleted. Herdr shows the right folder, because zsh is the foreground process again. The popup follows Latte and Mocha, because it only knows palette colors. There's nothing to work around.
 
-The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a popup. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped on 6 November. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), because the same friend who showed me Fig asked for it. There, hachikuji supplies the items and nushell's own menu shows them.
+The plan was written on 3 November 2026, the same day Kiro CLI 3.0 shipped without a popup. [Version 1.0.0](https://github.com/glpecile/hachikuji/releases/tag/v1.0.0) shipped three days later, on 6 November 2026. [Version 1.1](https://github.com/glpecile/hachikuji/releases/tag/v1.1.0) added [nushell](https://www.nushell.sh), because the same friend who showed me Fig asked for it. There, hachikuji supplies the items and nushell's own menu shows them.
 
 <DemoVideo src={nu} label="In nushell, Tab after git ch, make and docker run --r opens nushell's menu next to the line. It lists subcommands, branches, make targets and options, with the description of the selected item in a box beside it.">
 	In nushell, the same specs feed nushell's own completion menu.
@@ -190,7 +190,7 @@ The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a 
 
 I wanted `brew install hachikuji` to work. It mostly does, and the details taught me more about [Homebrew](https://brew.sh) than years of using it.
 
-**homebrew-core will not take it yet.** Its [acceptance policy](https://docs.brew.sh/Package-Acceptance-Policy) asks for at least 75 stars (or 30 forks, or 30 watchers), more if the owner submits it, and a repository at least 30 days old. homebrew-core also builds every formula from source on its own CI. A repository from 3 November, owned by one person, does not qualify yet, and that's a fair rule.
+**homebrew-core will not take it yet.** Its [acceptance policy](https://docs.brew.sh/Package-Acceptance-Policy) asks for at least 75 stars (or 30 forks, or 30 watchers), more if the owner submits it, and a repository at least 30 days old. homebrew-core also builds every formula from source on its own CI. A repository from 3 November 2026, owned by one person, does not qualify yet, and that's a fair rule.
 
 **A tap is just a Git repository.** [glpecile/homebrew-tap](https://github.com/glpecile/homebrew-tap) holds one file, `Formula/hachikuji.rb`. The `homebrew-` prefix lets you write `glpecile/tap` for short. The formula downloads the prebuilt archive for your Mac's CPU, checks its SHA-256, and installs the binary and the index. No Rust or Bun needed on your machine.
 
