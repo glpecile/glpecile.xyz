@@ -1,10 +1,11 @@
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, expect, it, vi } from "bun:test";
+import { stubGlobal, unstubAllGlobals } from "./test-globals";
 
 import { attachCopyState } from "./copy";
 
 afterEach(() => {
 	vi.useRealTimers();
-	vi.unstubAllGlobals();
+	unstubAllGlobals();
 });
 
 it.each([
@@ -13,13 +14,13 @@ it.each([
 	{ detail: 1, success: false, label: "[unavailable]", state: "error" },
 ])("copy feedback: $state, click detail $detail", async ({ detail, success, label, state }) => {
 	vi.useFakeTimers();
-	vi.stubGlobal("window", { setTimeout, clearTimeout });
+	stubGlobal("window", { setTimeout, clearTimeout });
 	const writeText = vi.fn(async () => {
 		if (!success) throw new Error("clipboard denied");
 	});
-	vi.stubGlobal("navigator", { clipboard: { writeText } });
+	stubGlobal("navigator", { clipboard: { writeText } });
 	const status = { textContent: "", className: "", setAttribute: vi.fn() };
-	vi.stubGlobal("document", { createElement: () => status });
+	stubGlobal("document", { createElement: () => status });
 	let click: (event: { detail: number }) => Promise<void> = async () => {};
 	const button = {
 		addEventListener: (_type: string, listener: typeof click) => { click = listener; },

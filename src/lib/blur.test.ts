@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "bun:test";
+import { stubGlobal, unstubAllGlobals } from "./test-globals";
 
 import { getBlurPlaceholder, tinyPosterUrl, toDataUri } from "./blur";
 
@@ -47,7 +48,7 @@ describe("getBlurPlaceholder", () => {
 		`https://a.ltrbxd.com/resized/film-poster/${id}-0-600-0-900-crop.jpg`;
 
 	afterEach(() => {
-		vi.unstubAllGlobals();
+		unstubAllGlobals();
 	});
 
 	it("inlines the tiny variant as a data uri", async () => {
@@ -56,7 +57,7 @@ describe("getBlurPlaceholder", () => {
 				headers: { "content-type": "image/jpeg" },
 			}),
 		);
-		vi.stubGlobal("fetch", fetchMock);
+		stubGlobal("fetch", fetchMock);
 
 		expect(await getBlurPlaceholder(posterUrl("1"))).toBe(
 			"data:image/jpeg;base64,aGk=",
@@ -67,7 +68,7 @@ describe("getBlurPlaceholder", () => {
 	});
 
 	it("returns null when the image cannot be fetched", async () => {
-		vi.stubGlobal(
+		stubGlobal(
 			"fetch",
 			vi.fn().mockResolvedValue(new Response(null, { status: 404 })),
 		);
@@ -77,7 +78,7 @@ describe("getBlurPlaceholder", () => {
 
 	it("returns null for urls it cannot rewrite", async () => {
 		const fetchMock = vi.fn();
-		vi.stubGlobal("fetch", fetchMock);
+		stubGlobal("fetch", fetchMock);
 
 		expect(await getBlurPlaceholder("https://example.com/poster.jpg")).toBe(
 			null,
@@ -89,7 +90,7 @@ describe("getBlurPlaceholder", () => {
 		const fetchMock = vi
 			.fn()
 			.mockResolvedValue(new Response(null, { status: 404 }));
-		vi.stubGlobal("fetch", fetchMock);
+		stubGlobal("fetch", fetchMock);
 
 		await getBlurPlaceholder(posterUrl("3"));
 		await getBlurPlaceholder(posterUrl("3"));
