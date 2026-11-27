@@ -97,16 +97,20 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 	The same popup in Catppuccin Latte. No theme config: the terminal's palette does the work.
 </DemoVideo>
 
-## Rust, for the first time
+## Why Rust
 
-The plan picks [Rust](https://www.rust-lang.org), and it gives its reasons:
+The helper is one small process next to every shell, and it lives as long as the shell does. So the language had to fit three of the constraints: one native binary with no runtime (2), less than 4 MB of private memory (3), and less than 10 ms of startup (5). We looked at four.
 
-- No garbage collector and no runtime, so the 4 MB budget is easy to keep. A [Go](https://go.dev) process starts near 4 MB before it does any work.
-- Mature crates for each part: [`memmap2`](https://docs.rs/memmap2) for the index, [`unicode-width`](https://docs.rs/unicode-width) to cut rows to the terminal width, [`toml`](https://docs.rs/toml) for config.
-- One static binary for macOS and Linux.
-- [Zig](https://ziglang.org) would also meet the budgets, but it is not at 1.0 yet, and it has fewer libraries for the parts this needs.
+| Language | Verdict |
+|---|---|
+| [Elixir](https://elixir-lang.org) | Runs on the BEAM, the Erlang VM. Each shell would start its own VM, and a VM per shell is the runtime that constraint 2 rules out. The BEAM is great at many processes in one long-lived node. This job is the opposite: one tiny process per shell. |
+| [Go](https://go.dev) | A garbage collector and a runtime come with every binary. A Go process starts near 4 MB before it does any work, so the whole budget is gone at hello world. |
+| [Zig](https://ziglang.org) | Meets the budgets. But it is not at 1.0 yet, each release breaks the language and the standard library, and it has fewer libraries for TOML, Unicode width and fuzzing. |
+| [Rust](https://www.rust-lang.org) | No garbage collector and no runtime. A mature crate for each part: [`memmap2`](https://docs.rs/memmap2) for the index, [`unicode-width`](https://docs.rs/unicode-width) to cut rows to the terminal width, [`toml`](https://docs.rs/toml) for config, `cargo-fuzz` for the tokenizer. One static binary per target with `cargo build --target`. |
 
-I agree with every line. I had also never used Rust before this project.
+The helper ended at 2.19 MB and a 700 KB binary, well inside the budget.
+
+I had never used Rust before this project.
 
 That mattered less than I expected. I wrote the plan, the agent wrote the first pass of the Rust, and I reviewed it against what the plan asked for: behavior and numbers. I was still learning what idiomatic Rust looks like. But I could check whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
 
@@ -128,8 +132,6 @@ if libc::setsid() < 0 {
 ```
 
 [`setsid()`](https://man7.org/linux/man-pages/man2/setsid.2.html) puts the helper in its own session, so it is never the terminal's foreground process. That is constraint 1, and it is why Herdr shows `zsh` and the right folder. But zsh had already made the helper a process group leader, and a leader can't call `setsid()`. So it forks once and lets the child do it. I did not know that rule before this project. Now I do, and the comment says exactly why the code is there.
-
-Rust was the right tool for this job. Not because it is fashionable, but because the job is a small, long-running process per shell with a strict memory ceiling, and Rust is the language where that ceiling is the default instead of an effort.
 
 ## How it works
 
