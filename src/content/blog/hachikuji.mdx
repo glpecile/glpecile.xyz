@@ -52,7 +52,7 @@ I understand why. The attention is on agents, not on a popup that tells you `git
 
 Three names, one acquisition, and the thing I actually used was the part that got cut.
 
-## inshellisense, and 1.1 GB of popup
+## inshellisense, and half a gigabyte of popup
 
 The obvious replacement was [inshellisense](https://github.com/microsoft/inshellisense), from Microsoft. Open source, MIT, and built on the same Fig specs. Same popup, same commands, no account.
 
@@ -105,7 +105,7 @@ The helper is one small process next to every shell, and it lives as long as the
 1. **[Elixir](https://elixir-lang.org)** runs on the BEAM, the Erlang VM. Each shell would start its own VM, and that is the runtime constraint 2 rules out. The BEAM is built for many processes in one long-lived node. This job is one tiny process per shell.
 2. **[Go](https://go.dev)** ships a garbage collector and a runtime in every binary. That overhead comes out of the same 4 MB budget before the helper does any work.
 3. **[Zig](https://ziglang.org)** meets the budgets. But it is not at 1.0 yet, each release breaks the language and the standard library, and it has fewer libraries for TOML, Unicode width and fuzzing. The summer of 2026 made it a harder bet. The Zig project does not accept LLM-written contributions, and [Bun](https://bun.sh), the best-known program written in Zig, ported itself to Rust with Claude agents in 11 days. Andrew Kelley, Zig's creator, [answered with a long post](https://andrewkelley.me/post/my-thoughts-bun-rust-rewrite.html) that went after the rewrite and Bun's creator, Jarred Sumner, by name ([The Register has the summary](https://www.theregister.com/devops/2026/07/14/zig-creator-calls-buns-claude-rust-rewrite-unreviewed-slop/5270743)). hachikuji was going to be written by an agent too. I did not want to start it in a language whose project had just made that a fight.
-4. **[Rust](https://www.rust-lang.org)** has no garbage collector and no runtime. It has a mature crate for each part: [`memmap2`](https://docs.rs/memmap2) for the index, [`unicode-width`](https://docs.rs/unicode-width) to cut rows to the terminal width, [`toml`](https://docs.rs/toml) for config, and `cargo-fuzz` for the tokenizer. `cargo build --target` gives one static binary per platform.
+4. **[Rust](https://www.rust-lang.org)** has no garbage collector and no runtime. It has a mature crate for each part: [`memmap2`](https://docs.rs/memmap2) for the index, [`unicode-width`](https://docs.rs/unicode-width) to cut rows to the terminal width, [`toml`](https://docs.rs/toml) for config, and `cargo-fuzz` for the tokenizer. `cargo build --target` gives one self-contained binary per platform.
 
 The helper ended at 2.19 MB and a 700 KB binary, well inside the budget.
 
