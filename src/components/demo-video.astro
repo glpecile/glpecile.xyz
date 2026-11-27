@@ -27,20 +27,19 @@ const { src, label } = Astro.props;
 <script>
 	const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 	const visible = new WeakSet<HTMLVideoElement>();
+	const readerPaused = new WeakSet<HTMLVideoElement>();
 	const play = async (video: HTMLVideoElement) => {
 		try {
 			await video.play();
-		} catch {
-			return;
-		}
+		} catch {}
 	};
 	const observer = new IntersectionObserver(
 		(entries) => {
-			for (const { target, isIntersecting } of entries) {
+			for (const { target, intersectionRatio } of entries) {
 				if (!(target instanceof HTMLVideoElement)) continue;
-				if (isIntersecting) {
+				if (intersectionRatio >= 0.5) {
 					visible.add(target);
-					if (!reducedMotion.matches) void play(target);
+					if (!reducedMotion.matches && !readerPaused.has(target)) void play(target);
 				} else {
 					visible.delete(target);
 					target.pause();
@@ -51,8 +50,9 @@ const { src, label } = Astro.props;
 	);
 	for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
 		video.addEventListener("pause", () => {
-			if (visible.has(video)) observer.unobserve(video);
+			if (visible.has(video) && !document.hidden) readerPaused.add(video);
 		});
+		video.addEventListener("play", () => readerPaused.delete(video));
 		observer.observe(video);
 	}
 </script>
