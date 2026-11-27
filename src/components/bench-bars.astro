@@ -1,0 +1,48 @@
+---
+interface Metric {
+	label: string;
+	rows: [name: string, value: number, text: string][];
+}
+
+interface Props {
+	metrics: Metric[];
+	highlight: string;
+	caption?: string;
+}
+
+const { metrics, highlight, caption } = Astro.props;
+// Bars fill at most 70% of the track, so the value label fits beside the longest one on a phone.
+const BAR_MAX = 70;
+---
+
+<figure class="my-8 grid gap-6">
+	{
+		metrics.map(({ label, rows }) => {
+			const max = Math.max(...rows.map(([, value]) => value));
+			return (
+				<div>
+					<p class="mb-2 font-[575] text-[0.9rem]">{label}</p>
+					<ul class="grid gap-1.5">
+						{rows.map(([name, value, text]) => {
+							const own = name === highlight;
+							return (
+								<li class="grid grid-cols-[7rem_1fr] items-center gap-3 text-[0.85rem]">
+									<span class:list={[own ? "text-foreground font-[575]" : "text-tone-soft"]}>{name}</span>
+									<span class="flex min-w-0 items-center gap-2">
+										<span
+											aria-hidden="true"
+											class:list={["h-2.5 shrink-0 rounded-[2px]", own ? "bg-primary" : "bg-primary/50"]}
+											style={`width: max(${(value / max) * BAR_MAX}%, 3px)`}
+										/>
+										<span class="font-mono tabular-nums">{text}</span>
+									</span>
+								</li>
+							);
+						})}
+					</ul>
+				</div>
+			);
+		})
+	}
+	{caption && <figcaption class="text-tone-soft text-[0.85rem]">{caption}</figcaption>}
+</figure>

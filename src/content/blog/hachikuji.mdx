@@ -5,6 +5,7 @@ pubDate: 2026-11-27
 authors: [glpecile, claude-opus]
 ---
 
+import BenchBars from "@/components/bench-bars.astro";
 import DemoVideo from "@/components/demo-video.astro";
 import Diagram from "@/components/diagram.astro";
 import demo from "@/assets/blog/hachikuji/demo.mp4";
@@ -163,12 +164,16 @@ The specs ship with their original MIT notice, in [`specs/FIG-LICENSE`](https://
 
 Apple M5, the full Fig index, the same `.zshrc` in a real pty. Only the plugin changes. The scripts and the full table are in the [README](https://github.com/glpecile/hachikuji#numbers).
 
-| | zsh alone | hachikuji | inshellisense |
-|---|---|---|---|
-| Memory per terminal | | 2.2 MB | 43 MB |
-| Time to the first prompt | 18 ms | 19 ms | 141 ms |
-| Key press to updated screen, p99 | 5.1 ms | 12.8 ms | 44.2 ms |
-| Installed size | | 15 MB | 120 MB + Node |
+<BenchBars
+	highlight="hachikuji"
+	caption="Lower is better. inshellisense's install is 120 MB plus Node (149 MB)."
+	metrics={[
+		{ label: "Memory per terminal", rows: [["hachikuji", 2.2, "2.2 MB"], ["inshellisense", 43, "43 MB"]] },
+		{ label: "Time to the first prompt", rows: [["zsh alone", 18, "18 ms"], ["hachikuji", 19, "19 ms"], ["inshellisense", 141, "141 ms"]] },
+		{ label: "Key press to updated screen, p99", rows: [["zsh alone", 5.1, "5.1 ms"], ["hachikuji", 12.8, "12.8 ms"], ["inshellisense", 44.2, "44.2 ms"]] },
+		{ label: "Installed size", rows: [["hachikuji", 15, "15 MB"], ["inshellisense", 269, "269 MB"]] },
+	]}
+/>
 
 Inside the helper, a request takes 0.14 ms at p99. The binary is about 700 KB. Twelve terminals use about 26 MB together, less than one terminal of inshellisense.
 
