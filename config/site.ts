@@ -31,6 +31,8 @@ export type ProjectEntry = {
 	stack: string;
 	period?: string;
 	url?: string;
+	/** Spans the full row of the bento grid on /work. */
+	wide?: boolean;
 	highlights: readonly string[];
 };
 
@@ -252,6 +254,7 @@ export const siteConfig = {
 			name: "glpecile.xyz — Personal site & design system",
 			stack: "Astro / TypeScript / Tailwind CSS",
 			url: "https://glpecile.xyz",
+			wide: true,
 			highlights: [
 				"Designed and built this site as a hand-crafted component system — consistent type, color, and motion tokens driving every page from a single config.",
 				"Engineered a custom CV generator that renders a typeset PDF programmatically (pdf-lib) from the same content source as the live site.",
@@ -298,6 +301,7 @@ export const siteConfig = {
 			name: "ITBA Coursework",
 			stack: "Python / PyTorch / C / Java / PostgreSQL / Redis",
 			url: "https://github.com/glpecile",
+			wide: true,
 			highlights: [
 				"Thesis: a PyTorch CNN that detects people in images, compiled with Concrete ML to run inference on FHE-encrypted data, with a web demo.",
 				"Perceptrons, search and optimization algorithms written from scratch in Python.",

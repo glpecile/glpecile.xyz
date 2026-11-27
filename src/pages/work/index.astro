@@ -74,9 +74,9 @@ const cvFileName = cvDownloadName();
 		{projects.length === 0 ? (
 			<p class="text-tone-soft text-sm">no projects yet.</p>
 		) : (
-			<ol class="space-y-4">
+			<ol class="grid gap-3 sm:grid-cols-2">
 				{projects.map((project) => (
-					<li class="card group relative space-y-2 p-5">
+					<li class:list={["card group relative flex flex-col gap-2 p-5", project.wide && "sm:col-span-2"]}>
 						<p class="flex items-start justify-between gap-4 font-[575]">
 							{project.url ? (
 								<a
@@ -101,13 +101,6 @@ const cvFileName = cvDownloadName();
 								</svg>
 							)}
 						</p>
-						<ul class="flex flex-wrap gap-1.5">
-							{project.stack.split(" / ").map((tech) => (
-								<li class="bg-muted text-tone-soft rounded-md px-1.5 py-0.5 font-mono text-xs">
-									{tech}
-								</li>
-							))}
-						</ul>
 						{project.period && (
 							<p class="text-tone-soft text-sm">
 								{project.period}
@@ -125,6 +118,13 @@ const cvFileName = cvDownloadName();
 											segment.text
 										),
 									)}
+								</li>
+							))}
+						</ul>
+						<ul class="mt-auto flex flex-wrap gap-1.5 pt-2">
+							{project.stack.split(" / ").map((tech) => (
+								<li class="bg-muted text-tone-soft rounded-md px-1.5 py-0.5 font-mono text-xs">
+									{tech}
 								</li>
 							))}
 						</ul>
