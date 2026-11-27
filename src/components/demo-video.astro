@@ -27,7 +27,6 @@ const { src, label, width, height } = Astro.props;
 </figure>
 
 <script>
-	// Autoplay only when the reader allows motion; otherwise the controls start it.
 	if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
 		for (const video of document.querySelectorAll<HTMLVideoElement>("video[data-demo-video]")) {
 			void video.play();
