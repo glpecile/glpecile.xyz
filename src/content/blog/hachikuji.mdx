@@ -36,7 +36,7 @@ Keep that repository in mind. It is the one piece of this story that never went 
 
 ## Then it became Amazon Q
 
-In August 2023, [AWS acquired Fig](https://www.geekwire.com/2023/amazon-web-services-acquires-fig-a-yc-grad-that-boosts-the-command-line-for-devs/). For a while nothing changed. Then the features moved into an AWS product, first under the CodeWhisperer name and then under [Amazon Q Developer](https://aws.amazon.com/q/developer/). The Fig service shut down on 1 September 2024, and the migration path was the Amazon Q Developer CLI: the `q` command.
+In August 2023, [AWS acquired Fig](https://www.geekwire.com/2023/amazon-web-services-acquires-fig-a-yc-grad-that-boosts-the-command-line-for-devs/). For a while nothing changed. Then the features moved into [Amazon Q Developer](https://aws.amazon.com/q/developer/). The Fig service shut down on 1 September 2024, and the migration path was the Amazon Q Developer CLI: the `q` command.
 
 It still worked. The popup was still there. It now came with an AWS login and a chat feature, but the part I used did not change.
 
@@ -48,7 +48,7 @@ In November 2025, the Amazon Q Developer CLI became [Kiro CLI](https://kiro.dev/
 
 The popup lasted one more year. On 3 November 2026, [Kiro CLI 3.0](https://kiro.dev/changelog/cli/3-0/) became the default. It is a chat agent, and its changelog says it plainly: inline shell autocomplete is retired, with "no standalone replacement". The Homebrew casks `kiro-cli` and `amazon-q` both install it now.
 
-I understand why. The attention is on agents, not on a popup that tells you `git rebase` takes `--onto`. But the feature I installed Fig for, years earlier, was no longer in any product.
+I understand why. The attention is on agents, not on a popup that tells you `git rebase` takes `--onto`. But the feature I installed Fig for, years earlier, was no longer in any of them.
 
 Three names, one acquisition, and the thing I actually used was the part that got cut.
 
@@ -87,10 +87,10 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 1. **No pty wrapper.** zsh stays the foreground process. All drawing goes through [ZLE](https://zsh.sourceforge.io/Doc/Release/Zsh-Line-Editor.html), the zsh line editor. The plan says it plainly: "If a design needs a wrapper, it is wrong."
 2. **No Node, no JS runtime, no Python at runtime.** One native binary.
 3. **Less than 4 MB of private memory per shell.** Measured with `footprint` or `vmmap`, not RSS.
-4. **p99 below 16 ms**, from key press to updated popup. One frame.
+4. **p99 below 16 ms** for static specs, from key press to updated popup. One frame.
 5. **Less than 10 ms added to zsh startup.** The helper starts on the first key, not in `.zshrc`.
 6. **Fail silent.** If the helper crashes or hangs, the shell works as normal. zsh never blocks on it.
-7. **No network** and no telemetry.
+7. **No network** and no telemetry. The one exception, added later, is `hachikuji update`: you run it, and it calls the system `curl`.
 8. **zsh only**, macOS first, Linux must build.
 9. **Colors follow the terminal.** Only the 16 ANSI palette colors and reverse video. Never RGB, never the 256-color cube, because terminals do not change those when the theme changes.
 
@@ -100,7 +100,7 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 
 ## Why Rust
 
-The helper is one small process next to every shell, and it lives as long as the shell does. So the language had to fit three of the constraints: one native binary with no runtime (2), less than 4 MB of private memory (3), and less than 10 ms of startup (5). We looked at four.
+The helper is one small process next to every shell, and it lives as long as the shell does. So the language had to fit three of the constraints: one native binary with no runtime (2), less than 4 MB of private memory (3), and a fast start, because it starts on the first key you type. We looked at four.
 
 1. **[Elixir](https://elixir-lang.org)** runs on the BEAM, the Erlang VM. Each shell would start its own VM, and that is the runtime constraint 2 rules out. The BEAM is built for many processes in one long-lived node. This job is one tiny process per shell.
 2. **[Go](https://go.dev)** ships a garbage collector and a runtime in every binary. A Go process starts near 4 MB before it does any work, so the budget is gone at hello world.
@@ -113,7 +113,7 @@ I respect Rust from the outside, through what people build with it. [GPUI](https
 
 I wrote the plan and the agent wrote the Rust. I did not read a line of it. What am I, some kind of vibe coder? Yes. But one with a test suite and a memory budget: I checked every result against the plan. Does `footprint` say 2.19 MB? Does `cd` update the folder in Herdr? Does Ctrl-C at the prompt leave the helper alive?
 
-The constraints did the reviewing. Each one is a number or a yes/no check, and each check is a script in the repo. A design that broke a constraint failed a test, whatever language it was in.
+The constraints did the reviewing. Each one is a number or a yes/no check, and most of them are a script in the repo: memory, latency, startup, the foreground process, a hung helper and the colors. A design that broke one of those failed a test, whatever language it was in.
 
 ## How it works
 
@@ -144,7 +144,7 @@ The whole thing is two pieces: about 350 lines of zsh ([`shell/hachikuji.zsh`](h
 
 - **The zsh side** hooks `line-pre-redraw`, not `self-insert`, so it plays well with [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) and [starship](https://starship.rs), which wrap widgets. It sends a request only when the buffer or the cursor changed. Otherwise the redraw from a response would send a new request, forever.
 - **Transport** is two FIFOs in a private folder. zsh opens both read-write, so no open blocks. Writes are non-blocking. At most one request is in flight, and zsh keeps only the newest pending one. Each request has a sequence number, and older responses are dropped.
-- **The helper** tokenizes the line (quotes, pipes, `&&`, `$( )`, subshells), walks the spec, ranks prefix matches first and fuzzy matches after, and sends back rows that are ready to print, already cut to the terminal width.
+- **The helper** tokenizes the line (quotes, pipes, `&&`, `$( )`, subshells), walks the spec, ranks prefix matches, falls back to fuzzy matches only when nothing starts with what you typed, and sends back rows that are ready to print, already cut to the terminal width.
 - **Generators** list branches, files, package scripts and make targets. They run async with a 200 ms timeout, so a slow `git` never blocks typing. When one finishes, the popup updates through `zle -F`.
 - **Fail silent** is real: if a request gets no response in 1 s, zsh kills the helper, shows no popup, and restarts it at most once a minute.
 
@@ -156,7 +156,7 @@ hachikuji uses [withfig/autocomplete](https://github.com/withfig/autocomplete) a
 
 Then `hachikuji compile` writes one binary index: a string table plus fixed-size node records, read in place with `mmap`. 1,455 specs fit in 14.7 MB. Because it's a read-only `mmap` file, the OS shares its pages between all shells. Twelve terminals don't load it twelve times.
 
-Some specs need JavaScript to be useful, like a generator that lists git branches. Those are dropped and listed in [`specs/lost.txt`](https://github.com/glpecile/hachikuji/blob/main/specs/lost.txt) (262 of them), so they can be ported later. The most common ones are already ported to Rust built-ins: git branches, remotes, tags and changed files, `package.json` scripts, Makefile targets, ssh hosts and [zoxide](https://github.com/ajeetdsouza/zoxide) folders.
+Some specs use JavaScript for parts of their data, like a generator that lists git branches. Those parts are dropped and logged in [`specs/lost.txt`](https://github.com/glpecile/hachikuji/blob/main/specs/lost.txt): 262 specs lose something, so it can be ported later. A few, like `cargo`, are not static at all and give no popup. The most common ones are already ported to Rust built-ins: git branches, remotes, tags and changed files, `package.json` scripts, Makefile targets, ssh hosts and [zoxide](https://github.com/ajeetdsouza/zoxide) folders.
 
 The specs ship with their original MIT notice, in [`specs/FIG-LICENSE`](https://github.com/glpecile/hachikuji/blob/main/specs/FIG-LICENSE), next to the index.
 
@@ -189,7 +189,7 @@ The plan was written on 3 November, the same day Kiro CLI 3.0 shipped without a 
 
 I wanted `brew install hachikuji` to work. It mostly does, and the details taught me more about [Homebrew](https://brew.sh) than years of using it.
 
-**homebrew-core will not take it yet.** Its [acceptance policy](https://docs.brew.sh/Package-Acceptance-Policy) asks for at least 75 stars (or 30 forks, or 30 watchers), more if the owner submits it, and a repository at least 30 days old. homebrew-core also builds every formula from source on its own CI. A week-old repository from one person does not qualify, and that's a fair rule.
+**homebrew-core will not take it yet.** Its [acceptance policy](https://docs.brew.sh/Package-Acceptance-Policy) asks for at least 75 stars (or 30 forks, or 30 watchers), more if the owner submits it, and a repository at least 30 days old. homebrew-core also builds every formula from source on its own CI. A repository from 3 November, owned by one person, does not qualify yet, and that's a fair rule.
 
 **A tap is just a Git repository.** [glpecile/homebrew-tap](https://github.com/glpecile/homebrew-tap) holds one file, `Formula/hachikuji.rb`. The `homebrew-` prefix lets you write `glpecile/tap` for short. The formula downloads the prebuilt archive for your Mac's CPU, checks its SHA-256, and installs the binary and the index. No Rust or Bun needed on your machine.
 
