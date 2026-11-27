@@ -52,11 +52,10 @@ const html = svg.replace(
 		--pele-border: var(--color-border);
 		--pele-accent: var(--color-ring);
 		--pele-radius: 0;
-		--pele-series-1: var(--color-secondary);
-		--pele-series-2: var(--color-secondary);
-		--pele-series-3: var(--color-secondary);
-		--pele-series-4: var(--color-secondary);
-		--pele-series-5: var(--color-secondary);
+	}
+
+	.diagram :global(.pele-timeline .pele-period > rect) {
+		fill: transparent;
 	}
 
 	.diagram :global(.pele-timeline .pele-period > text) {
