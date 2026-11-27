@@ -37,14 +37,7 @@ Keep that repository in mind. It is the one piece of this story that never went 
 
 In August 2023, [AWS acquired Fig](https://www.geekwire.com/2023/amazon-web-services-acquires-fig-a-yc-grad-that-boosts-the-command-line-for-devs/). For a while nothing changed. Then the features moved into an AWS product, first under the CodeWhisperer name and then under [Amazon Q Developer](https://aws.amazon.com/q/developer/). The Fig service shut down on 1 September 2024, and the migration path was the Amazon Q Developer CLI: the `q` command.
 
-It still worked. The popup was still there. It now came with an AWS login and a chat feature, plus two blocks of lines in my `.zshrc`:
-
-```zsh
-# Amazon Q pre block. Keep at the top of this file.
-[[ -f "${HOME}/.local/share/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/amazon-q/shell/zshrc.pre.zsh"
-```
-
-And a matching *post block* at the bottom. Fine. A popup is worth two lines.
+It still worked. The popup was still there. It now came with an AWS login and a chat feature, but the part I used did not change.
 
 There was also a good sign: the Amazon Q Developer CLI was [open source](https://github.com/aws/amazon-q-developer-cli). If AWS ever lost interest, the code would still be there.
 
@@ -54,7 +47,7 @@ In November 2025, the Amazon Q Developer CLI became [Kiro CLI](https://kiro.dev/
 
 First, the source closed. The old repository now says it will only get critical security fixes, and that the CLI continues as Kiro CLI, a closed-source product.
 
-Second, the product changed shape. Kiro CLI 3 is a chat agent. It has [no completion popup](https://github.com/glpecile/hachikuji/blob/main/docs/MIGRATION.md#kiro-cli-3x) and adds no lines to the shell startup files. The Homebrew casks `kiro-cli` and `amazon-q` both install it now.
+Second, the product changed shape. Kiro CLI 3 is a chat agent. It has [no completion popup](https://github.com/glpecile/hachikuji/blob/main/docs/MIGRATION.md#kiro-cli-3x). The Homebrew casks `kiro-cli` and `amazon-q` both install it now.
 
 I understand why. In 2025 the attention was on agents, not on a popup that tells you `git rebase` takes `--onto`. But the feature I installed Fig for, years earlier, was no longer in any product.
 
