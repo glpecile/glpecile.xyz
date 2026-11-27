@@ -111,26 +111,11 @@ The helper is one small process next to every shell, and it lives as long as the
 
 The helper ended at 2.19 MB and a 700 KB binary, well inside the budget.
 
-I wrote the plan, the agent wrote the first pass of the Rust, and I reviewed it against what the plan asked for: behavior and numbers. I was still learning what idiomatic Rust looks like. But I could check whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
+I respect Rust from the outside, through what people build with it. [GPUI](https://www.gpui.rs), the GPU-accelerated UI framework that the [Zed](https://zed.dev) editor is built on, is a good example. That track record made Rust an easy pick, even though I would not be the one writing it.
+
+I wrote the plan, the agent wrote the Rust, and I did not read it. I checked the results against what the plan asked for: whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
 
 The constraints did the reviewing. Each one is a number or a yes/no check, and each check is a script in the repo. A design that broke a constraint failed a test, whatever language it was in.
-
-Reading the code was how I learned. Rust is very readable for a first-timer, because the types and the comments tell you most of the story. This is from the helper's startup:
-
-```rust
-if libc::setsid() < 0 {
-    // zsh job control made us a process group leader, and a leader cannot call setsid.
-    match libc::fork() {
-        0 => {
-            libc::setsid();
-        }
-        -1 => {}
-        _ => libc::_exit(0),
-    }
-}
-```
-
-[`setsid()`](https://man7.org/linux/man-pages/man2/setsid.2.html) puts the helper in its own session, so it is never the terminal's foreground process. That is constraint 1, and it is why Herdr shows `zsh` and the right folder. But zsh had already made the helper a process group leader, and a leader can't call `setsid()`. So it forks once and lets the child do it. I did not know that rule before this project. Now I do, and the comment says exactly why the code is there.
 
 ## How it works
 
