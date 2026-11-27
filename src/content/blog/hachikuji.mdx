@@ -93,15 +93,11 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 8. **zsh only**, macOS first, Linux must build.
 9. **Colors follow the terminal.** Only the 16 ANSI palette colors and reverse video. Never RGB, never the 256-color cube, because terminals do not change those when the theme changes.
 
-Number 9 is my favorite, because it deletes a feature instead of adding one. If the popup only uses palette colors, the terminal does the theming. No config, no code, no restart. Switch to Latte, and the popup is Latte.
-
 <DemoVideo src={latte} label="The same zsh demo in the light Catppuccin Latte theme. The popup under git checkout lists branches and tags on a light background, with the selected row in reverse video." width={1100} height={540}>
 	The same popup in Catppuccin Latte. No theme config: the terminal's palette does the work.
 </DemoVideo>
 
-The plan also has milestones, and the first one is "stop and report". Milestone 0 was a [pure zsh spike](https://github.com/glpecile/hachikuji/tree/main/spike), no helper, eight fake items in a popup, to answer one question before anything else: can ZLE draw this reliably?
-
-It could. Two methods were tried. Drawing with escape codes (save the cursor, draw, restore) broke at the bottom of the screen: every key drew a new copy of the rows, and old rows stayed in the scrollback. Putting the popup in `POSTDISPLAY`, the text zsh shows after the cursor, colored with `region_highlight`, let ZLE handle scrolling, multi-line prompts and resize by itself. That became the design.
+Drawing with escape codes (save the cursor, draw, restore) broke at the bottom of the screen: every key drew a new copy of the rows, and old rows stayed in the scrollback. Putting the popup in `POSTDISPLAY`, the text zsh shows after the cursor, colored with `region_highlight`, let ZLE handle scrolling, multi-line prompts and resize by itself. That became the design.
 
 ## Rust, for the first time
 
