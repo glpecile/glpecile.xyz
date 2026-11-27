@@ -1,0 +1,225 @@
+---
+title: "hachikuji: the completion popup that outlived three products"
+description: Fig became Amazon Q, Amazon Q became Kiro CLI, and the popup under my prompt disappeared along the way. inshellisense filled the gap at 43 MB per terminal. So I wrote a plan, picked a language I don't know, and built my own.
+pubDate: 2026-11-27
+authors: [glpecile, claude]
+---
+
+import Diagram from "@/components/diagram.astro";
+
+For years, I had a small popup under my prompt.
+
+Type `git ch`, and a list opened under the cursor: `checkout`, `cherry-pick`, `cherry`, each with a one-line description. Type `git checkout `, and it listed my branches. Press Tab, and the word was there. It felt like an IDE had quietly moved into the terminal.
+
+Then the tool that drew it changed names. Twice. And the second time, the popup was gone.
+
+This is the story of how I got it back. It involves one acquisition, one rebrand, one Node process per terminal, a plan written for an agent, and a language I can't write. It ends with [`hachikuji`](https://github.com/glpecile/hachikuji): an IDE-style completion popup for zsh that uses about 2 MB per shell.
+
+## Fig was the good part
+
+[Fig](https://github.com/withfig) was a Mac app that added IDE-style autocomplete to the terminal. You typed, and a popup offered subcommands, options, file paths and branches, with descriptions.
+
+The app was the visible part. The valuable part was a repository.
+
+Every command Fig knew about came from a *completion spec*: a TypeScript file that describes a CLI. Which subcommands `git` has. Which options take an argument. That `git checkout` wants a branch, and how to list branches. Those specs lived in [withfig/autocomplete](https://github.com/withfig/autocomplete), under the MIT license, and the community wrote them by the hundreds. `docker`, `kubectl`, `npm`, `ssh`, `make`, `brew`, `ffmpeg`. If you used it, someone had probably written its spec.
+
+Keep that repository in mind. It is the one piece of this story that never went away.
+
+## Then it became Amazon Q
+
+In August 2023, [AWS acquired Fig](https://www.geekwire.com/2023/amazon-web-services-acquires-fig-a-yc-grad-that-boosts-the-command-line-for-devs/). For a while nothing changed. Then the features moved into an AWS product, first under the CodeWhisperer name and then under Amazon Q Developer. The Fig service shut down on 1 September 2024, and the migration path was the Amazon Q Developer CLI: the `q` command.
+
+It still worked. The popup was still there. It now came with an AWS login and a chat feature, plus two blocks of lines in my `.zshrc`:
+
+```zsh
+# Amazon Q pre block. Keep at the top of this file.
+[[ -f "${HOME}/.local/share/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/amazon-q/shell/zshrc.pre.zsh"
+```
+
+And a matching *post block* at the bottom. Fine. A popup is worth two lines.
+
+There was also a good sign: the Amazon Q Developer CLI was [open source](https://github.com/aws/amazon-q-developer-cli). If AWS ever lost interest, the code would still be there.
+
+## Then it became Kiro CLI
+
+In November 2025, the Amazon Q Developer CLI became [Kiro CLI](https://kiro.dev/docs/upgrade-guides/migrating-from-q/). Two things changed with the name.
+
+First, the source closed. The old repository now says it will only get critical security fixes, and that the CLI continues as Kiro CLI, a closed-source product.
+
+Second, the product changed shape. Kiro CLI 3 is a chat agent. It has no completion popup and adds no lines to the shell startup files. The Homebrew casks `kiro-cli` and `amazon-q` both install it now.
+
+I understand why. In 2025 the attention was on agents, not on a popup that tells you `git rebase` takes `--onto`. But the feature I installed Fig for, years earlier, was no longer in any product.
+
+Three names, one acquisition, and the thing I actually used was the part that got cut.
+
+## inshellisense, and 1.1 GB of popup
+
+The obvious replacement was [inshellisense](https://github.com/microsoft/inshellisense), from Microsoft. Open source, MIT, and built on the same Fig specs. Same popup, same commands, no account.
+
+It worked. It also cost more than I expected, in three ways.
+
+**Memory.** inshellisense is a Node app. My first count was about 95 MB per terminal: a Node launcher of about 31 MB and a native binary of about 64 MB. I keep around 12 terminals open, so that is roughly 1.1 GB of RAM to draw a popup. Measured more carefully with `footprint`, which counts private memory instead of shared pages, it is 43 MB per terminal. Still about twenty times what a popup should need.
+
+**A wrapper.** inshellisense runs your shell inside its own pseudo-terminal. So the terminal's foreground process is not zsh, it is the wrapper. Apps that read the folder of the foreground process, like Herdr, saw the wrapper and always showed the folder it started in. `cd` anywhere, and the tab still showed the start folder.
+
+**Colors.** Its theme did not follow the system light and dark mode. My terminal switches between Catppuccin Latte and Mocha with the system. The popup did not.
+
+Each problem had a workaround in my dotfiles. Each workaround was a few more lines that existed only to fix a tool that was supposed to save me time. And every new shell took about 140 ms to show a prompt, against 18 ms without it.
+
+At some point, the honest question was: what does a completion popup actually need?
+
+## The plan
+
+I did not start with code. I started with [`plan.md`](https://github.com/glpecile/hachikuji/blob/main/plan.md).
+
+It is a build prompt. It is written for an agent ("You are building `hachikuji`... Read this whole file before you write code"), and most of it is constraints, not features. The constraints came straight from the three problems above:
+
+1. **No pty wrapper.** zsh stays the foreground process. All drawing goes through ZLE, the zsh line editor. The plan says it plainly: "If a design needs a wrapper, it is wrong."
+2. **No Node, no JS runtime, no Python at runtime.** One native binary.
+3. **Less than 4 MB of private memory per shell.** Measured with `footprint` or `vmmap`, not RSS.
+4. **p99 below 16 ms**, from key press to updated popup. One frame.
+5. **Less than 10 ms added to zsh startup.** The helper starts on the first key, not in `.zshrc`.
+6. **Fail silent.** If the helper crashes or hangs, the shell works as normal. zsh never blocks on it.
+7. **No network** and no telemetry.
+8. **zsh only**, macOS first, Linux must build.
+9. **Colors follow the terminal.** Only the 16 ANSI palette colors and reverse video. Never RGB, never the 256-color cube, because terminals do not change those when the theme changes.
+
+Number 9 is my favorite, because it deletes a feature instead of adding one. If the popup only uses palette colors, the terminal does the theming. No config, no code, no restart. Switch to Latte, and the popup is Latte.
+
+The plan also has milestones, and the first one is "stop and report". Milestone 0 was a pure zsh spike, no helper, eight fake items in a popup, to answer one question before anything else: can ZLE draw this reliably?
+
+It could. Two methods were tried. Drawing with escape codes (save the cursor, draw, restore) broke at the bottom of the screen: every key drew a new copy of the rows, and old rows stayed in the scrollback. Putting the popup in `POSTDISPLAY`, the text zsh shows after the cursor, colored with `region_highlight`, let ZLE handle scrolling, multi-line prompts and resize by itself. That became the design.
+
+## Rust, and I don't know Rust
+
+The plan picks Rust, and it gives its reasons:
+
+- No garbage collector and no runtime, so the 4 MB budget is easy to keep. A Go process starts near 4 MB before it does any work.
+- Mature crates for each part: `memmap2` for the index, `unicode-width` to cut rows to the terminal width, `toml` for config.
+- One static binary for macOS and Linux.
+- Zig would also meet the budgets, but it is not at 1.0 yet, and it has fewer libraries for the parts this needs.
+
+I agree with every line. I also can't write Rust. I have never shipped a line of it.
+
+That sounds like it should matter more than it did. I wrote the plan, the agent wrote the Rust, and I reviewed what I could actually judge: behavior and numbers. I can't tell you if a lifetime annotation is idiomatic. I can tell you whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
+
+The constraints did the reviewing. Each one is a number or a yes/no check, and each check is a script in the repo. A design that broke a constraint failed a test, whatever language it was in.
+
+Reading the code later was still worth it. Rust turned out to be readable even when I can't write it. This is from the helper's startup:
+
+```rust
+if libc::setsid() < 0 {
+    // zsh job control made us a process group leader, and a leader cannot call setsid.
+    match libc::fork() {
+        0 => {
+            libc::setsid();
+        }
+        -1 => {}
+        _ => libc::_exit(0),
+    }
+}
+```
+
+`setsid()` puts the helper in its own session, so it is never the terminal's foreground process. That is constraint 1, and it is why Herdr shows `zsh` and the right folder. But zsh had already made the helper a process group leader, and a leader can't call `setsid()`. So it forks once and lets the child do it. I would never have known that rule. I can read the comment and see why it's there.
+
+Rust was the right tool for this job. Not because it is fashionable, but because the job is a small, long-running process per shell with a strict memory ceiling, and Rust is the language where that ceiling is the default instead of an effort.
+
+## How it works
+
+The whole thing is two pieces: about 350 lines of zsh, and one Rust helper per shell.
+
+<Diagram
+	caption="zsh draws; the helper decides what to draw. The spec index is one mmap file that all shells share."
+	code={`flowchart LR
+    subgraph shell ["zsh (hachikuji.zsh)"]
+        H["line-pre-redraw hook"]
+        F["zle -F handler"]
+        P["POSTDISPLAY +<br/>region_highlight"]
+        F --> P
+    end
+
+    subgraph helper ["hachikuji serve (Rust)"]
+        T["tokenizer"] --> S["spec walk"] --> R["rank"] --> D["render"]
+        G["generators<br/>200 ms timeout, cache"]
+    end
+
+    I[("specs.idx<br/>mmap, shared")]
+
+    H -- "request (FIFO)" --> T
+    D -- "response (FIFO)" --> F
+    G -- "async update" --> F
+    S --> I`}
+/>
+
+- **The zsh side** hooks `line-pre-redraw`, not `self-insert`, so it plays well with zsh-autosuggestions, zsh-syntax-highlighting and starship, which wrap widgets. It sends a request only when the buffer or the cursor changed. Otherwise the redraw from a response would send a new request, forever.
+- **Transport** is two FIFOs in a private folder. zsh opens both read-write, so no open blocks. Writes are non-blocking. At most one request is in flight, and zsh keeps only the newest pending one. Each request has a sequence number, and older responses are dropped.
+- **The helper** tokenizes the line (quotes, pipes, `&&`, `$( )`, subshells), walks the spec, ranks prefix matches first and fuzzy matches after, and sends back rows that are ready to print, already cut to the terminal width.
+- **Generators** list branches, files, package scripts and make targets. They run async with a 200 ms timeout, so a slow `git` never blocks typing. When one finishes, the popup updates through `zle -F`.
+- **Fail silent** is real: if a request gets no response in 1 s, zsh kills the helper, shows no popup, and restarts it at most once a minute.
+
+## The specs, again
+
+Remember the Fig repository? This is where it comes back.
+
+hachikuji uses [withfig/autocomplete](https://github.com/withfig/autocomplete) at one pinned commit. The specs are TypeScript, but the helper can't run JavaScript, by design. So a build step (`tools/extract.ts`, in Bun) reads each spec **without running it**. The TypeScript parser gives the syntax tree, and a small evaluator keeps only literal values: objects, arrays, strings, constants and spreads. Functions are never called.
+
+Then `hachikuji compile` writes one binary index: a string table plus fixed-size node records, read in place with `mmap`. 1,455 specs fit in 14.7 MB. Because it's a read-only `mmap` file, the OS shares its pages between all shells. Twelve terminals don't load it twelve times.
+
+Some specs need JavaScript to be useful, like a generator that lists git branches. Those are dropped and listed in `specs/lost.txt` (262 of them), so they can be ported later. The most common ones are already ported to Rust built-ins: git branches, remotes, tags and changed files, `package.json` scripts, Makefile targets, ssh hosts and zoxide folders.
+
+The specs ship with their original MIT notice, in `specs/FIG-LICENSE`, inside the index.
+
+## The numbers
+
+Apple M5, the full Fig index, the same `.zshrc` in a real pty. Only the plugin changes.
+
+| | zsh alone | hachikuji | inshellisense |
+|---|---|---|---|
+| Memory per terminal | | 2.2 MB | 43 MB |
+| Time to the first prompt | 18 ms | 19 ms | 141 ms |
+| Key press to updated screen, p99 | 5.1 ms | 12.8 ms | 44.2 ms |
+| Installed size | | 15 MB | 120 MB + Node |
+
+Inside the helper, a request takes 0.14 ms at p99. The binary is about 700 KB. Twelve terminals use about 26 MB together, less than one terminal of inshellisense.
+
+And the three workarounds in my dotfiles are deleted. Herdr shows the right folder, because zsh is the foreground process again. The popup follows Latte and Mocha, because it only knows palette colors. There's nothing to work around.
+
+The plan was written on 3 November. Version 1.0.0 shipped on 6 November. Version 1.1 added nushell, where hachikuji supplies the items and nushell's own menu shows them.
+
+## A short detour into Homebrew
+
+I wanted `brew install hachikuji` to work. It mostly does, and the details taught me more about Homebrew than years of using it.
+
+**homebrew-core will not take it yet.** Its [acceptance policy](https://docs.brew.sh/Package-Acceptance-Policy) asks for at least 75 stars (or 30 forks, or 30 watchers), more if the owner submits it, and a repository at least 30 days old. homebrew-core also builds every formula from source on its own CI. A week-old repository from one person does not qualify, and that's a fair rule.
+
+**A tap is just a Git repository.** [glpecile/homebrew-tap](https://github.com/glpecile/homebrew-tap) holds one file, `Formula/hachikuji.rb`. The `homebrew-` prefix lets you write `glpecile/tap` for short. The formula downloads the prebuilt archive for your Mac's CPU, checks its SHA-256, and installs the binary and the index. No Rust or Bun needed on your machine.
+
+**Homebrew 7 doesn't trust taps by default.** This one surprised me. `brew tap glpecile/tap` followed by `brew install hachikuji` fails with "Refusing to load formula glpecile/tap/hachikuji from untrusted tap". The one-command form trusts that formula as it installs:
+
+```sh
+brew install glpecile/tap/hachikuji
+```
+
+So that's the only command the docs give.
+
+**Symlinks keep the `.zshrc` line stable.** The binary finds its zsh file through the `bin` and `share` symlinks in `$(brew --prefix)`, not through the versioned folder in `Cellar/`. So the line you add to `.zshrc` still works after `brew upgrade`.
+
+**Don't update what Homebrew owns.** `hachikuji update` replaces a script install in place. But if the binary's real path contains `Cellar`, it prints `brew upgrade hachikuji` and stops. Files that change outside Homebrew break `brew upgrade` and `brew uninstall` later.
+
+The cost of a tap is one manual step per release: copy the generated formula into the tap repository and push. When the project meets the policy, it can move to homebrew-core.
+
+## Open source is what kept this moving
+
+Look at the chain again.
+
+Fig the company is gone. Fig the app is gone. Amazon Q Developer CLI became Kiro CLI, closed its source, and dropped the popup. If the story had ended inside those products, it would have ended there.
+
+But the specs were MIT. So Microsoft could build inshellisense on them. And because inshellisense was open source too, I could read exactly why it used 43 MB and why it needed a wrapper, and write a plan whose first constraint is "no wrapper". And because both were open, hachikuji didn't have to describe 1,455 CLIs from scratch. It had to describe one popup.
+
+None of this is a new idea. It's just rare to watch it happen in one small tool, in the span of a few years: a company stops, a product changes direction, and the work survives because someone put a license on it.
+
+So hachikuji is MIT too. The plan is in the repo. There's a [migration guide](https://github.com/glpecile/hachikuji/blob/main/docs/MIGRATION.md) from Kiro CLI, Amazon Q, Fig and inshellisense, written so that a coding agent can do the move for you, with a backup and a check at each step. If someone takes this further, or takes only the index format, or only the plan, that's the point.
+
+The name comes from Monogatari: Mayoi Hachikuji, the girl with the lost snail. The snail is the mascot. It felt right for a tool that exists because my completion popup kept getting lost between rebrands.
+
+It found its way back. It just had to stop belonging to a product first.
