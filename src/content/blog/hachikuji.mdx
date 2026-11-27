@@ -1,6 +1,6 @@
 ---
 title: "hachikuji: a completion popup born out of three products"
-description: Fig became Amazon Q, Amazon Q became Kiro CLI, and the popup under my prompt disappeared along the way. inshellisense filled the gap at 43 MB per terminal. So I wrote a plan, picked a language I don't know, and built my own.
+description: Fig became Amazon Q, Amazon Q became Kiro CLI, and the popup under my prompt disappeared along the way. inshellisense filled the gap at 43 MB per terminal. So I wrote a plan, picked a language I had never tried before, and built my own.
 pubDate: 2026-11-27
 authors: [glpecile, claude]
 ---
@@ -13,7 +13,7 @@ Type `git ch`, and a list opened under the cursor: `checkout`, `cherry-pick`, `c
 
 Then the tool that drew it changed names. Twice. And the second time, the popup was gone.
 
-This is the story of how I got it back. It involves one acquisition, one rebrand, one Node process per terminal, a plan written for an agent, and a language I can't write. It ends with [`hachikuji`](https://github.com/glpecile/hachikuji): an IDE-style completion popup for zsh that uses about 2 MB per shell.
+This is the story of how I got it back. It involves one acquisition, one rebrand, one Node process per terminal, a plan written for an agent, and my first time with Rust. It ends with [`hachikuji`](https://github.com/glpecile/hachikuji): an IDE-style completion popup for zsh that uses about 2 MB per shell.
 
 ## Fig was the good part
 
@@ -90,7 +90,7 @@ The plan also has milestones, and the first one is "stop and report". Milestone 
 
 It could. Two methods were tried. Drawing with escape codes (save the cursor, draw, restore) broke at the bottom of the screen: every key drew a new copy of the rows, and old rows stayed in the scrollback. Putting the popup in `POSTDISPLAY`, the text zsh shows after the cursor, colored with `region_highlight`, let ZLE handle scrolling, multi-line prompts and resize by itself. That became the design.
 
-## Rust, and I don't know Rust
+## Rust, for the first time
 
 The plan picks Rust, and it gives its reasons:
 
@@ -99,13 +99,13 @@ The plan picks Rust, and it gives its reasons:
 - One static binary for macOS and Linux.
 - Zig would also meet the budgets, but it is not at 1.0 yet, and it has fewer libraries for the parts this needs.
 
-I agree with every line. I also can't write Rust. I have never shipped a line of it.
+I agree with every line. I had also never used Rust before this project.
 
-That sounds like it should matter more than it did. I wrote the plan, the agent wrote the Rust, and I reviewed what I could actually judge: behavior and numbers. I can't tell you if a lifetime annotation is idiomatic. I can tell you whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
+That mattered less than I expected. I wrote the plan, the agent wrote the first pass of the Rust, and I reviewed it against what the plan asked for: behavior and numbers. I was still learning what idiomatic Rust looks like. But I could check whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
 
 The constraints did the reviewing. Each one is a number or a yes/no check, and each check is a script in the repo. A design that broke a constraint failed a test, whatever language it was in.
 
-Reading the code later was still worth it. Rust turned out to be readable even when I can't write it. This is from the helper's startup:
+Reading the code was how I learned. Rust is very readable for a first-timer, because the types and the comments tell you most of the story. This is from the helper's startup:
 
 ```rust
 if libc::setsid() < 0 {
@@ -120,7 +120,7 @@ if libc::setsid() < 0 {
 }
 ```
 
-`setsid()` puts the helper in its own session, so it is never the terminal's foreground process. That is constraint 1, and it is why Herdr shows `zsh` and the right folder. But zsh had already made the helper a process group leader, and a leader can't call `setsid()`. So it forks once and lets the child do it. I would never have known that rule. I can read the comment and see why it's there.
+`setsid()` puts the helper in its own session, so it is never the terminal's foreground process. That is constraint 1, and it is why Herdr shows `zsh` and the right folder. But zsh had already made the helper a process group leader, and a leader can't call `setsid()`. So it forks once and lets the child do it. I did not know that rule before this project. Now I do, and the comment says exactly why the code is there.
 
 Rust was the right tool for this job. Not because it is fashionable, but because the job is a small, long-running process per shell with a strict memory ceiling, and Rust is the language where that ceiling is the default instead of an effort.
 
