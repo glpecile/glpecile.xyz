@@ -168,10 +168,10 @@ Apple M5, the full Fig index, the same `.zshrc` in a real pty. Only the plugin c
 	highlight="hachikuji"
 	caption="Lower is better. inshellisense's install is 120 MB plus Node (149 MB)."
 	metrics={[
-		{ label: "Memory per terminal", rows: [["hachikuji", 2.2, "2.2 MB"], ["inshellisense", 43, "43 MB"]] },
-		{ label: "Time to the first prompt", rows: [["zsh alone", 18, "18 ms"], ["hachikuji", 19, "19 ms"], ["inshellisense", 141, "141 ms"]] },
-		{ label: "Key press to updated screen, p99", rows: [["zsh alone", 5.1, "5.1 ms"], ["hachikuji", 12.8, "12.8 ms"], ["inshellisense", 44.2, "44.2 ms"]] },
-		{ label: "Installed size", rows: [["hachikuji", 15, "15 MB"], ["inshellisense", 269, "269 MB"]] },
+		{ label: "Memory per terminal", unit: "MB", rows: [["hachikuji", 2.2], ["inshellisense", 43]] },
+		{ label: "Time to the first prompt", unit: "ms", rows: [["zsh alone", 18], ["hachikuji", 19], ["inshellisense", 141]] },
+		{ label: "Key press to updated screen, p99", unit: "ms", rows: [["zsh alone", 5.1], ["hachikuji", 12.8], ["inshellisense", 44.2]] },
+		{ label: "Installed size", unit: "MB", rows: [["hachikuji", 15], ["inshellisense", 269]] },
 	]}
 />
 
