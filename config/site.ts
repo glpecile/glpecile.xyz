@@ -272,21 +272,21 @@ export const siteConfig = {
 			],
 		},
 		{
-			name: "norph",
-			stack: "React Native / Reanimated / TypeScript",
-			url: "https://github.com/glpecile/norph",
-			highlights: [
-				"Published @glpecile/norph, a Reanimated port of torph: text that morphs into its next value on iOS, Android, and web from one implementation.",
-				"Shared words and characters slide to their new places, and numbers roll digit by digit, aligned on the decimal point.",
-			],
-		},
-		{
 			name: "shinobu",
 			stack: "React Native / Expo / TypeScript",
 			url: "https://github.com/glpecile/shinobu",
 			highlights: [
 				"Building a DB-less, cross-platform media tracker (iOS / Android / web) — log a movie, episode, or manga chapter once and it fans out to every connected tracking service (Trakt, AniList, Letterboxd), with the same providers aggregated back into one feed.",
 				"Modern Expo stack — expo-router, React 19 with the React Compiler, TanStack Query, Effect, Reanimated, and Tailwind-based styling — from a single TypeScript codebase.",
+			],
+		},
+		{
+			name: "norph",
+			stack: "React Native / Reanimated / TypeScript",
+			url: "https://github.com/glpecile/norph",
+			highlights: [
+				"Published @glpecile/norph, a Reanimated port of torph: text that morphs into its next value on iOS, Android, and web from one implementation.",
+				"Shared words and characters slide to their new places, and numbers roll digit by digit, aligned on the decimal point.",
 			],
 		},
 		{
