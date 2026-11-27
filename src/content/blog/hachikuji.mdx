@@ -97,8 +97,6 @@ It is a build prompt. It is written for an agent ("You are building `hachikuji`.
 	The same popup in Catppuccin Latte. No theme config: the terminal's palette does the work.
 </DemoVideo>
 
-Drawing with escape codes (save the cursor, draw, restore) broke at the bottom of the screen: every key drew a new copy of the rows, and old rows stayed in the scrollback. Putting the popup in `POSTDISPLAY`, the text zsh shows after the cursor, colored with `region_highlight`, let ZLE handle scrolling, multi-line prompts and resize by itself. That became the design.
-
 ## Rust, for the first time
 
 The plan picks [Rust](https://www.rust-lang.org), and it gives its reasons:
