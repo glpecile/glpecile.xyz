@@ -14,8 +14,10 @@ Project-specific guidance for working in this repo.
 
 ## Gotchas
 
-- Assume the user is already running a dev server. Do not start another one unless they explicitly ask.
-- Always run code validation after making changes. Prefer `bun run check`, and run `bun run lint` when the change affects linted files.
+- Assume the user is already running a dev server. Do not start another one unless they explicitly ask. To check rendered output, ask the user for its port.
+- Always run code validation after making changes. Commands: `bun run check` (astro type check, after any `.astro` or content-schema change), `bun run lint` (oxlint with `.oxlintrc.json`, and `oxfmt --check`), `bun run test` (unit tests) and `bun run build` (production build).
+- Unit tests are colocated as `src/**/*.test.ts` and run with `bun test`, which resolves the `@/*` and `#config/*` aliases from `tsconfig.json`. Import from `bun:test`, and swap globals with `src/lib/test-globals.ts`, since bun has no `vi.stubGlobal`. Add tests for new pure helpers in `src/lib/`.
+- Content collections are defined in `src/content.config.ts`. Posts live in `src/content/{blog,projects}/` as MDX with kebab-case slugs.
 - Format with `bun run format` (oxfmt, Prettier style with tabs, settings in `.oxfmtrc.json`). It formats every file type here, `.astro` and `.mdx` included, and sorts Tailwind classes against `src/styles/global.css`. Do not add Prettier or rustywind back. Embedded code in `.md` and `.mdx` is left as written. The vendored skills and the generated `fonts.css` are ignored. The pre-commit hook formats staged files and stages them again; a file with both staged and unstaged changes is only checked.
 - Use Bun only. Prefer `bun`, `bunx`, and `bun install`, and do not add `pnpm-lock.yaml`, `package-lock.json`, or `yarn.lock`.
 - Prefer Tailwind CSS utilities over custom `<style>` blocks or one-off CSS when implementing UI changes.
@@ -23,7 +25,6 @@ Project-specific guidance for working in this repo.
 - Keep the `@/*` alias pointing to `./src/*` and `#config/*` pointing to `./config/*`. New imports and generated files should use the `src`-based alias layout, and config imports should use `#config/*`.
 - Treat `config/site.ts` as the source of truth for site-wide nav, links, metadata, and work entries. Prefer updating config over duplicating literals in pages/components.
 - Keep shared keyboard shortcuts in `config/site.ts` under `siteConfig.shortcuts` and derive labels/handlers from that config instead of hardcoding keys across pages/components.
-- Run `bun run check` after `.astro` changes. Use `bun run lint` for TS and JS changes that oxlint covers (config in `.oxlintrc.json`).
 - In Astro, `script is:inline` blocks share the page scope after compilation. Wrap inline script bodies in an IIFE or otherwise isolate names; do not rely on component boundaries to prevent top-level redeclarations.
 - For shadcn, use `bunx shadcn@latest ...` and keep generated components under `src/components/ui`.
 - Prefer shorter, clearer variable names when they stay unambiguous in context. Avoid verbose names like `workExperience` when `work` is sufficient.
