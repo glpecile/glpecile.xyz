@@ -111,9 +111,7 @@ The helper is one small process next to every shell, and it lives as long as the
 
 The helper ended at 2.19 MB and a 700 KB binary, well inside the budget.
 
-I had never used Rust before this project.
-
-That mattered less than I expected. I wrote the plan, the agent wrote the first pass of the Rust, and I reviewed it against what the plan asked for: behavior and numbers. I was still learning what idiomatic Rust looks like. But I could check whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
+I wrote the plan, the agent wrote the first pass of the Rust, and I reviewed it against what the plan asked for: behavior and numbers. I was still learning what idiomatic Rust looks like. But I could check whether `footprint` says 2.19 MB, whether `cd` updates the folder in Herdr, and whether Ctrl-C at the prompt kills the helper.
 
 The constraints did the reviewing. Each one is a number or a yes/no check, and each check is a script in the repo. A design that broke a constraint failed a test, whatever language it was in.
 
