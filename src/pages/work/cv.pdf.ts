@@ -120,15 +120,20 @@ const languages: readonly LanguageItem[] = siteConfig.languages;
 const certificates: readonly CertificateItem[] = siteConfig.certificates;
 const contact: ContactInfo = siteConfig.contact;
 
-const stripUrl = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+const stripUrl = (url: string) =>
+	url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 const contactSegments: ContactSegment[] = [
 	{ text: contact.email, url: `mailto:${contact.email}` },
-	contact.phone ? { text: contact.phone, url: `tel:${contact.phone.replace(/\s+/g, "")}` } : null,
+	contact.phone
+		? { text: contact.phone, url: `tel:${contact.phone.replace(/\s+/g, "")}` }
+		: null,
 	{ text: contact.location },
 	{ text: stripUrl(siteConfig.siteUrl), url: siteConfig.siteUrl },
 	{ text: stripUrl(siteConfig.links.github), url: siteConfig.links.github },
-	contact.linkedin ? { text: stripUrl(contact.linkedin), url: contact.linkedin } : null,
+	contact.linkedin
+		? { text: stripUrl(contact.linkedin), url: contact.linkedin }
+		: null,
 ].filter((segment): segment is ContactSegment => segment !== null);
 
 const allSections: CvSection[] = [
@@ -158,7 +163,10 @@ const allSections: CvSection[] = [
 	{
 		kind: "inline",
 		title: "SKILLS",
-		rows: skills.map((group) => ({ label: group.category, value: group.items.join(", ") })),
+		rows: skills.map((group) => ({
+			label: group.category,
+			value: group.items.join(", "),
+		})),
 	},
 	{
 		kind: "entries",
@@ -175,7 +183,10 @@ const allSections: CvSection[] = [
 	{
 		kind: "inline",
 		title: "LANGUAGES",
-		rows: languages.map((item) => ({ label: item.language, value: item.level })),
+		rows: languages.map((item) => ({
+			label: item.language,
+			value: item.level,
+		})),
 	},
 	{
 		kind: "entries",
@@ -191,11 +202,15 @@ const allSections: CvSection[] = [
 ];
 
 const sections: CvSection[] = allSections.filter((section) =>
-	section.kind === "entries" ? section.entries.length > 0 : section.rows.length > 0,
+	section.kind === "entries"
+		? section.entries.length > 0
+		: section.rows.length > 0,
 );
 
 const decodeDataUrl = (dataUrl: string) => {
-	const payload = dataUrl.includes(",") ? dataUrl.slice(dataUrl.indexOf(",") + 1) : dataUrl;
+	const payload = dataUrl.includes(",")
+		? dataUrl.slice(dataUrl.indexOf(",") + 1)
+		: dataUrl;
 
 	return Uint8Array.from(atob(payload), (character) => character.charCodeAt(0));
 };
@@ -204,7 +219,12 @@ const lineBox = (fontSize: number, lineHeight: number) => fontSize * lineHeight;
 
 // Greedy word-wrap using the embedded font's real metrics, so measured heights
 // and drawn positions agree exactly.
-function wrapText(font: PDFFont, text: string, fontSize: number, maxWidth: number): string[] {
+function wrapText(
+	font: PDFFont,
+	text: string,
+	fontSize: number,
+	maxWidth: number,
+): string[] {
 	const words = text.trim().split(/\s+/).filter(Boolean);
 
 	if (words.length === 0) {
@@ -217,7 +237,10 @@ function wrapText(font: PDFFont, text: string, fontSize: number, maxWidth: numbe
 	for (const word of words) {
 		const next = current.length === 0 ? word : `${current} ${word}`;
 
-		if (current.length === 0 || font.widthOfTextAtSize(next, fontSize) <= maxWidth) {
+		if (
+			current.length === 0 ||
+			font.widthOfTextAtSize(next, fontSize) <= maxWidth
+		) {
 			current = next;
 			continue;
 		}
@@ -231,7 +254,12 @@ function wrapText(font: PDFFont, text: string, fontSize: number, maxWidth: numbe
 	return lines;
 }
 
-function addLink(ctx: Ctx, page: PDFPage, rect: [number, number, number, number], url: string) {
+function addLink(
+	ctx: Ctx,
+	page: PDFPage,
+	rect: [number, number, number, number],
+	url: string,
+) {
 	const annotation = ctx.pdf.context.obj({
 		Type: "Annot",
 		Subtype: "Link",
@@ -267,20 +295,42 @@ function drawLineText(
 	options: DrawOptions,
 ) {
 	const baseline = top - options.size * layout.baselineFactor;
-	page.drawText(text, { x, y: baseline, size: options.size, font: options.font, color: options.color });
+	page.drawText(text, {
+		x,
+		y: baseline,
+		size: options.size,
+		font: options.font,
+		color: options.color,
+	});
 
 	if (options.url) {
 		const width = options.font.widthOfTextAtSize(text, options.size);
-		addLink(ctx, page, [x, baseline - options.size * 0.25, x + width, baseline + options.size * 0.82], options.url);
+		addLink(
+			ctx,
+			page,
+			[
+				x,
+				baseline - options.size * 0.25,
+				x + width,
+				baseline + options.size * 0.82,
+			],
+			options.url,
+		);
 	}
 }
 
 function buildHeaderBlock(ctx: Ctx): Block {
-	const headingLines = wrapText(ctx.regular, siteConfig.cv.heading, layout.headerBodySize, contentWidth);
+	const headingLines = wrapText(
+		ctx.regular,
+		siteConfig.cv.heading,
+		layout.headerBodySize,
+		contentWidth,
+	);
 	const height =
 		lineBox(layout.headerTitleSize, layout.headerTitleLineHeight) +
 		layout.headerGap +
-		headingLines.length * lineBox(layout.headerBodySize, layout.headerBodyLineHeight) +
+		headingLines.length *
+			lineBox(layout.headerBodySize, layout.headerBodyLineHeight) +
 		layout.headerGap +
 		lineBox(layout.headerLinkSize, layout.headerLinkLineHeight);
 
@@ -292,7 +342,9 @@ function buildHeaderBlock(ctx: Ctx): Block {
 			size: layout.headerTitleSize,
 			color: colors.foreground,
 		});
-		y -= lineBox(layout.headerTitleSize, layout.headerTitleLineHeight) + layout.headerGap;
+		y -=
+			lineBox(layout.headerTitleSize, layout.headerTitleLineHeight) +
+			layout.headerGap;
 
 		for (const line of headingLines) {
 			drawLineText(ctx, page, line, x0, y, {
@@ -315,7 +367,10 @@ function buildHeaderBlock(ctx: Ctx): Block {
 				color: colors.muted,
 				url: segment.url,
 			});
-			cursor += ctx.regular.widthOfTextAtSize(segment.text, layout.headerLinkSize);
+			cursor += ctx.regular.widthOfTextAtSize(
+				segment.text,
+				layout.headerLinkSize,
+			);
 
 			if (index < contactSegments.length - 1) {
 				page.drawText(separator, {
@@ -325,7 +380,10 @@ function buildHeaderBlock(ctx: Ctx): Block {
 					font: ctx.regular,
 					color: colors.muted,
 				});
-				cursor += ctx.regular.widthOfTextAtSize(separator, layout.headerLinkSize);
+				cursor += ctx.regular.widthOfTextAtSize(
+					separator,
+					layout.headerLinkSize,
+				);
 			}
 		});
 	};
@@ -334,7 +392,10 @@ function buildHeaderBlock(ctx: Ctx): Block {
 }
 
 function buildSectionTitleBlock(ctx: Ctx, title: string): Block {
-	const height = lineBox(layout.sectionTitleSize, layout.sectionTitleLineHeight);
+	const height = lineBox(
+		layout.sectionTitleSize,
+		layout.sectionTitleLineHeight,
+	);
 
 	const draw = (page: PDFPage, top: number) => {
 		drawLineText(ctx, page, title, x0, top, {
@@ -348,18 +409,32 @@ function buildSectionTitleBlock(ctx: Ctx, title: string): Block {
 }
 
 function buildEntryBlock(ctx: Ctx, entry: CvEntry): Block {
-	const titleRowHeight = lineBox(layout.entryTitleSize, layout.entryTitleLineHeight);
+	const titleRowHeight = lineBox(
+		layout.entryTitleSize,
+		layout.entryTitleLineHeight,
+	);
 	const hasSubtitleRow = Boolean(entry.subtitle || entry.subtitleMeta);
-	const subtitleRowHeight = hasSubtitleRow ? lineBox(layout.entryMetaSize, layout.entryMetaLineHeight) : 0;
+	const subtitleRowHeight = hasSubtitleRow
+		? lineBox(layout.entryMetaSize, layout.entryMetaLineHeight)
+		: 0;
 
 	const dashWidth = ctx.regular.widthOfTextAtSize("-", layout.detailSize);
-	const bulletTextX = x0 + layout.entryIndent + dashWidth + layout.detailBulletGap;
+	const bulletTextX =
+		x0 + layout.entryIndent + dashWidth + layout.detailBulletGap;
 	const bulletTextWidth = rightEdge - bulletTextX;
 	const bulletLineGroups = (entry.bullets ?? []).map((bullet) =>
-		wrapText(ctx.regular, flattenInlineLinks(bullet), layout.detailSize, bulletTextWidth),
+		wrapText(
+			ctx.regular,
+			flattenInlineLinks(bullet),
+			layout.detailSize,
+			bulletTextWidth,
+		),
 	);
 	const bulletsHeight = bulletLineGroups.reduce(
-		(total, lines) => total + layout.entryGap + lines.length * lineBox(layout.detailSize, layout.detailLineHeight),
+		(total, lines) =>
+			total +
+			layout.entryGap +
+			lines.length * lineBox(layout.detailSize, layout.detailLineHeight),
 		0,
 	);
 
@@ -388,7 +463,10 @@ function buildEntryBlock(ctx: Ctx, entry: CvEntry): Block {
 		});
 
 		if (entry.titleMeta) {
-			const metaWidth = ctx.regular.widthOfTextAtSize(entry.titleMeta, layout.entryMetaSize);
+			const metaWidth = ctx.regular.widthOfTextAtSize(
+				entry.titleMeta,
+				layout.entryMetaSize,
+			);
 			page.drawText(entry.titleMeta, {
 				x: rightEdge - metaWidth,
 				y: titleBaseline,
@@ -414,7 +492,10 @@ function buildEntryBlock(ctx: Ctx, entry: CvEntry): Block {
 			}
 
 			if (entry.subtitleMeta) {
-				const metaWidth = ctx.regular.widthOfTextAtSize(entry.subtitleMeta, layout.entryMetaSize);
+				const metaWidth = ctx.regular.widthOfTextAtSize(
+					entry.subtitleMeta,
+					layout.entryMetaSize,
+				);
 				page.drawText(entry.subtitleMeta, {
 					x: rightEdge - metaWidth,
 					y: subtitleBaseline,
@@ -460,16 +541,28 @@ function buildInlineGridBlock(ctx: Ctx, rows: CvInlineRow[]): Block {
 	);
 	// Labels wrap too, so a long category never bleeds into the value column.
 	const labelLineGroups = rows.map((row) =>
-		wrapText(ctx.bold, row.label, layout.entryMetaSize, layout.inlineLabelWidth),
+		wrapText(
+			ctx.bold,
+			row.label,
+			layout.entryMetaSize,
+			layout.inlineLabelWidth,
+		),
 	);
 
 	const cellLines = (index: number) =>
-		Math.max(labelLineGroups[index]?.length ?? 0, valueLineGroups[index]?.length ?? 0);
+		Math.max(
+			labelLineGroups[index]?.length ?? 0,
+			valueLineGroups[index]?.length ?? 0,
+		);
 
 	const pairHeight = (index: number) => {
 		const leftLines = cellLines(index) || 1;
 		const rightLines = index + 1 < rows.length ? cellLines(index + 1) : 0;
-		return Math.max(leftLines, rightLines) * lineBox(layout.entryMetaSize, layout.entryMetaLineHeight) + layout.inlineRowGap;
+		return (
+			Math.max(leftLines, rightLines) *
+				lineBox(layout.entryMetaSize, layout.entryMetaLineHeight) +
+			layout.inlineRowGap
+		);
 	};
 
 	let height = 0;
@@ -517,7 +610,12 @@ function buildInlineGridBlock(ctx: Ctx, rows: CvInlineRow[]): Block {
 			};
 
 			drawCell(rows[index], valueLineGroups[index], labelLineGroups[index], x0);
-			drawCell(rows[index + 1], valueLineGroups[index + 1], labelLineGroups[index + 1], x0 + cellWidth);
+			drawCell(
+				rows[index + 1],
+				valueLineGroups[index + 1],
+				labelLineGroups[index + 1],
+				x0 + cellWidth,
+			);
 
 			y -= pairHeight(index);
 		}
@@ -547,8 +645,10 @@ function buildBlocks(ctx: Ctx): Block[] {
 // Greedily pack measured blocks into pages, breaking only between blocks so no
 // entry is split and no section heading is orphaned at a page foot.
 function paginate(blocks: Block[]): PageItem[][] {
-	const usable = size.height - layout.pagePaddingY * 2 - layout.pageSafetyMargin;
-	const gapBefore = (block: Block) => (block.kind === "section" ? layout.pageGap : layout.sectionGap);
+	const usable =
+		size.height - layout.pagePaddingY * 2 - layout.pageSafetyMargin;
+	const gapBefore = (block: Block) =>
+		block.kind === "section" ? layout.pageGap : layout.sectionGap;
 
 	const pages: PageItem[][] = [];
 	let page: PageItem[] = [];
@@ -598,8 +698,12 @@ export const GET: APIRoute = async () => {
 
 	const ctx: Ctx = {
 		pdf,
-		regular: await pdf.embedFont(decodeDataUrl(jetBrainsMonoRegularDataUrl), { subset: true }),
-		bold: await pdf.embedFont(decodeDataUrl(jetBrainsMonoBoldDataUrl), { subset: true }),
+		regular: await pdf.embedFont(decodeDataUrl(jetBrainsMonoRegularDataUrl), {
+			subset: true,
+		}),
+		bold: await pdf.embedFont(decodeDataUrl(jetBrainsMonoBoldDataUrl), {
+			subset: true,
+		}),
 	};
 
 	const pages = paginate(buildBlocks(ctx));

@@ -24,31 +24,46 @@ const introExtra = `Press ${kbd(latestPostRange)} for the latest posts, ${kbd("j
 >
 	<section class="space-y-10">
 		<div class="space-y-4">
-		<PageIntro
-			title="Notes, builds, and rabbit holes."
-			extra={posts.length > 0 ? introExtra : undefined}
-		/>
-		<p class="text-sm" data-reveal>
-			<a class="action" href="/blog/rss.xml"><Icon name="rss" />rss feed</a>
-		</p>
+			<PageIntro
+				title="Notes, builds, and rabbit holes."
+				extra={posts.length > 0 ? introExtra : undefined}
+			/>
+			<p class="text-sm" data-reveal>
+				<a class="action" href="/blog/rss.xml">
+					<Icon name="rss" />
+					rss feed
+				</a>
+			</p>
 		</div>
 
 		{posts.length === 0 ? (
-			<p class="text-tone-soft text-sm" data-reveal>no posts yet.</p>
+			<p class="text-tone-soft text-sm" data-reveal>
+				no posts yet.
+			</p>
 		) : (
 			<ol class="space-y-7" data-reveal>
 				{posts.map((post, index) => (
 					<li data-tui-row class="space-y-1">
 						<div class="flex items-baseline gap-3">
-							<a class="min-w-0 font-[575] no-underline" href={getBlogPostUrl(post.id)}>
+							<a
+								class="min-w-0 font-[575] no-underline"
+								href={getBlogPostUrl(post.id)}
+							>
 								{post.data.title}
 							</a>
 							{index < latestPostCount && (
-								<span class="kbd shrink-0" aria-hidden="true">{index + 1}</span>
+								<span class="kbd shrink-0" aria-hidden="true">
+									{index + 1}
+								</span>
 							)}
-							<span aria-hidden="true" class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"></span>
+							<span
+								aria-hidden="true"
+								class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"
+							></span>
 							<time class="text-tone-faint ml-auto shrink-0 font-mono text-xs">
-								{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
+								{formatDate(
+									post.data.updatedDate ?? post.data.pubDate,
+								).toLowerCase()}
 							</time>
 						</div>
 						<p class="text-tone-soft text-sm leading-6">
@@ -58,13 +73,9 @@ const introExtra = `Press ${kbd(latestPostRange)} for the latest posts, ${kbd("j
 				))}
 			</ol>
 		)}
-
 	</section>
 
-	<script
-		is:inline
-		define:vars={{ recentPostUrls }}
-	>
+	<script is:inline define:vars={{ recentPostUrls }}>
 		(() => {
 			const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 

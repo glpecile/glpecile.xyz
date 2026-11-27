@@ -23,7 +23,9 @@ const { svg } = render(code, {
 // Pele emits role="graphics-document document", which assistive tech
 // and audits don't recognize. A function replacer keeps `$` in the
 // caption literal.
-const label = (caption ?? "Diagram").replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+const label = (caption ?? "Diagram")
+	.replaceAll("&", "&amp;")
+	.replaceAll('"', "&quot;");
 const html = svg.replace(
 	/role="graphics-document document" aria-roledescription="[^"]*"/,
 	() => `role="img" aria-label="${label}"`,
@@ -31,13 +33,16 @@ const html = svg.replace(
 // Phones scroll a wide diagram at full size instead of shrinking its text.
 ---
 
-<figure class="diagram my-8 overflow-x-auto [&_svg]:mx-auto max-sm:[&_svg]:max-w-none!" tabindex="0">
+<figure
+	class="diagram my-8 overflow-x-auto [&_svg]:mx-auto max-sm:[&_svg]:max-w-none!"
+	tabindex="0"
+>
 	<Fragment set:html={html} />
-	{
-		caption && (
-			<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">{caption}</figcaption>
-		)
-	}
+	{caption && (
+		<figcaption class="text-tone-soft mt-3 text-center text-[0.85rem]">
+			{caption}
+		</figcaption>
+	)}
 </figure>
 
 <style>

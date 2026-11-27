@@ -19,7 +19,9 @@ const socialIcons: Record<string, { title: string; path: string }> = {
 	bluesky: siBluesky,
 	github: siGithub,
 };
-const socialLinks = Object.entries(siteConfig.links).filter(([label]) => label in socialIcons);
+const socialLinks = Object.entries(siteConfig.links).filter(
+	([label]) => label in socialIcons,
+);
 const posts = await getBlogPosts();
 const latestPosts = posts.slice(0, 3);
 const work: readonly WorkExperience[] = siteConfig.work;
@@ -43,10 +45,7 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 ---
 
 <SiteLayout>
-	<PageIntro
-		title="Software / Frontend Engineer."
-		extra={introExtra}
-	/>
+	<PageIntro title="Software / Frontend Engineer." extra={introExtra} />
 
 	<section class="space-y-4" data-reveal>
 		<SectionLabel label="blog" />
@@ -60,9 +59,14 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 						<a class="min-w-0 no-underline" href={getBlogPostUrl(post.id)}>
 							{post.data.title}
 						</a>
-						<span aria-hidden="true" class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"></span>
+						<span
+							aria-hidden="true"
+							class="border-border hidden min-w-4 flex-1 -translate-y-1 border-b border-dashed sm:block"
+						></span>
 						<time class="text-tone-faint ml-auto shrink-0 font-mono text-xs">
-							{formatDate(post.data.updatedDate ?? post.data.pubDate).toLowerCase()}
+							{formatDate(
+								post.data.updatedDate ?? post.data.pubDate,
+							).toLowerCase()}
 						</time>
 					</li>
 				))}
@@ -89,8 +93,8 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 				rel="noopener noreferrer"
 			>
 				Letterboxd
-			</a>
-			{" "}for the rest.
+			</a>{" "}
+			for the rest.
 		</p>
 
 		<FilmListLoader client:load limit={4} layout="grid" films={latestFilms} />
@@ -103,7 +107,12 @@ const introExtra = `Jump with ${navShortcutCopy}.<span class="block">Move throug
 		<ul class="flex flex-wrap gap-2.5">
 			{socialLinks.map(([label, href]) => (
 				<li>
-					<a href={href} target="_blank" rel="noopener noreferrer" class="chip group">
+					<a
+						href={href}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="chip group"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							aria-hidden="true"

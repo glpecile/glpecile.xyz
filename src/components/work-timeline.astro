@@ -25,20 +25,20 @@ const { work, detail = "summary" } = Astro.props;
 				/>
 			</span>
 			<p>
-					<span class="text-foreground font-[575]">{job.role}</span>
-					<span class="text-tone-faint"> at </span>
-					{job.url ? (
-						<a
-							class="site-link"
-							href={job.url}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{job.company}
-						</a>
-					) : (
-						<span>{job.company}</span>
-					)}
+				<span class="text-foreground font-[575]">{job.role}</span>
+				<span class="text-tone-faint"> at </span>
+				{job.url ? (
+					<a
+						class="site-link"
+						href={job.url}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{job.company}
+					</a>
+				) : (
+					<span>{job.company}</span>
+				)}
 			</p>
 			<p class="text-tone-soft flex flex-wrap items-baseline justify-between gap-x-4 text-sm">
 				<span>{job.place}</span>
@@ -62,9 +62,7 @@ const { work, detail = "summary" } = Astro.props;
 				</ul>
 			) : (
 				(job.summary ?? job.highlights?.[0]) && (
-					<p class="text-tone-mid mt-2">
-						{job.summary ?? job.highlights?.[0]}
-					</p>
+					<p class="text-tone-mid mt-2">{job.summary ?? job.highlights?.[0]}</p>
 				)
 			)}
 		</li>

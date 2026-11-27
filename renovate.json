@@ -1,56 +1,50 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    "group:allNonMajor",
-    "schedule:weekly",
-    ":approveMajorUpdates",
-    ":automergeMinor",
-    "schedule:weekly",
-    ":semanticCommits",
-    ":semanticCommitTypeAll(chore)"
-  ],
-  "labels": [
-    "dependencies"
-  ],
-  "rangeStrategy": "bump",
-  "packageRules": [
-    {
-      "description": "The astro + vite + cloudflare dev toolchain is tightly coupled: version skew between astro, vite, and the workerd runtime has broken `astro dev` before (vite 8.1.3+ with astro <=7.0.8). Never automerge these; each update must be approved from the dependency dashboard and verified with `bun dev` + `bun run build` locally.",
-      "matchPackageNames": [
-        "astro",
-        "vite",
-        "wrangler",
-        "miniflare",
-        "workerd",
-        "@astrojs/**",
-        "@cloudflare/**"
-      ],
-      "groupName": "astro/vite/cloudflare toolchain",
-      "automerge": false,
-      "dependencyDashboardApproval": true
-    },
-    {
-      "description": "satori 0.33+ bundles HarfBuzz (Emscripten) whose glue reads `self.location.href` under a WorkerGlobalScope. The Cloudflare prerenderer runs in workerd, which has no `location`, so `astro build` crashes on /preview routes. Cap until satori handles workerd.",
-      "matchPackageNames": [
-        "satori"
-      ],
-      "allowedVersions": "<0.33.0"
-    },
-    {
-      "description": "astro check refuses TypeScript 7.0. Type-checking .astro files on TypeScript 7 needs 7.1+ with @astrojs/ts-content-mapper, and 7.1 is still beta. Cap until 7.1 is stable, then move `bun run check` to `tsc --noEmit --runExternalCode`.",
-      "matchPackageNames": [
-        "typescript"
-      ],
-      "allowedVersions": "<7.0.0"
-    }
-  ],
-  "ignoreDeps": [
-    "@types/react",
-    "@types/react-dom",
-    "react",
-    "react-dom",
-    "next",
-    "eslint-config-next"
-  ]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		"group:allNonMajor",
+		"schedule:weekly",
+		":approveMajorUpdates",
+		":automergeMinor",
+		"schedule:weekly",
+		":semanticCommits",
+		":semanticCommitTypeAll(chore)"
+	],
+	"labels": ["dependencies"],
+	"rangeStrategy": "bump",
+	"packageRules": [
+		{
+			"description": "The astro + vite + cloudflare dev toolchain is tightly coupled: version skew between astro, vite, and the workerd runtime has broken `astro dev` before (vite 8.1.3+ with astro <=7.0.8). Never automerge these; each update must be approved from the dependency dashboard and verified with `bun dev` + `bun run build` locally.",
+			"matchPackageNames": [
+				"astro",
+				"vite",
+				"wrangler",
+				"miniflare",
+				"workerd",
+				"@astrojs/**",
+				"@cloudflare/**"
+			],
+			"groupName": "astro/vite/cloudflare toolchain",
+			"automerge": false,
+			"dependencyDashboardApproval": true
+		},
+		{
+			"description": "satori 0.33+ bundles HarfBuzz (Emscripten) whose glue reads `self.location.href` under a WorkerGlobalScope. The Cloudflare prerenderer runs in workerd, which has no `location`, so `astro build` crashes on /preview routes. Cap until satori handles workerd.",
+			"matchPackageNames": ["satori"],
+			"allowedVersions": "<0.33.0"
+		},
+		{
+			"description": "astro check refuses TypeScript 7.0. Type-checking .astro files on TypeScript 7 needs 7.1+ with @astrojs/ts-content-mapper, and 7.1 is still beta. Cap until 7.1 is stable, then move `bun run check` to `tsc --noEmit --runExternalCode`.",
+			"matchPackageNames": ["typescript"],
+			"allowedVersions": "<7.0.0"
+		}
+	],
+	"ignoreDeps": [
+		"@types/react",
+		"@types/react-dom",
+		"react",
+		"react-dom",
+		"next",
+		"eslint-config-next"
+	]
 }

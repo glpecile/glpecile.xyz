@@ -94,7 +94,10 @@ const Poster = ({
 		height={450}
 		loading="lazy"
 		style={film.blur ? { backgroundImage: `url(${film.blur})` } : undefined}
-		className={cn("bg-muted border-border aspect-[2/3] rounded-md border bg-cover bg-center object-cover", className)}
+		className={cn(
+			"bg-muted border-border aspect-[2/3] rounded-md border bg-cover bg-center object-cover",
+			className,
+		)}
 	/>
 );
 
@@ -108,20 +111,20 @@ const FilmGrid = ({ films }: { films: FilmWithBlur[] }) => (
 					rel="noopener noreferrer"
 					className="group block"
 				>
-				{film.image ? (
-					<Poster
-						film={film}
-						className="w-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]"
-					/>
-				) : (
-					<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 motion-safe:transition-[border-color,translate,rotate,scale] motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]">
-						<p className="text-tone-mid text-sm leading-relaxed">{film.title}</p>
-					</div>
-				)}
+					{film.image ? (
+						<Poster
+							film={film}
+							className="w-full motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]"
+						/>
+					) : (
+						<div className="bg-muted border-border group-hover:border-tone-mid aspect-[2/3] w-full rounded-md border p-3 motion-safe:transition-[border-color,translate,rotate,scale] motion-safe:duration-200 motion-safe:ease-(--ease-reveal) motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-(--tilt) motion-safe:group-active:scale-[0.97]">
+							<p className="text-tone-mid text-sm leading-relaxed">
+								{film.title}
+							</p>
+						</div>
+					)}
 					<p className="mt-2 text-sm leading-snug">
-						<span className="text-foreground">
-							{film.title}
-						</span>
+						<span className="text-foreground">{film.title}</span>
 						<span className="text-tone-faint">, {film.year}</span>
 					</p>
 				</a>
@@ -237,9 +240,17 @@ type Props = {
 	allowLayoutSwitch?: boolean;
 };
 
-const EmptyState = () => <p className="text-tone-soft text-sm">no films yet.</p>;
+const EmptyState = () => (
+	<p className="text-tone-soft text-sm">no films yet.</p>
+);
 
-const FilmListContent = ({ films: initialFilms, limit, tags, layout, allowLayoutSwitch }: Props) => {
+const FilmListContent = ({
+	films: initialFilms,
+	limit,
+	tags,
+	layout,
+	allowLayoutSwitch,
+}: Props) => {
 	const [view, setView] = useState<Layout>(layout ?? "grid");
 	const [animate, setAnimate] = useState(false);
 	// Seed with the build-time films so the first paint is real content, then
