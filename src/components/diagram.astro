@@ -53,4 +53,25 @@ const html = svg.replace(
 		--pele-accent: var(--color-ring);
 		--pele-radius: 0;
 	}
+
+	.diagram :global(.pele-timeline .pele-period > rect) {
+		fill: transparent;
+	}
+
+	.diagram :global(.pele-timeline .pele-period > text) {
+		fill: var(--pele-fg);
+	}
+
+	.diagram :global(.pele-timeline .pele-event rect) {
+		fill: var(--color-muted);
+		fill-opacity: 1;
+	}
+
+	.diagram :global(.pele-timeline .pele-dot) {
+		fill: var(--pele-line);
+	}
+
+	.diagram :global(.pele-timeline .pele-edge) {
+		stroke: var(--pele-line);
+	}
 </style>

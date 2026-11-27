@@ -1,6 +1,6 @@
 import meAvatar from "@/assets/me-avatar.webp?inline";
 
-export type AuthorId = "glpecile" | "chatgpt" | "claude" | "glm";
+export type AuthorId = "glpecile" | "chatgpt" | "claude" | "claude-opus" | "glm";
 
 export type Author = {
 	name: string;
@@ -31,6 +31,10 @@ export const authors = {
 	},
 	claude: {
 		name: "Claude Fable 5",
+		avatar: { kind: "icon", title: "Claude", path: CLAUDE_ICON_PATH },
+	},
+	"claude-opus": {
+		name: "Claude Opus 5.5",
 		avatar: { kind: "icon", title: "Claude", path: CLAUDE_ICON_PATH },
 	},
 	glm: {
